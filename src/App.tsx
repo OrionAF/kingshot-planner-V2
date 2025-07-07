@@ -1,5 +1,11 @@
+import { MapCanvas } from './features/Map/MapCanvas'
+
 function App() {
-  return <h1>Kingshot Planner V2</h1>
+  return (
+    <main>
+      <MapCanvas />
+    </main>
+  )
 }
 
 export default App
