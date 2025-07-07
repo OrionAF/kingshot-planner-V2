@@ -1,0 +1,4733 @@
+{
+  "size": 1200,
+  "unoccupiableTiles": [
+    [
+      5,
+      6
+    ],
+    [
+      6,
+      6
+    ],
+    [
+      763,
+      280
+    ],
+    [
+      763,
+      281
+    ],
+    [
+      764,
+      281
+    ],
+    [
+      764,
+      280
+    ],
+    [
+      764,
+      279
+    ],
+    [
+      764,
+      278
+    ],
+    [
+      764,
+      277
+    ],
+    [
+      764,
+      276
+    ],
+    [
+      763,
+      278
+    ],
+    [
+      763,
+      277
+    ],
+    [
+      765,
+      276
+    ],
+    [
+      766,
+      276
+    ],
+    [
+      767,
+      276
+    ],
+    [
+      768,
+      277
+    ],
+    [
+      769,
+      277
+    ],
+    [
+      770,
+      277
+    ],
+    [
+      771,
+      277
+    ],
+    [
+      771,
+      276
+    ],
+    [
+      770,
+      276
+    ],
+    [
+      767,
+      277
+    ],
+    [
+      766,
+      277
+    ],
+    [
+      765,
+      277
+    ],
+    [
+      765,
+      280
+    ],
+    [
+      766,
+      280
+    ],
+    [
+      767,
+      280
+    ],
+    [
+      767,
+      281
+    ],
+    [
+      768,
+      281
+    ],
+    [
+      769,
+      281
+    ],
+    [
+      769,
+      282
+    ],
+    [
+      770,
+      282
+    ],
+    [
+      770,
+      281
+    ],
+    [
+      771,
+      281
+    ],
+    [
+      772,
+      281
+    ],
+    [
+      773,
+      281
+    ],
+    [
+      773,
+      280
+    ],
+    [
+      773,
+      279
+    ],
+    [
+      772,
+      279
+    ],
+    [
+      772,
+      278
+    ],
+    [
+      771,
+      278
+    ],
+    [
+      772,
+      280
+    ],
+    [
+      771,
+      280
+    ],
+    [
+      771,
+      279
+    ],
+    [
+      770,
+      278
+    ],
+    [
+      770,
+      279
+    ],
+    [
+      770,
+      280
+    ],
+    [
+      769,
+      280
+    ],
+    [
+      769,
+      279
+    ],
+    [
+      769,
+      278
+    ],
+    [
+      768,
+      278
+    ],
+    [
+      767,
+      278
+    ],
+    [
+      766,
+      278
+    ],
+    [
+      765,
+      278
+    ],
+    [
+      765,
+      279
+    ],
+    [
+      766,
+      279
+    ],
+    [
+      767,
+      279
+    ],
+    [
+      768,
+      279
+    ],
+    [
+      768,
+      280
+    ],
+    [
+      658,
+      334
+    ],
+    [
+      659,
+      334
+    ],
+    [
+      658,
+      333
+    ],
+    [
+      659,
+      333
+    ],
+    [
+      658,
+      332
+    ],
+    [
+      659,
+      332
+    ],
+    [
+      659,
+      331
+    ],
+    [
+      660,
+      331
+    ],
+    [
+      661,
+      331
+    ],
+    [
+      661,
+      330
+    ],
+    [
+      661,
+      329
+    ],
+    [
+      662,
+      329
+    ],
+    [
+      663,
+      329
+    ],
+    [
+      663,
+      330
+    ],
+    [
+      664,
+      330
+    ],
+    [
+      665,
+      330
+    ],
+    [
+      665,
+      331
+    ],
+    [
+      666,
+      331
+    ],
+    [
+      667,
+      331
+    ],
+    [
+      667,
+      332
+    ],
+    [
+      668,
+      332
+    ],
+    [
+      668,
+      333
+    ],
+    [
+      668,
+      334
+    ],
+    [
+      668,
+      335
+    ],
+    [
+      667,
+      335
+    ],
+    [
+      667,
+      336
+    ],
+    [
+      666,
+      336
+    ],
+    [
+      666,
+      335
+    ],
+    [
+      665,
+      335
+    ],
+    [
+      665,
+      334
+    ],
+    [
+      664,
+      334
+    ],
+    [
+      664,
+      333
+    ],
+    [
+      663,
+      333
+    ],
+    [
+      662,
+      333
+    ],
+    [
+      661,
+      333
+    ],
+    [
+      660,
+      333
+    ],
+    [
+      660,
+      332
+    ],
+    [
+      661,
+      332
+    ],
+    [
+      662,
+      332
+    ],
+    [
+      662,
+      331
+    ],
+    [
+      662,
+      330
+    ],
+    [
+      663,
+      331
+    ],
+    [
+      664,
+      331
+    ],
+    [
+      663,
+      332
+    ],
+    [
+      664,
+      332
+    ],
+    [
+      665,
+      332
+    ],
+    [
+      666,
+      332
+    ],
+    [
+      665,
+      333
+    ],
+    [
+      666,
+      333
+    ],
+    [
+      667,
+      333
+    ],
+    [
+      667,
+      334
+    ],
+    [
+      666,
+      334
+    ],
+    [
+      777,
+      523
+    ],
+    [
+      776,
+      523
+    ],
+    [
+      776,
+      524
+    ],
+    [
+      775,
+      524
+    ],
+    [
+      775,
+      523
+    ],
+    [
+      774,
+      523
+    ],
+    [
+      773,
+      523
+    ],
+    [
+      773,
+      522
+    ],
+    [
+      773,
+      521
+    ],
+    [
+      772,
+      521
+    ],
+    [
+      772,
+      520
+    ],
+    [
+      773,
+      520
+    ],
+    [
+      773,
+      519
+    ],
+    [
+      772,
+      519
+    ],
+    [
+      773,
+      518
+    ],
+    [
+      774,
+      518
+    ],
+    [
+      775,
+      518
+    ],
+    [
+      776,
+      518
+    ],
+    [
+      777,
+      519
+    ],
+    [
+      777,
+      520
+    ],
+    [
+      777,
+      521
+    ],
+    [
+      777,
+      522
+    ],
+    [
+      774,
+      519
+    ],
+    [
+      775,
+      519
+    ],
+    [
+      776,
+      519
+    ],
+    [
+      776,
+      520
+    ],
+    [
+      776,
+      522
+    ],
+    [
+      776,
+      521
+    ],
+    [
+      775,
+      522
+    ],
+    [
+      774,
+      522
+    ],
+    [
+      774,
+      521
+    ],
+    [
+      774,
+      520
+    ],
+    [
+      775,
+      519
+    ],
+    [
+      775,
+      521
+    ],
+    [
+      775,
+      520
+    ],
+    [
+      734,
+      525
+    ],
+    [
+      734,
+      524
+    ],
+    [
+      734,
+      523
+    ],
+    [
+      733,
+      523
+    ],
+    [
+      733,
+      522
+    ],
+    [
+      733,
+      521
+    ],
+    [
+      732,
+      521
+    ],
+    [
+      731,
+      521
+    ],
+    [
+      730,
+      521
+    ],
+    [
+      729,
+      521
+    ],
+    [
+      729,
+      522
+    ],
+    [
+      728,
+      522
+    ],
+    [
+      728,
+      523
+    ],
+    [
+      729,
+      523
+    ],
+    [
+      729,
+      524
+    ],
+    [
+      730,
+      524
+    ],
+    [
+      730,
+      525
+    ],
+    [
+      731,
+      525
+    ],
+    [
+      732,
+      525
+    ],
+    [
+      733,
+      525
+    ],
+    [
+      733,
+      524
+    ],
+    [
+      732,
+      524
+    ],
+    [
+      731,
+      524
+    ],
+    [
+      731,
+      524
+    ],
+    [
+      730,
+      523
+    ],
+    [
+      730,
+      522
+    ],
+    [
+      731,
+      522
+    ],
+    [
+      731,
+      523
+    ],
+    [
+      732,
+      523
+    ],
+    [
+      732,
+      522
+    ],
+    [
+      732,
+      540
+    ],
+    [
+      732,
+      539
+    ],
+    [
+      732,
+      538
+    ],
+    [
+      732,
+      537
+    ],
+    [
+      732,
+      536
+    ],
+    [
+      731,
+      536
+    ],
+    [
+      731,
+      535
+    ],
+    [
+      730,
+      535
+    ],
+    [
+      729,
+      535
+    ],
+    [
+      728,
+      535
+    ],
+    [
+      728,
+      536
+    ],
+    [
+      727,
+      536
+    ],
+    [
+      727,
+      537
+    ],
+    [
+      727,
+      538
+    ],
+    [
+      727,
+      539
+    ],
+    [
+      728,
+      539
+    ],
+    [
+      728,
+      540
+    ],
+    [
+      729,
+      540
+    ],
+    [
+      730,
+      540
+    ],
+    [
+      731,
+      540
+    ],
+    [
+      731,
+      539
+    ],
+    [
+      731,
+      538
+    ],
+    [
+      731,
+      537
+    ],
+    [
+      730,
+      537
+    ],
+    [
+      730,
+      536
+    ],
+    [
+      729,
+      536
+    ],
+    [
+      729,
+      537
+    ],
+    [
+      728,
+      537
+    ],
+    [
+      728,
+      538
+    ],
+    [
+      729,
+      538
+    ],
+    [
+      730,
+      538
+    ],
+    [
+      730,
+      539
+    ],
+    [
+      729,
+      539
+    ],
+    [
+      787,
+      508
+    ],
+    [
+      786,
+      508
+    ],
+    [
+      785,
+      508
+    ],
+    [
+      785,
+      507
+    ],
+    [
+      785,
+      506
+    ],
+    [
+      785,
+      505
+    ],
+    [
+      785,
+      504
+    ],
+    [
+      784,
+      504
+    ],
+    [
+      784,
+      505
+    ],
+    [
+      786,
+      504
+    ],
+    [
+      787,
+      504
+    ],
+    [
+      788,
+      504
+    ],
+    [
+      788,
+      503
+    ],
+    [
+      787,
+      503
+    ],
+    [
+      788,
+      505
+    ],
+    [
+      788,
+      506
+    ],
+    [
+      789,
+      506
+    ],
+    [
+      789,
+      507
+    ],
+    [
+      790,
+      507
+    ],
+    [
+      790,
+      508
+    ],
+    [
+      789,
+      508
+    ],
+    [
+      788,
+      508
+    ],
+    [
+      788,
+      507
+    ],
+    [
+      787,
+      507
+    ],
+    [
+      786,
+      507
+    ],
+    [
+      786,
+      506
+    ],
+    [
+      786,
+      505
+    ],
+    [
+      787,
+      505
+    ],
+    [
+      787,
+      506
+    ],
+    [
+      788,
+      489
+    ],
+    [
+      789,
+      490
+    ],
+    [
+      789,
+      489
+    ],
+    [
+      790,
+      490
+    ],
+    [
+      791,
+      489
+    ],
+    [
+      791,
+      488
+    ],
+    [
+      791,
+      487
+    ],
+    [
+      791,
+      486
+    ],
+    [
+      791,
+      485
+    ],
+    [
+      791,
+      484
+    ],
+    [
+      790,
+      484
+    ],
+    [
+      789,
+      484
+    ],
+    [
+      788,
+      484
+    ],
+    [
+      787,
+      484
+    ],
+    [
+      787,
+      485
+    ],
+    [
+      787,
+      486
+    ],
+    [
+      787,
+      487
+    ],
+    [
+      787,
+      488
+    ],
+    [
+      786,
+      487
+    ],
+    [
+      786,
+      486
+    ],
+    [
+      786,
+      485
+    ],
+    [
+      790,
+      489
+    ],
+    [
+      790,
+      488
+    ],
+    [
+      789,
+      488
+    ],
+    [
+      788,
+      488
+    ],
+    [
+      788,
+      487
+    ],
+    [
+      789,
+      487
+    ],
+    [
+      790,
+      487
+    ],
+    [
+      790,
+      486
+    ],
+    [
+      790,
+      485
+    ],
+    [
+      789,
+      485
+    ],
+    [
+      789,
+      486
+    ],
+    [
+      788,
+      486
+    ],
+    [
+      788,
+      485
+    ],
+    [
+      758,
+      476
+    ],
+    [
+      758,
+      477
+    ],
+    [
+      758,
+      478
+    ],
+    [
+      759,
+      478
+    ],
+    [
+      759,
+      477
+    ],
+    [
+      760,
+      477
+    ],
+    [
+      760,
+      476
+    ],
+    [
+      761,
+      476
+    ],
+    [
+      761,
+      475
+    ],
+    [
+      761,
+      474
+    ],
+    [
+      760,
+      474
+    ],
+    [
+      760,
+      473
+    ],
+    [
+      760,
+      472
+    ],
+    [
+      759,
+      472
+    ],
+    [
+      759,
+      471
+    ],
+    [
+      758,
+      471
+    ],
+    [
+      758,
+      472
+    ],
+    [
+      758,
+      473
+    ],
+    [
+      758,
+      474
+    ],
+    [
+      758,
+      475
+    ],
+    [
+      757,
+      474
+    ],
+    [
+      757,
+      475
+    ],
+    [
+      759,
+      476
+    ],
+    [
+      760,
+      475
+    ],
+    [
+      759,
+      475
+    ],
+    [
+      759,
+      474
+    ],
+    [
+      759,
+      473
+    ],
+    [
+      769,
+      471
+    ],
+    [
+      769,
+      472
+    ],
+    [
+      769,
+      473
+    ],
+    [
+      770,
+      473
+    ],
+    [
+      770,
+      474
+    ],
+    [
+      771,
+      474
+    ],
+    [
+      772,
+      474
+    ],
+    [
+      773,
+      474
+    ],
+    [
+      773,
+      473
+    ],
+    [
+      774,
+      473
+    ],
+    [
+      775,
+      473
+    ],
+    [
+      775,
+      472
+    ],
+    [
+      775,
+      471
+    ],
+    [
+      774,
+      471
+    ],
+    [
+      773,
+      471
+    ],
+    [
+      773,
+      470
+    ],
+    [
+      772,
+      470
+    ],
+    [
+      771,
+      470
+    ],
+    [
+      770,
+      470
+    ],
+    [
+      770,
+      471
+    ],
+    [
+      770,
+      472
+    ],
+    [
+      771,
+      472
+    ],
+    [
+      771,
+      471
+    ],
+    [
+      772,
+      471
+    ],
+    [
+      772,
+      472
+    ],
+    [
+      772,
+      473
+    ],
+    [
+      771,
+      473
+    ],
+    [
+      773,
+      472
+    ],
+    [
+      774,
+      472
+    ],
+    [
+      645,
+      517
+    ],
+    [
+      646,
+      517
+    ],
+    [
+      647,
+      517
+    ],
+    [
+      648,
+      517
+    ],
+    [
+      649,
+      517
+    ],
+    [
+      648,
+      518
+    ],
+    [
+      648,
+      516
+    ],
+    [
+      648,
+      515
+    ],
+    [
+      648,
+      514
+    ],
+    [
+      648,
+      513
+    ],
+    [
+      649,
+      513
+    ],
+    [
+      649,
+      514
+    ],
+    [
+      649,
+      515
+    ],
+    [
+      649,
+      516
+    ],
+    [
+      650,
+      514
+    ],
+    [
+      650,
+      513
+    ],
+    [
+      647,
+      513
+    ],
+    [
+      646,
+      513
+    ],
+    [
+      646,
+      514
+    ],
+    [
+      646,
+      515
+    ],
+    [
+      646,
+      516
+    ],
+    [
+      647,
+      516
+    ],
+    [
+      647,
+      515
+    ],
+    [
+      647,
+      514
+    ],
+    [
+      645,
+      516
+    ],
+    [
+      645,
+      515
+    ],
+    [
+      645,
+      514
+    ],
+    [
+      644,
+      516
+    ],
+    [
+      644,
+      515
+    ],
+    [
+      647,
+      518
+    ],
+    [
+      646,
+      518
+    ],
+    [
+      710,
+      499
+    ],
+    [
+      710,
+      498
+    ],
+    [
+      711,
+      498
+    ],
+    [
+      712,
+      498
+    ],
+    [
+      713,
+      498
+    ],
+    [
+      714,
+      498
+    ],
+    [
+      715,
+      498
+    ],
+    [
+      715,
+      497
+    ],
+    [
+      714,
+      497
+    ],
+    [
+      713,
+      497
+    ],
+    [
+      713,
+      499
+    ],
+    [
+      713,
+      500
+    ],
+    [
+      713,
+      501
+    ],
+    [
+      714,
+      500
+    ],
+    [
+      714,
+      499
+    ],
+    [
+      712,
+      501
+    ],
+    [
+      712,
+      502
+    ],
+    [
+      711,
+      502
+    ],
+    [
+      710,
+      502
+    ],
+    [
+      710,
+      501
+    ],
+    [
+      709,
+      501
+    ],
+    [
+      709,
+      500
+    ],
+    [
+      710,
+      500
+    ],
+    [
+      711,
+      500
+    ],
+    [
+      711,
+      501
+    ],
+    [
+      712,
+      500
+    ],
+    [
+      712,
+      499
+    ],
+    [
+      711,
+      499
+    ],
+    [
+      716,
+      494
+    ],
+    [
+      717,
+      494
+    ],
+    [
+      718,
+      494
+    ],
+    [
+      719,
+      494
+    ],
+    [
+      720,
+      494
+    ],
+    [
+      719,
+      493
+    ],
+    [
+      718,
+      493
+    ],
+    [
+      717,
+      493
+    ],
+    [
+      720,
+      495
+    ],
+    [
+      720,
+      496
+    ],
+    [
+      720,
+      497
+    ],
+    [
+      720,
+      498
+    ],
+    [
+      719,
+      498
+    ],
+    [
+      718,
+      498
+    ],
+    [
+      718,
+      497
+    ],
+    [
+      717,
+      497
+    ],
+    [
+      717,
+      496
+    ],
+    [
+      716,
+      496
+    ],
+    [
+      716,
+      495
+    ],
+    [
+      717,
+      495
+    ],
+    [
+      718,
+      495
+    ],
+    [
+      719,
+      495
+    ],
+    [
+      719,
+      496
+    ],
+    [
+      719,
+      497
+    ],
+    [
+      718,
+      496
+    ],
+    [
+      726,
+      482
+    ],
+    [
+      726,
+      483
+    ],
+    [
+      725,
+      483
+    ],
+    [
+      725,
+      482
+    ],
+    [
+      726,
+      481
+    ],
+    [
+      727,
+      482
+    ],
+    [
+      728,
+      482
+    ],
+    [
+      729,
+      482
+    ],
+    [
+      729,
+      481
+    ],
+    [
+      729,
+      480
+    ],
+    [
+      729,
+      479
+    ],
+    [
+      729,
+      478
+    ],
+    [
+      729,
+      477
+    ],
+    [
+      729,
+      476
+    ],
+    [
+      729,
+      475
+    ],
+    [
+      729,
+      474
+    ],
+    [
+      730,
+      474
+    ],
+    [
+      731,
+      474
+    ],
+    [
+      731,
+      475
+    ],
+    [
+      731,
+      476
+    ],
+    [
+      730,
+      476
+    ],
+    [
+      730,
+      477
+    ],
+    [
+      730,
+      475
+    ],
+    [
+      728,
+      477
+    ],
+    [
+      727,
+      477
+    ],
+    [
+      727,
+      476
+    ],
+    [
+      728,
+      476
+    ],
+    [
+      728,
+      475
+    ],
+    [
+      728,
+      474
+    ],
+    [
+      727,
+      478
+    ],
+    [
+      727,
+      479
+    ],
+    [
+      727,
+      480
+    ],
+    [
+      727,
+      481
+    ],
+    [
+      728,
+      481
+    ],
+    [
+      728,
+      480
+    ],
+    [
+      728,
+      479
+    ],
+    [
+      728,
+      478
+    ],
+    [
+      807,
+      521
+    ],
+    [
+      807,
+      520
+    ],
+    [
+      808,
+      521
+    ],
+    [
+      809,
+      521
+    ],
+    [
+      810,
+      521
+    ],
+    [
+      811,
+      521
+    ],
+    [
+      812,
+      521
+    ],
+    [
+      812,
+      522
+    ],
+    [
+      812,
+      523
+    ],
+    [
+      813,
+      523
+    ],
+    [
+      813,
+      522
+    ],
+    [
+      811,
+      522
+    ],
+    [
+      811,
+      520
+    ],
+    [
+      811,
+      519
+    ],
+    [
+      811,
+      517
+    ],
+    [
+      811,
+      516
+    ],
+    [
+      810,
+      516
+    ],
+    [
+      809,
+      516
+    ],
+    [
+      809,
+      517
+    ],
+    [
+      809,
+      518
+    ],
+    [
+      808,
+      518
+    ],
+    [
+      808,
+      519
+    ],
+    [
+      808,
+      520
+    ],
+    [
+      810,
+      517
+    ],
+    [
+      810,
+      518
+    ],
+    [
+      810,
+      519
+    ],
+    [
+      810,
+      520
+    ],
+    [
+      809,
+      520
+    ],
+    [
+      809,
+      519
+    ],
+    [
+      795,
+      534
+    ],
+    [
+      795,
+      533
+    ],
+    [
+      794,
+      533
+    ],
+    [
+      793,
+      533
+    ],
+    [
+      793,
+      534
+    ],
+    [
+      792,
+      534
+    ],
+    [
+      792,
+      535
+    ],
+    [
+      791,
+      535
+    ],
+    [
+      791,
+      536
+    ],
+    [
+      790,
+      536
+    ],
+    [
+      790,
+      537
+    ],
+    [
+      791,
+      537
+    ],
+    [
+      791,
+      538
+    ],
+    [
+      792,
+      538
+    ],
+    [
+      793,
+      538
+    ],
+    [
+      794,
+      538
+    ],
+    [
+      795,
+      538
+    ],
+    [
+      795,
+      537
+    ],
+    [
+      795,
+      536
+    ],
+    [
+      795,
+      535
+    ],
+    [
+      794,
+      534
+    ],
+    [
+      794,
+      535
+    ],
+    [
+      794,
+      536
+    ],
+    [
+      794,
+      537
+    ],
+    [
+      793,
+      537
+    ],
+    [
+      792,
+      537
+    ],
+    [
+      792,
+      536
+    ],
+    [
+      793,
+      536
+    ],
+    [
+      793,
+      535
+    ],
+    [
+      796,
+      534
+    ],
+    [
+      796,
+      535
+    ],
+    [
+      796,
+      536
+    ],
+    [
+      796,
+      537
+    ],
+    [
+      809,
+      550
+    ],
+    [
+      809,
+      549
+    ],
+    [
+      809,
+      548
+    ],
+    [
+      808,
+      548
+    ],
+    [
+      807,
+      548
+    ],
+    [
+      807,
+      547
+    ],
+    [
+      808,
+      547
+    ],
+    [
+      806,
+      547
+    ],
+    [
+      805,
+      547
+    ],
+    [
+      804,
+      547
+    ],
+    [
+      804,
+      548
+    ],
+    [
+      804,
+      549
+    ],
+    [
+      804,
+      550
+    ],
+    [
+      804,
+      551
+    ],
+    [
+      805,
+      551
+    ],
+    [
+      806,
+      551
+    ],
+    [
+      807,
+      551
+    ],
+    [
+      808,
+      550
+    ],
+    [
+      808,
+      549
+    ],
+    [
+      807,
+      549
+    ],
+    [
+      807,
+      550
+    ],
+    [
+      806,
+      550
+    ],
+    [
+      805,
+      550
+    ],
+    [
+      805,
+      549
+    ],
+    [
+      806,
+      549
+    ],
+    [
+      806,
+      548
+    ],
+    [
+      805,
+      548
+    ],
+    [
+      762,
+      549
+    ],
+    [
+      763,
+      549
+    ],
+    [
+      764,
+      549
+    ],
+    [
+      765,
+      549
+    ],
+    [
+      766,
+      549
+    ],
+    [
+      762,
+      550
+    ],
+    [
+      762,
+      551
+    ],
+    [
+      762,
+      552
+    ],
+    [
+      762,
+      553
+    ],
+    [
+      763,
+      553
+    ],
+    [
+      763,
+      554
+    ],
+    [
+      764,
+      554
+    ],
+    [
+      764,
+      555
+    ],
+    [
+      765,
+      555
+    ],
+    [
+      766,
+      554
+    ],
+    [
+      766,
+      553
+    ],
+    [
+      766,
+      552
+    ],
+    [
+      766,
+      551
+    ],
+    [
+      766,
+      550
+    ],
+    [
+      765,
+      550
+    ],
+    [
+      764,
+      550
+    ],
+    [
+      763,
+      550
+    ],
+    [
+      763,
+      551
+    ],
+    [
+      763,
+      552
+    ],
+    [
+      764,
+      552
+    ],
+    [
+      764,
+      553
+    ],
+    [
+      765,
+      554
+    ],
+    [
+      765,
+      553
+    ],
+    [
+      765,
+      552
+    ],
+    [
+      765,
+      551
+    ],
+    [
+      764,
+      551
+    ],
+    [
+      770,
+      502
+    ],
+    [
+      771,
+      502
+    ],
+    [
+      772,
+      502
+    ],
+    [
+      773,
+      502
+    ],
+    [
+      774,
+      502
+    ],
+    [
+      774,
+      503
+    ],
+    [
+      774,
+      504
+    ],
+    [
+      774,
+      505
+    ],
+    [
+      774,
+      506
+    ],
+    [
+      774,
+      507
+    ],
+    [
+      773,
+      507
+    ],
+    [
+      773,
+      508
+    ],
+    [
+      772,
+      508
+    ],
+    [
+      772,
+      507
+    ],
+    [
+      771,
+      507
+    ],
+    [
+      771,
+      506
+    ],
+    [
+      770,
+      506
+    ],
+    [
+      770,
+      505
+    ],
+    [
+      770,
+      504
+    ],
+    [
+      770,
+      503
+    ],
+    [
+      771,
+      503
+    ],
+    [
+      772,
+      503
+    ],
+    [
+      773,
+      503
+    ],
+    [
+      773,
+      504
+    ],
+    [
+      772,
+      504
+    ],
+    [
+      771,
+      504
+    ],
+    [
+      771,
+      505
+    ],
+    [
+      772,
+      505
+    ],
+    [
+      773,
+      506
+    ],
+    [
+      773,
+      505
+    ],
+    [
+      772,
+      506
+    ]
+  ],
+  "defaultBuildings": [
+    {
+      "x": 594,
+      "y": 594,
+      "w": 12,
+      "h": 12,
+      "displayName": "King's Castle",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255,215,0,1)",
+      "borderColor": "rgba(204,172,0,1)",
+      "imageKey": "kings_castle",
+      "imageScale": 0.095,
+      "imageScaleBreakpoint_1": 0.17,
+      "imageScaleBreakpoint_2": 0.25,
+      "anchorTile": {
+        "x": 600.3,
+        "y": 600.9
+      }
+    },
+    {
+      "x": 800,
+      "y": 597,
+      "w": 6,
+      "h": 6,
+      "displayName": "Fortress No. 4",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(178,34,34,1)",
+      "borderColor": "rgba(142,27,27,1)",
+      "imageKey": "fortress",
+      "imageScale": 0.05,
+      "imageScaleBreakpoint_1": 0.09,
+      "imageScaleBreakpoint_2": 0.13,
+      "anchorTile": {
+        "x": 803.2,
+        "y": 600.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 597,
+      "y": 400,
+      "w": 6,
+      "h": 6,
+      "displayName": "Fortress No. 3",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(178,34,34,1)",
+      "borderColor": "rgba(142,27,27,1)",
+      "imageKey": "fortress",
+      "imageScale": 0.05,
+      "imageScaleBreakpoint_1": 0.09,
+      "imageScaleBreakpoint_2": 0.13,
+      "anchorTile": {
+        "x": 600.2,
+        "y": 403.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 400,
+      "y": 597,
+      "w": 6,
+      "h": 6,
+      "displayName": "Fortress No. 2",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(178,34,34,1)",
+      "borderColor": "rgba(142,27,27,1)",
+      "imageKey": "fortress",
+      "imageScale": 0.05,
+      "imageScaleBreakpoint_1": 0.09,
+      "imageScaleBreakpoint_2": 0.13,
+      "anchorTile": {
+        "x": 403.2,
+        "y": 600.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 597,
+      "y": 800,
+      "w": 6,
+      "h": 6,
+      "displayName": "Fortress No. 1",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(178,34,34,1)",
+      "borderColor": "rgba(142,27,27,1)",
+      "imageKey": "fortress",
+      "imageScale": 0.05,
+      "imageScaleBreakpoint_1": 0.09,
+      "imageScaleBreakpoint_2": 0.13,
+      "anchorTile": {
+        "x": 600.2,
+        "y": 803.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 237,
+      "y": 828,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 1",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 240.2,
+        "y": 831.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 237,
+      "y": 606,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 2",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 240.2,
+        "y": 609.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 237,
+      "y": 348,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 3",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 240.2,
+        "y": 351.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 366,
+      "y": 237,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 4",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 369.2,
+        "y": 240.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 588,
+      "y": 237,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 5",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 591.2,
+        "y": 240.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 846,
+      "y": 237,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 6",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 849.2,
+        "y": 240.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 957,
+      "y": 348,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 7",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 960.2,
+        "y": 351.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 957,
+      "y": 606,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 8",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 960.2,
+        "y": 609.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 957,
+      "y": 828,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 9",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 960.2,
+        "y": 831.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 846,
+      "y": 957,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 10",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 849.2,
+        "y": 960.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 606,
+      "y": 957,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 11",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 609.2,
+        "y": 960.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 366,
+      "y": 957,
+      "w": 6,
+      "h": 6,
+      "displayName": "Sanctuary 12",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(65,105,225,1)",
+      "borderColor": "rgba(52,84,178,1)",
+      "imageKey": "sanctuary",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.1,
+      "imageScaleBreakpoint_2": 0.15,
+      "anchorTile": {
+        "x": 369.2,
+        "y": 960.2
+      },
+      "ruins": 60
+    },
+    {
+      "x": 138,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 139.7,
+        "y": 139.6
+      }
+    },
+    {
+      "x": 138,
+      "y": 237,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Forager Grove",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(50, 205, 50, 1)",
+      "borderColor": "rgba(40, 164, 40, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 139.5,
+        "y": 238.6
+      }
+    },
+    {
+      "x": 237,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Harvest Altar",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 255, 1)",
+      "borderColor": "rgba(204, 0, 204, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 238.5,
+        "y": 139.6
+      }
+    },
+    {
+      "x": 237,
+      "y": 237,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 238.7,
+        "y": 238.6
+      }
+    },
+    {
+      "x": 366,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 367.5,
+        "y": 139.45
+      }
+    },
+    {
+      "x": 438,
+      "y": 267,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 439.5,
+        "y": 268.45
+      }
+    },
+    {
+      "x": 486,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Drill Camp",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(135, 206, 235, 1)",
+      "borderColor": "rgba(108, 164, 188, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 487.5,
+        "y": 139.5
+      }
+    },
+    {
+      "x": 537,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 538.7,
+        "y": 139.6
+      }
+    },
+    {
+      "x": 1068,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 1069.7,
+        "y": 139.6
+      }
+    },
+    {
+      "x": 1068,
+      "y": 567,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 1069.7,
+        "y": 568.6
+      }
+    },
+    {
+      "x": 1068,
+      "y": 1068,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 1069.7,
+        "y": 1069.6
+      }
+    },
+    {
+      "x": 666,
+      "y": 1068,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 667.7,
+        "y": 1069.6
+      }
+    },
+    {
+      "x": 138,
+      "y": 1038,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 139.7,
+        "y": 1039.6
+      }
+    },
+    {
+      "x": 138,
+      "y": 666,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 139.7,
+        "y": 667.6
+      }
+    },
+    {
+      "x": 486,
+      "y": 327,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 487.7,
+        "y": 328.6
+      }
+    },
+    {
+      "x": 867,
+      "y": 567,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 868.7,
+        "y": 568.6
+      }
+    },
+    {
+      "x": 768,
+      "y": 867,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 769.7,
+        "y": 868.6
+      }
+    },
+    {
+      "x": 327,
+      "y": 666,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Builder's Guild",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 206, 209, 1)",
+      "borderColor": "rgba(0, 165, 167, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 328.7,
+        "y": 667.6
+      }
+    },
+    {
+      "x": 666,
+      "y": 267,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 667.7,
+        "y": 268.6
+      }
+    },
+    {
+      "x": 957,
+      "y": 237,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 958.7,
+        "y": 238.6
+      }
+    },
+    {
+      "x": 936,
+      "y": 537,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 937.7,
+        "y": 538.6
+      }
+    },
+    {
+      "x": 957,
+      "y": 957,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 958.7,
+        "y": 958.6
+      }
+    },
+    {
+      "x": 537,
+      "y": 936,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 538.7,
+        "y": 937.6
+      }
+    },
+    {
+      "x": 237,
+      "y": 957,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 238.7,
+        "y": 958.6
+      }
+    },
+    {
+      "x": 267,
+      "y": 537,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 268.7,
+        "y": 538.6
+      }
+    },
+    {
+      "x": 327,
+      "y": 327,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 328.7,
+        "y": 328.6
+      }
+    },
+    {
+      "x": 867,
+      "y": 327,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 868.7,
+        "y": 328.6
+      }
+    },
+    {
+      "x": 867,
+      "y": 867,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 868.7,
+        "y": 868.6
+      }
+    },
+    {
+      "x": 327,
+      "y": 867,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Scholar's Tower",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(138, 43, 226, 1)",
+      "borderColor": "rgba(110, 34, 181, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "scholar_builder",
+      "imageScale": 0.057,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 328.7,
+        "y": 868.6
+      }
+    },
+    {
+      "x": 537,
+      "y": 87,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Forager Grove",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(50, 205, 50, 1)",
+      "borderColor": "rgba(40, 164, 40, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 538.5,
+        "y": 88.6
+      }
+    },
+    {
+      "x": 957,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Forager Grove",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(50, 205, 50, 1)",
+      "borderColor": "rgba(40, 164, 40, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 958.5,
+        "y": 139.6
+      }
+    },
+    {
+      "x": 1137,
+      "y": 567,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Forager Grove",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(50, 205, 50, 1)",
+      "borderColor": "rgba(40, 164, 40, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 1138.5,
+        "y": 568.6
+      }
+    },
+    {
+      "x": 1068,
+      "y": 936,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Forager Grove",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(50, 205, 50, 1)",
+      "borderColor": "rgba(40, 164, 40, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 1069.5,
+        "y": 937.6
+      }
+    },
+    {
+      "x": 636,
+      "y": 1137,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Forager Grove",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(50, 205, 50, 1)",
+      "borderColor": "rgba(40, 164, 40, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 637.5,
+        "y": 1138.6
+      }
+    },
+    {
+      "x": 267,
+      "y": 1068,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Forager Grove",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(50, 205, 50, 1)",
+      "borderColor": "rgba(40, 164, 40, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 268.5,
+        "y": 1069.6
+      }
+    },
+    {
+      "x": 87,
+      "y": 666,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Forager Grove",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(50, 205, 50, 1)",
+      "borderColor": "rgba(40, 164, 40, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 88.5,
+        "y": 667.6
+      }
+    },
+    {
+      "x": 768,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Harvest Altar",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 255, 1)",
+      "borderColor": "rgba(204, 0, 204, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 769.5,
+        "y": 139.6
+      }
+    },
+    {
+      "x": 1068,
+      "y": 237,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Harvest Altar",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 255, 1)",
+      "borderColor": "rgba(204, 0, 204, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 1069.5,
+        "y": 238.6
+      }
+    },
+    {
+      "x": 1068,
+      "y": 747,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Harvest Altar",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 255, 1)",
+      "borderColor": "rgba(204, 0, 204, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 1069.5,
+        "y": 748.6
+      }
+    },
+    {
+      "x": 957,
+      "y": 1068,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Harvest Altar",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 255, 1)",
+      "borderColor": "rgba(204, 0, 204, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 958.5,
+        "y": 1069.6
+      }
+    },
+    {
+      "x": 327,
+      "y": 1038,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Harvest Altar",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 255, 1)",
+      "borderColor": "rgba(204, 0, 204, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 328.5,
+        "y": 1039.6
+      }
+    },
+    {
+      "x": 138,
+      "y": 957,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Harvest Altar",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 255, 1)",
+      "borderColor": "rgba(204, 0, 204, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 139.5,
+        "y": 958.6
+      }
+    },
+    {
+      "x": 138,
+      "y": 327,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.1 Harvest Altar",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 255, 1)",
+      "borderColor": "rgba(204, 0, 204, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "harvest_forager",
+      "imageScale": 0.011,
+      "imageScaleBreakpoint_1": 0.015,
+      "imageScaleBreakpoint_2": 0.021,
+      "anchorTile": {
+        "x": 139.5,
+        "y": 328.6
+      }
+    },
+    {
+      "x": 867,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 868.5,
+        "y": 139.45
+      }
+    },
+    {
+      "x": 1068,
+      "y": 327,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 1069.5,
+        "y": 328.45
+      }
+    },
+    {
+      "x": 1068,
+      "y": 867,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 1069.5,
+        "y": 868.45
+      }
+    },
+    {
+      "x": 867,
+      "y": 1068,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 868.5,
+        "y": 1069.45
+      }
+    },
+    {
+      "x": 438,
+      "y": 1068,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 439.5,
+        "y": 1069.45
+      }
+    },
+    {
+      "x": 138,
+      "y": 867,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 139.5,
+        "y": 868.45
+      }
+    },
+    {
+      "x": 138,
+      "y": 438,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 139.5,
+        "y": 439.45
+      }
+    },
+    {
+      "x": 816,
+      "y": 486,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.4 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 817.5,
+        "y": 487.45
+      }
+    },
+    {
+      "x": 588,
+      "y": 867,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.4 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 589.5,
+        "y": 868.45
+      }
+    },
+    {
+      "x": 387,
+      "y": 486,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.4 Arsenal",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(255, 0, 0, 1)",
+      "borderColor": "rgba(204, 0, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 388.5,
+        "y": 487.45
+      }
+    },
+    {
+      "x": 666,
+      "y": 138,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 667.5,
+        "y": 139.45
+      }
+    },
+    {
+      "x": 957,
+      "y": 438,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 958.5,
+        "y": 439.45
+      }
+    },
+    {
+      "x": 1068,
+      "y": 666,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 1069.5,
+        "y": 667.45
+      }
+    },
+    {
+      "x": 738,
+      "y": 957,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 739.5,
+        "y": 958.45
+      }
+    },
+    {
+      "x": 537,
+      "y": 1038,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 538.5,
+        "y": 1039.45
+      }
+    },
+    {
+      "x": 237,
+      "y": 768,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 238.5,
+        "y": 769.45
+      }
+    },
+    {
+      "x": 138,
+      "y": 537,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 139.5,
+        "y": 538.45
+      }
+    },
+    {
+      "x": 588,
+      "y": 327,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.4 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 589.5,
+        "y": 328.45
+      }
+    },
+    {
+      "x": 816,
+      "y": 717,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.4 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 817.5,
+        "y": 718.45
+      }
+    },
+    {
+      "x": 387,
+      "y": 717,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.4 Armory",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(0, 128, 128, 1)",
+      "borderColor": "rgba(0, 102, 102, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "armory_arsenal",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 388.5,
+        "y": 718.45
+      }
+    },
+    {
+      "x": 768,
+      "y": 237,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Drill Camp",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(135, 206, 235, 1)",
+      "borderColor": "rgba(108, 164, 188, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 769.7,
+        "y": 238.4
+      }
+    },
+    {
+      "x": 1068,
+      "y": 486,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Drill Camp",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(135, 206, 235, 1)",
+      "borderColor": "rgba(108, 164, 188, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 1069.7,
+        "y": 487.4
+      }
+    },
+    {
+      "x": 957,
+      "y": 747,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Drill Camp",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(135, 206, 235, 1)",
+      "borderColor": "rgba(108, 164, 188, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 958.7,
+        "y": 748.4
+      }
+    },
+    {
+      "x": 768,
+      "y": 1038,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Drill Camp",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(135, 206, 235, 1)",
+      "borderColor": "rgba(108, 164, 188, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 769.7,
+        "y": 1039.4
+      }
+    },
+    {
+      "x": 486,
+      "y": 957,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Drill Camp",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(135, 206, 235, 1)",
+      "borderColor": "rgba(108, 164, 188, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 487.7,
+        "y": 958.4
+      }
+    },
+    {
+      "x": 138,
+      "y": 747,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Drill Camp",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(135, 206, 235, 1)",
+      "borderColor": "rgba(108, 164, 188, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 139.7,
+        "y": 748.4
+      }
+    },
+    {
+      "x": 237,
+      "y": 486,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.2 Drill Camp",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(135, 206, 235, 1)",
+      "borderColor": "rgba(108, 164, 188, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 238.7,
+        "y": 487.4
+      }
+    },
+    {
+      "x": 768,
+      "y": 327,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Frontier Lodge",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(128, 128, 0, 1)",
+      "borderColor": "rgba(102, 102, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 769.7,
+        "y": 328.4
+      }
+    },
+    {
+      "x": 867,
+      "y": 666,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Frontier Lodge",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(128, 128, 0, 1)",
+      "borderColor": "rgba(102, 102, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 868.7,
+        "y": 667.4
+      }
+    },
+    {
+      "x": 486,
+      "y": 867,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Frontier Lodge",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(128, 128, 0, 1)",
+      "borderColor": "rgba(102, 102, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 487.7,
+        "y": 868.4
+      }
+    },
+    {
+      "x": 327,
+      "y": 567,
+      "w": 3,
+      "h": 3,
+      "displayName": "Lv.3 Frontier Lodge",
+      "displayCoordinates": true,
+      "hideCoordinates": true,
+      "fillColor": "rgba(128, 128, 0, 1)",
+      "borderColor": "rgba(102, 102, 0, 1)",
+      "forbiddenArea": 15,
+      "imageKey": "frontier_drill",
+      "imageScale": 0.06,
+      "imageScaleBreakpoint_1": 0.07,
+      "imageScaleBreakpoint_2": 0.1,
+      "anchorTile": {
+        "x": 328.7,
+        "y": 568.4
+      }
+    }
+  ],
+  "allianceRssBuildings": [
+    {
+      "type": "wood",
+      "x": 24,
+      "y": 34
+    },
+    {
+      "type": "food",
+      "x": 59,
+      "y": 59
+    },
+    {
+      "type": "stone",
+      "x": 400,
+      "y": 400
+    },
+    {
+      "type": "iron",
+      "x": 450,
+      "y": 450
+    },
+    {
+      "type": "food",
+      "x": 756,
+      "y": 292
+    },
+    {
+      "type": "wood",
+      "x": 748,
+      "y": 287
+    },
+    {
+      "type": "wood",
+      "x": 754,
+      "y": 273
+    },
+    {
+      "type": "food",
+      "x": 743,
+      "y": 278
+    },
+    {
+      "type": "wood",
+      "x": 743,
+      "y": 293
+    },
+    {
+      "type": "food",
+      "x": 737,
+      "y": 291
+    },
+    {
+      "type": "wood",
+      "x": 747,
+      "y": 302
+    },
+    {
+      "type": "food",
+      "x": 736,
+      "y": 301
+    },
+    {
+      "type": "wood",
+      "x": 738,
+      "y": 263
+    },
+    {
+      "type": "wood",
+      "x": 747,
+      "y": 259
+    },
+    {
+      "type": "wood",
+      "x": 669,
+      "y": 332
+    },
+    {
+      "type": "stone",
+      "x": 773,
+      "y": 514
+    },
+    {
+      "type": "stone",
+      "x": 763,
+      "y": 507
+    },
+    {
+      "type": "iron",
+      "x": 757,
+      "y": 514
+    },
+    {
+      "type": "food",
+      "x": 763,
+      "y": 518
+    },
+    {
+      "type": "food",
+      "x": 751,
+      "y": 519
+    },
+    {
+      "type": "stone",
+      "x": 739,
+      "y": 514
+    },
+    {
+      "type": "iron",
+      "x": 733,
+      "y": 516
+    },
+    {
+      "type": "stone",
+      "x": 736,
+      "y": 527
+    },
+    {
+      "type": "iron",
+      "x": 736,
+      "y": 539
+    },
+    {
+      "type": "food",
+      "x": 748,
+      "y": 552
+    },
+    {
+      "type": "wood",
+      "x": 747,
+      "y": 535
+    },
+    {
+      "type": "stone",
+      "x": 763,
+      "y": 531
+    },
+    {
+      "type": "stone",
+      "x": 781,
+      "y": 543
+    },
+    {
+      "type": "iron",
+      "x": 786,
+      "y": 529
+    },
+    {
+      "type": "wood",
+      "x": 793,
+      "y": 523
+    },
+    {
+      "type": "wood",
+      "x": 787,
+      "y": 510
+    },
+    {
+      "type": "food",
+      "x": 781,
+      "y": 507
+    },
+    {
+      "type": "stone",
+      "x": 801,
+      "y": 511
+    },
+    {
+      "type": "stone",
+      "x": 803,
+      "y": 502
+    },
+    {
+      "type": "iron",
+      "x": 809,
+      "y": 501
+    },
+    {
+      "type": "stone",
+      "x": 807,
+      "y": 493
+    },
+    {
+      "type": "food",
+      "x": 804,
+      "y": 483
+    },
+    {
+      "type": "iron",
+      "x": 787,
+      "y": 490
+    },
+    {
+      "type": "food",
+      "x": 782,
+      "y": 483
+    },
+    {
+      "type": "food",
+      "x": 780,
+      "y": 491
+    },
+    {
+      "type": "wood",
+      "x": 772,
+      "y": 482
+    },
+    {
+      "type": "iron",
+      "x": 754,
+      "y": 475
+    },
+    {
+      "type": "wood",
+      "x": 769,
+      "y": 463
+    },
+    {
+      "type": "stone",
+      "x": 768,
+      "y": 457
+    },
+    {
+      "type": "iron",
+      "x": 784,
+      "y": 463
+    },
+    {
+      "type": "iron",
+      "x": 748,
+      "y": 489
+    },
+    {
+      "type": "iron",
+      "x": 742,
+      "y": 485
+    },
+    {
+      "type": "wood",
+      "x": 752,
+      "y": 498
+    },
+    {
+      "type": "food",
+      "x": 749,
+      "y": 505
+    },
+    {
+      "type": "stone",
+      "x": 617,
+      "y": 504
+    },
+    {
+      "type": "iron",
+      "x": 607,
+      "y": 511
+    },
+    {
+      "type": "stone",
+      "x": 604,
+      "y": 526
+    },
+    {
+      "type": "stone",
+      "x": 618,
+      "y": 535
+    },
+    {
+      "type": "iron",
+      "x": 618,
+      "y": 524
+    },
+    {
+      "type": "iron",
+      "x": 628,
+      "y": 531
+    },
+    {
+      "type": "stone",
+      "x": 624,
+      "y": 503
+    },
+    {
+      "type": "food",
+      "x": 639,
+      "y": 507
+    },
+    {
+      "type": "food",
+      "x": 640,
+      "y": 514
+    },
+    {
+      "type": "stone",
+      "x": 639,
+      "y": 520
+    },
+    {
+      "type": "iron",
+      "x": 648,
+      "y": 519
+    },
+    {
+      "type": "stone",
+      "x": 645,
+      "y": 529
+    },
+    {
+      "type": "iron",
+      "x": 645,
+      "y": 537
+    },
+    {
+      "type": "food",
+      "x": 657,
+      "y": 545
+    },
+    {
+      "type": "stone",
+      "x": 664,
+      "y": 544
+    },
+    {
+      "type": "iron",
+      "x": 672,
+      "y": 532
+    },
+    {
+      "type": "wood",
+      "x": 684,
+      "y": 524
+    },
+    {
+      "type": "food",
+      "x": 696,
+      "y": 513
+    },
+    {
+      "type": "stone",
+      "x": 700,
+      "y": 504
+    },
+    {
+      "type": "iron",
+      "x": 722,
+      "y": 482
+    },
+    {
+      "type": "iron",
+      "x": 738,
+      "y": 470
+    },
+    {
+      "type": "iron",
+      "x": 750,
+      "y": 455
+    },
+    {
+      "type": "wood",
+      "x": 756,
+      "y": 454
+    },
+    {
+      "type": "food",
+      "x": 745,
+      "y": 445
+    },
+    {
+      "type": "stone",
+      "x": 739,
+      "y": 441
+    },
+    {
+      "type": "food",
+      "x": 755,
+      "y": 441
+    },
+    {
+      "type": "food",
+      "x": 752,
+      "y": 435
+    },
+    {
+      "type": "iron",
+      "x": 764,
+      "y": 438
+    },
+    {
+      "type": "stone",
+      "x": 765,
+      "y": 425
+    },
+    {
+      "type": "stone",
+      "x": 768,
+      "y": 544
+    },
+    {
+      "type": "food",
+      "x": 780,
+      "y": 554
+    },
+    {
+      "type": "food",
+      "x": 798,
+      "y": 547
+    },
+    {
+      "type": "stone",
+      "x": 798,
+      "y": 553
+    },
+    {
+      "type": "food",
+      "x": 803,
+      "y": 540
+    },
+    {
+      "type": "wood",
+      "x": 797,
+      "y": 531
+    },
+    {
+      "type": "food",
+      "x": 804,
+      "y": 526
+    },
+    {
+      "type": "iron",
+      "x": 785,
+      "y": 560
+    },
+    {
+      "type": "stone",
+      "x": 788,
+      "y": 568
+    },
+    {
+      "type": "food",
+      "x": 796,
+      "y": 563
+    },
+    {
+      "type": "stone",
+      "x": 802,
+      "y": 559
+    },
+    {
+      "type": "iron",
+      "x": 809,
+      "y": 551
+    },
+    {
+      "type": "stone",
+      "x": 760,
+      "y": 546
+    },
+    {
+      "type": "wood",
+      "x": 770,
+      "y": 557
+    },
+    {
+      "type": "wood",
+      "x": 781,
+      "y": 567
+    },
+    {
+      "type": "iron",
+      "x": 771,
+      "y": 576
+    },
+    {
+      "type": "food",
+      "x": 759,
+      "y": 561
+    },
+    {
+      "type": "stone",
+      "x": 717,
+      "y": 519
+    },
+    {
+      "type": "stone",
+      "x": 723,
+      "y": 520
+    },
+    {
+      "type": "iron",
+      "x": 713,
+      "y": 512
+    },
+    {
+      "type": "iron",
+      "x": 719,
+      "y": 513
+    },
+    {
+      "type": "stone",
+      "x": 724,
+      "y": 541
+    },
+    {
+      "type": "iron",
+      "x": 732,
+      "y": 555
+    }
+  ]
+}

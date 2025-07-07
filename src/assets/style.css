@@ -1,0 +1,1154 @@
+/* --- BASE & LAYOUT --- */
+:root {
+  --toolbar-height: 55px;
+  --toolbar-bg: rgba(25, 28, 32, 0.75);
+  --panel-bg: rgba(35, 38, 43, 0.9);
+  --text-color: #e0e0e0;
+  --highlight-color: #2a9fd6;
+  --border-color: #444;
+  --build-mode-bg: rgba(214, 102, 43, 0.9);
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+}
+
+body {
+  margin: 0;
+  background: #111;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-color);
+}
+
+canvas#map {
+  display: block;
+  cursor: grab;
+}
+
+canvas#map:active {
+  cursor: grabbing;
+}
+
+canvas#map.build-cursor {
+  cursor: crosshair;
+}
+
+/* --- TOP BANNERS --- */
+#buildModeBanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--build-mode-bg);
+  color: white;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 1001;
+  display: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+#infoBanner {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-bg);
+  color: var(--text-color);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  z-index: 950;
+  display: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  pointer-events: none;
+  transition: top 0.3s ease-in-out;
+  /* Add smooth transition */
+}
+
+#infoBannerName {
+  font-weight: bold;
+}
+
+#infoBannerCoords {
+  margin-left: 10px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* *** NEW RULE to move info banner down when build banner is active *** */
+#infoBanner.with-build-banner {
+  top: 45px;
+}
+
+/* --- OVERLAY UI --- */
+#versionDisplay,
+#centerTile {
+  position: absolute;
+  bottom: calc(var(--toolbar-height) + 5px);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  user-select: none;
+  z-index: 5;
+}
+
+#versionDisplay {
+  left: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+#centerTile {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#minimapContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 900;
+  width: 352px;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: none;
+}
+
+#minimapContainer.visible {
+  display: block;
+}
+
+#minimapCanvas {
+  width: 350px;
+  height: 300px;
+  display: block;
+  border-radius: 0 0 6px 6px;
+}
+
+/* --- BOTTOM TOOLBAR --- */
+#bottomToolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--toolbar-height);
+  background: var(--toolbar-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.toolbar-group.center {
+  flex-grow: 1;
+  justify-content: center;
+  min-width: 200px;
+  padding: 0 10px;
+}
+
+#bottomToolbar button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 24px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  line-height: 1;
+}
+
+#bottomToolbar button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#bottomToolbar button.active {
+  background-color: var(--highlight-color);
+  color: white;
+}
+
+#bottomToolbar button#allianceMgtToggleBtn.active,
+#bottomToolbar button#buildMenuToggleBtn.active {
+  background-color: var(--build-mode-bg);
+}
+
+#bottomToolbar #zoomLevel {
+  font-size: 14px;
+  min-width: 90px;
+  text-align: center;
+  user-select: none;
+}
+
+#zoomSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  outline: none;
+  margin: 0 10px;
+}
+
+#zoomSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #f1f1f1;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#zoomSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #f1f1f1;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* --- GENERAL PANEL & BUTTON STYLES --- */
+.toolbar-panel,
+.sidebar-panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  padding: 15px;
+  z-index: 999;
+  box-sizing: border-box;
+}
+
+.toolbar-panel button,
+.sidebar-panel button {
+  background-color: #4f5358;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toolbar-panel button:hover,
+.sidebar-panel button:hover {
+  background-color: #5f6368;
+}
+
+.toolbar-panel button.primary,
+.sidebar-panel button.primary {
+  background-color: var(--highlight-color);
+}
+
+.toolbar-panel button.danger,
+.sidebar-panel button.danger {
+  background-color: var(--danger-color);
+}
+
+.panel-section button.warning,
+.sidebar-panel button.warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.toolbar-panel button:disabled,
+.sidebar-panel button:disabled {
+  background-color: #333;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.toolbar-panel input,
+.sidebar-panel input {
+  background-color: #222;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 6px;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.toolbar-panel h4,
+.sidebar-panel h4 {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  color: #aaa;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.panel-section {
+  margin-bottom: 15px;
+}
+
+.panel-section:last-child {
+  margin-bottom: 0;
+}
+
+/* --- TOOLBAR POPUP PANELS (Bottom Bar) --- */
+.toolbar-panel {
+  position: absolute;
+  bottom: calc(var(--toolbar-height) + 10px);
+  border-radius: 8px;
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+  width: 320px;
+  max-height: calc(100vh - 80px - var(--toolbar-height));
+  overflow-y: auto;
+}
+
+.toolbar-panel.open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#pinnedBookmarksPanel {
+  left: 110px;
+}
+
+#navPanel {
+  left: 165px;
+}
+
+#settingsPanel {
+  right: 10px;
+}
+
+#zoomPresetsPanel {
+  right: 120px;
+  width: 120px;
+}
+
+#overwatchPanel {
+  right: 175px;
+  width: 300px;
+}
+
+#buildMenuPanel {
+  left: 55px;
+}
+
+/* --- SIDEBAR PANELS --- */
+.sidebar-panel {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 350px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-in-out;
+  padding-bottom: calc(var(--toolbar-height) + 15px);
+}
+
+/* Positioning for left-side panels */
+#buildPanel,
+#devModePanel {
+  left: 0;
+  border-right: 1px solid var(--border-color);
+  transform: translateX(-105%);
+}
+
+#buildPanel.open,
+#devModePanel.open {
+  transform: translateX(0);
+}
+
+/* Specific content styling */
+#buildPanel .alliance-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin: 0 -15px 0 0;
+  padding-left: 15px;
+  padding-right: 10px;
+}
+
+#buildPanel .create-alliance-container {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+  margin-bottom: -15px;
+}
+
+/* --- BUILD MENU PANEL --- */
+#buildMenuPanel .building-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+#buildMenuPanel .building-list button {
+  text-align: center;
+}
+
+#buildMenuPanel .building-list button.selected {
+  background-color: var(--highlight-color);
+}
+
+#buildModeToggleContainer > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#buildModeToggleContainer .placeholder-text {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  padding: 6px 12px;
+  border: 1px dashed var(--border-color);
+  border-radius: 4px;
+}
+
+/* --- ALLIANCE MANAGEMENT CONTENT --- */
+.alliance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alliance-item {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border-left: 5px solid transparent;
+  transition:
+    background-color 0.2s,
+    border-left-color 0.2s;
+}
+
+.alliance-item[open] {
+  background: rgba(42, 159, 214, 0.1);
+  border-left-color: var(--highlight-color);
+}
+
+.alliance-item summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.alliance-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.alliance-item summary .controls button {
+  pointer-events: auto;
+}
+
+.alliance-item .color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.alliance-item .name {
+  flex-grow: 1;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alliance-item .tag {
+  font-weight: bold;
+  font-size: 13px;
+  background: #555;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.alliance-item .controls {
+  display: flex;
+  gap: 4px;
+}
+
+.alliance-item .controls button {
+  font-size: 12px;
+  padding: 3px 6px;
+}
+
+.alliance-item.is-active-builder {
+  border-left-color: var(--success-color);
+}
+
+.alliance-item.is-active-builder summary {
+  background: rgba(40, 167, 69, 0.15);
+}
+
+.alliance-details-content {
+  padding: 0 12px 12px 12px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
+}
+
+.alliance-details-content h5 {
+  margin: 8px 0 0 0;
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 15px;
+}
+
+.stats-grid strong {
+  font-weight: bold;
+  text-align: right;
+}
+
+.hq-list,
+.outpost-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hq-list-item,
+.outpost-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  padding: 4px 0;
+}
+
+.hq-list-item .controls button,
+.outpost-list-item .controls button {
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.create-alliance-container .form-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.create-alliance-container .form-grid input[type='color'] {
+  padding: 0;
+  height: 30px;
+  width: 50px;
+}
+
+.create-alliance-container #createAllianceBtn {
+  width: 100%;
+  margin-top: 5px;
+}
+
+#toggleDeleteModeBtn {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Style for the main button when delete mode is active */
+#toggleDeleteModeBtn.active {
+  background-color: #fff;
+  color: var(--danger-color);
+  font-weight: bold;
+}
+
+/* Style for the individual delete buttons that appear on each alliance */
+.alliance-item .delete-confirm-btn {
+  width: 100%;
+}
+
+/* --- DEV MODE PANEL --- */
+#devModePanel {
+  z-index: 998;
+  /* Lower priority so other panels open on top */
+}
+
+.dev-tools-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin: 0 -15px 0 0;
+  padding-left: 15px;
+  padding-right: 10px;
+}
+
+.dev-tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dev-tools-list button.active {
+  background-color: var(--success-color);
+  font-weight: bold;
+}
+
+#exportDevMapBtn {
+  width: 100%;
+}
+
+/* --- OTHER PANELS --- */
+.bookmarks-list {
+  max-height: 250px;
+  overflow-y: auto;
+  margin-right: -5px;
+  padding-right: 5px;
+}
+
+.bookmark-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 5px;
+  font-size: 14px;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.bookmark-item:last-child {
+  border-bottom: none;
+}
+
+.bookmark-item > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  padding-right: 10px;
+}
+
+.bookmark-item .controls button {
+  padding: 2px 6px;
+  font-size: 12px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.bookmark-item .unpin-btn {
+  color: #fdd;
+  background: #5a3838;
+}
+
+#navPanel .tab-buttons {
+  display: flex;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+#navPanel .tab-button {
+  flex: 1;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#navPanel .tab-button.active {
+  background: var(--highlight-color);
+}
+
+#navPanel .tab-content {
+  display: none;
+}
+
+#navPanel .tab-content.active {
+  display: block;
+}
+
+#navPanel #goToContent div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#settingsPanel label {
+  font-size: 14px;
+  user-select: none;
+  vertical-align: middle;
+}
+
+#settingsPanel > .panel-section > div {
+  margin-bottom: 8px;
+}
+
+#settingsPanel .info-buttons,
+#settingsPanel .plan-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+#settingsPanel .info-buttons button,
+#settingsPanel .plan-buttons button {
+  flex: 1;
+  cursor: pointer;
+}
+
+.overwatch-list details {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.overwatch-list details:last-of-type {
+  border-bottom: none;
+}
+
+.overwatch-list summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 8px 0;
+  font-weight: bold;
+}
+
+.overwatch-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.overwatch-list summary:before {
+  content: '▶';
+  margin-right: 8px;
+  font-size: 0.8em;
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.overwatch-list details[open] > summary:before {
+  transform: rotate(90deg);
+}
+
+.overwatch-list details[data-category="king's_castle"] > summary:before {
+  content: '';
+  margin-right: 0;
+  padding-left: 18px;
+}
+
+.overwatch-item {
+  font-size: 14px;
+  padding: 4px 0 4px 25px;
+}
+
+.overwatch-item label {
+  cursor: pointer;
+}
+
+#zoomPresetsPanel .preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#floatingBuildingsBtn {
+  position: fixed;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 998;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding: 15px 8px;
+  border-radius: 8px 0 0 8px;
+  background-color: var(--panel-bg);
+  display: none;
+  border-left: none;
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  transition:
+    transform 0.3s ease-in-out,
+    background-color 0.2s;
+}
+
+#floatingBuildingsBtn.active {
+  background-color: var(--highlight-color);
+  transform: translate(-280px, -50%);
+}
+
+#buildingPalettePanel {
+  top: 50%;
+  right: 0;
+  bottom: unset;
+  height: auto;
+  transform: translate(100%, -50%);
+  border-radius: 8px 0 0 8px;
+  border-right: none;
+  transition: transform 0.3s ease-in-out;
+  width: 280px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+#buildingPalettePanel.open {
+  transform: translate(0, -50%);
+  opacity: 1;
+}
+
+#buildingPalettePanel .building-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+#buildingPalettePanel .building-list button {
+  text-align: center;
+}
+
+#statsPanel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* --- MODALS --- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1001;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  background: #2c2c2c;
+  color: #eee;
+  border-radius: 8px;
+  z-index: 1002;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  padding: 15px;
+  border-bottom: 1px solid #444;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.modal-header .close-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 15px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modal-body ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.modal-body li {
+  margin-bottom: 8px;
+}
+
+.modal-body details {
+  border-bottom: 1px solid #4a4a4a;
+  margin-bottom: 5px;
+}
+
+.modal-body details:last-of-type {
+  border-bottom: none;
+}
+
+.modal-body summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 10px 0;
+  font-weight: bold;
+  font-size: 1.1em;
+  position: relative;
+}
+
+.modal-body summary::-webkit-details-marker {
+  display: none;
+}
+
+.modal-body summary:before {
+  content: '▶';
+  position: absolute;
+  left: -15px;
+  font-size: 0.8em;
+  transition: transform 0.2s;
+  transform: rotate(0deg);
+}
+
+.modal-body details[open] > summary:before {
+  transform: rotate(90deg);
+}
+
+.modal-body details > :not(summary) {
+  padding-bottom: 10px;
+  padding-left: 5px;
+}
+
+.modal-footer {
+  padding: 10px 15px;
+  border-top: 1px solid #444;
+  background: #333;
+  border-radius: 0 0 8px 8px;
+}
+
+.modal-footer label {
+  user-select: none;
+  font-size: 14px;
+}
+
+/* Add these new rules to your <style> tag */
+
+/* --- SIDEBAR PANEL (Alliance Management) --- */
+#buildPanel,
+#devModePanel {
+  left: 0;
+  border-right: 1px solid var(--border-color);
+  transform: translateX(-105%);
+}
+
+/* --- PLAYER MANAGEMENT PANEL --- */
+#playerPanel {
+  left: 0;
+  border-right: 1px solid var(--border-color);
+  transform: translateX(-105%);
+}
+
+#playerPanel.open {
+  transform: translateX(0);
+}
+
+#playerPanel .player-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin: 0 -15px 0 0;
+  padding-left: 15px;
+  padding-right: 10px;
+}
+
+#playerPanel .create-player-container {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+  margin-bottom: -15px;
+}
+
+/* Form grid specific to the player panel for better layout */
+#playerPanel .form-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+#playerPanel .form-grid input[type='color'] {
+  padding: 0;
+  height: 30px;
+  width: 50px;
+}
+
+#playerPanel .form-grid input {
+  width: 100%;
+}
+
+#playerPanel #startPlayerPlacementBtn {
+  width: 100%;
+}
+
+/* Player list styles */
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border-left: 5px solid transparent;
+}
+
+.player-item .color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.player-item .info {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-item .info .name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.player-item .info .power {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.player-item .controls {
+  display: flex;
+  gap: 4px;
+}
+
+.player-item .controls button {
+  font-size: 12px;
+  padding: 3px 6px;
+}
+
+#buildPanel.open,
+#devModePanel.open {
+  transform: translateX(0);
+}
+
+#devModePanel {
+  padding-bottom: calc(var(--toolbar-height) + 15px);
+}
+
+.dev-tools-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin: 0 -15px 0 0;
+  padding-left: 15px;
+  padding-right: 10px;
+}
+
+.dev-tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dev-tools-list button.active {
+  background-color: var(--success-color);
+  font-weight: bold;
+}
+
+#exportDevMapBtn {
+  width: 100%;
+}
+
+/* --- RESPONSIVE STYLES --- */
+@media (max-width: 768px) {
+  .toolbar-group.center {
+    padding: 0 5px;
+  }
+
+  .toolbar-panel,
+  #buildPanel {
+    width: calc(100vw - 20px);
+    max-width: 400px;
+  }
+
+  #pinnedBookmarksPanel,
+  #navPanel,
+  #settingsPanel,
+  #zoomPresetsPanel {
+    left: 10px;
+    right: 10px;
+    width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --toolbar-height: 50px;
+  }
+
+  #bottomToolbar {
+    padding: 0 5px;
+  }
+
+  .toolbar-group {
+    gap: 0;
+  }
+
+  .toolbar-group.center {
+    min-width: 0;
+    flex: 1;
+  }
+
+  #bottomToolbar button {
+    font-size: 20px;
+    padding: 6px;
+  }
+
+  #zoomLevel {
+    display: none;
+  }
+
+  #statsPanel,
+  #centerTile,
+  #versionDisplay {
+    display: none;
+  }
+}
