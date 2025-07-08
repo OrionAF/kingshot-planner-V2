@@ -1,0 +1,35 @@
+.allianceItem {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border-left: 5px solid transparent;
+  transition:
+    background-color 0.2s,
+    border-left-color 0.2s;
+}
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  cursor: pointer;
+}
+.colorSwatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.name {
+  flex-grow: 1;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tag {
+  font-weight: bold;
+  font-size: 13px;
+  background: #555;
+  padding: 2px 5px;
+  border-radius: 3px;
+}

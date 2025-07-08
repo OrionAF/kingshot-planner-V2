@@ -1,0 +1,29 @@
+.overlayContainer {
+  /* This container is a ghost; it doesn't intercept mouse clicks. */
+  pointer-events: none;
+}
+
+.overlayItem {
+  /* This is the base style for any floating info box. */
+  position: fixed;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #e0e0e0;
+  /* Children of the container CAN be interacted with if we choose. */
+  pointer-events: auto;
+}
+
+.versionDisplay {
+  bottom: 60px; /* Adjusted for a 55px toolbar + 5px margin */
+  left: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.centerTile {
+  bottom: 60px; /* Adjusted for a 55px toolbar + 5px margin */
+  left: 50%;
+  transform: translateX(-50%);
+}
