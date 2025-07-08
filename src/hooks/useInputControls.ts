@@ -1,32 +1,17 @@
 import { useCameraStore } from '../state/useCameraStore'
-import { useSelectionStore } from '../state/useSelectionStore'
-import { type CanvasRenderer } from '../core/CanvasRenderer'
-import { useMapStore } from '../state/useMapStore'
+import { screenToWorld } from '../core/coordinate-utils'
 
-/**
- * This is no longer a traditional "hook" that uses useEffect. It's now a
- * helper function that generates the event handler functions for our canvas.
- * This gives the component more control over when to attach them.
- */
-export function createInputHandlers(
-  rendererRef: React.RefObject<CanvasRenderer | null>
-) {
-  // Get actions from our stores.
+export function createInputHandlers() {
   const { panBy, setScale } = useCameraStore.getState()
-  const { setSelection } = useSelectionStore.getState()
 
-  // Keep track of drag state.
   let isDragging = false
   let lastPos = { x: 0, y: 0 }
   let clickStartPos = { x: 0, y: 0 }
-
-  // --- Define the event handlers ---
 
   const handleMouseDown = (e: MouseEvent) => {
     clickStartPos = { x: e.clientX, y: e.clientY }
     isDragging = true
     lastPos = { x: e.clientX, y: e.clientY }
-    // We now have to get the canvas element from the event itself.
     if (e.currentTarget instanceof HTMLElement) {
       e.currentTarget.style.cursor = 'grabbing'
     }
@@ -47,30 +32,14 @@ export function createInputHandlers(
     )
 
     if (dist < 5) {
-      const renderer = rendererRef.current
       const camera = useCameraStore.getState()
-      const { buildingMap } = useMapStore.getState()
+      // Call the utility function directly. No renderer needed!
+      const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera)
 
-      if (renderer) {
-        const [worldX, worldY] = renderer.screenToWorld(
-          e.clientX,
-          e.clientY,
-          camera
-        )
-        const tileX = Math.round(worldX)
-        const tileY = Math.round(worldY)
-
-        // First, check if there's a building at the clicked coordinate.
-        const clickedBuilding = buildingMap.get(`${tileX},${tileY}`)
-
-        if (clickedBuilding) {
-          // If we found a building, select it!
-          setSelection({ type: 'building', data: clickedBuilding })
-        } else {
-          // Otherwise, just select the single tile.
-          setSelection({ type: 'tile', data: { x: tileX, y: tileY } })
-        }
-      }
+      // (Selection logic is temporarily disabled as we don't draw it in WebGL yet)
+      console.log(
+        `WebGL Click at: ${Math.round(worldX)}, ${Math.round(worldY)}`
+      )
     }
 
     isDragging = false
@@ -86,11 +55,5 @@ export function createInputHandlers(
     setScale(currentScale * zoomFactor)
   }
 
-  // Return all the functions so the component can use them.
-  return {
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleWheel,
-  }
+  return { handleMouseDown, handleMouseMove, handleMouseUp, handleWheel }
 }

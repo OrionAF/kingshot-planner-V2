@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-interface CameraState {
+export interface CameraState {
   x: number
   y: number
   scale: number

@@ -1,40 +1,41 @@
 import { useEffect, useRef } from 'react'
-import { CanvasRenderer } from '../../core/CanvasRenderer'
 import { useAnimationLoop } from '../../hooks/useAnimationLoop'
-import { createInputHandlers } from '../../hooks/useInputControls' // Renamed function
+import { createInputHandlers } from '../../hooks/useInputControls'
 import styles from './MapCanvas.module.css'
+import { WebGLRenderer } from '../../core/WebGLRenderer'
+
+// We can clean this up now since we aren't using the CanvasRenderer for now.
+type Renderer = WebGLRenderer
 
 export function MapCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const rendererRef = useRef<CanvasRenderer | null>(null)
+  const rendererRef = useRef<Renderer | null>(null)
 
-  // This is now just for animation.
   useAnimationLoop(() => {
     rendererRef.current?.renderFrame()
   })
 
-  // This `useEffect` is now the single place for all canvas-related setup.
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const context = canvas.getContext('2d')
-    if (!context) return
+    const context = canvas.getContext('webgl')
+    if (!context) {
+      console.error('This browser does not support WebGL.')
+      return
+    }
 
-    // 1. Create the renderer.
-    rendererRef.current = new CanvasRenderer(context)
+    rendererRef.current = new WebGLRenderer(context)
 
-    // 2. Create the input handlers, passing the renderer ref.
+    // Input handlers are now self-sufficient
     const { handleMouseDown, handleMouseMove, handleMouseUp, handleWheel } =
-      createInputHandlers(rendererRef)
+      createInputHandlers()
 
-    // 3. Attach all the listeners.
     canvas.addEventListener('mousedown', handleMouseDown)
     window.addEventListener('mousemove', handleMouseMove)
-    canvas.addEventListener('mouseup', handleMouseUp) // Attach to canvas
+    canvas.addEventListener('mouseup', handleMouseUp)
     canvas.addEventListener('wheel', handleWheel)
 
-    // 4. Handle resize.
     const resizeCanvas = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
@@ -42,7 +43,6 @@ export function MapCanvas() {
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
 
-    // 5. Cleanup function to remove ALL listeners.
     return () => {
       canvas.removeEventListener('mousedown', handleMouseDown)
       window.removeEventListener('mousemove', handleMouseMove)
@@ -50,7 +50,7 @@ export function MapCanvas() {
       canvas.removeEventListener('wheel', handleWheel)
       window.removeEventListener('resize', resizeCanvas)
     }
-  }, []) // This effect runs only once, which is correct.
+  }, [])
 
   return <canvas ref={canvasRef} className={styles.canvas} id="map" />
 }

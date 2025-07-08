@@ -77,4 +77,8 @@ export const AppConfig = {
     zoomFactorMax: 15.0,
     mainMapZoomThresholdForMinimapZoom: 0.03,
   },
+  webgl: {
+    gridThickness: 1, // A value of 1.0 is ~1 pixel. >1 is thicker, <1 is thinner.
+    gridDarkness: 0.95, // 1.0 is invisible, 0.0 is black. 0.9 is a good default.
+  },
 }
