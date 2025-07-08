@@ -25,3 +25,7 @@ dist-ssr
 
 *storybook.log
 storybook-static
+src/state/useCameraStore.ts.txt
+src/state/useMapStore.ts.txt
+src/state/useUiStore.ts.txt
+src/types/map.types.ts.txt
