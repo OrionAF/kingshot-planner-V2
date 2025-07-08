@@ -15,6 +15,7 @@ interface MapState {
 
 interface MapActions {
   createAlliance: (newAllianceData: Omit<Alliance, 'id'>) => void
+  importPlan: (data: { alliances: Alliance[] }) => void // Add this
 }
 
 function processBaseMapData(): {
@@ -58,4 +59,11 @@ export const useMapStore = create<MapState & MapActions>((set) => ({
       // Return the new state object with the new alliance appended
       return { alliances: [...state.alliances, newAlliance] }
     }),
+
+  importPlan: (data) =>
+    set(() => ({
+      // Simply overwrite the existing alliances with the data from the file.
+      alliances: data.alliances,
+      // We can add buildings and players here later
+    })),
 }))

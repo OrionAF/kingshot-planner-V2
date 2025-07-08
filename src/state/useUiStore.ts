@@ -1,13 +1,13 @@
 import { create } from 'zustand'
 
-type PanelId = 'alliance' | 'nav' | null
+type PanelId = 'alliance' | 'nav' | 'settings' | null
 
 interface UiState {
   openPanel: PanelId
 }
 
 interface UiActions {
-  togglePanel: (panelId: 'alliance' | 'nav') => void
+  togglePanel: (panelId: 'alliance' | 'nav' | 'settings') => void
 }
 
 export const useUiStore = create<UiState & UiActions>((set) => ({

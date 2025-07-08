@@ -59,7 +59,11 @@ export function BottomToolbar() {
         <button className={styles.toolbarButton} title="Toggle Minimap">
           🗺️
         </button>
-        <button className={styles.toolbarButton} title="Settings">
+        <button
+          className={styles.toolbarButton}
+          title="Settings"
+          onClick={() => togglePanel('settings')} // Add this
+        >
           ⚙️
         </button>
       </div>
