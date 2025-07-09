@@ -7,18 +7,23 @@ export function BottomToolbar() {
   const { togglePanel, openPanel } = useUiStore()
   const zoomPct = Math.round(scale * 20)
 
-  // This is the new, better logic for the mobile highlight.
-  // The management group button is active if its own panel OR any child panel is open.
+  // New, robust logic for highlighting group buttons on mobile
   const isManagementActive =
     openPanel === 'management' ||
     openPanel === 'alliance' ||
-    openPanel === 'player' // We will add 'build' here later
+    openPanel === 'player'
+  const isToolsActive =
+    openPanel === 'tools' ||
+    openPanel === 'nav' ||
+    openPanel === 'overwatch' ||
+    openPanel === 'zoomPresets' ||
+    openPanel === 'minimap'
 
   return (
     <div className={styles.bottomToolbar}>
       {/* ====== LEFT GROUP ====== */}
       <div className={`${styles.toolbarGroup} ${styles.left}`}>
-        {/* DESKTOP-ONLY Buttons */}
+        {/* DESKTOP-ONLY Left Buttons */}
         <button
           className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'alliance' ? styles.active : ''}`}
           title="Alliance Management"
@@ -53,7 +58,7 @@ export function BottomToolbar() {
           🧭
         </button>
 
-        {/* MOBILE-ONLY Buttons */}
+        {/* MOBILE-ONLY Left Buttons */}
         <button
           className={`${styles.toolbarButton} ${styles.mobileOnly} ${isManagementActive ? styles.active : ''}`}
           title="Management"
@@ -90,18 +95,38 @@ export function BottomToolbar() {
 
       {/* ====== RIGHT GROUP ====== */}
       <div className={`${styles.toolbarGroup} ${styles.right}`}>
-        {/* This follows the same logic as the management button, but for the tools */}
+        {/* DESKTOP-ONLY Right Buttons */}
         <button
-          className={`${styles.toolbarButton} ${styles.mobileOnly} ${openPanel === 'tools' || openPanel === 'nav' || openPanel === 'settings' ? styles.active : ''}`}
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Overwatch"
+        >
+          👁️
+        </button>
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Zoom Presets"
+        >
+          🎯
+        </button>
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Toggle Minimap"
+        >
+          🗺️
+        </button>
+
+        {/* MOBILE-ONLY Right Button */}
+        <button
+          className={`${styles.toolbarButton} ${styles.mobileOnly} ${isToolsActive ? styles.active : ''}`}
           title="Tools"
           onClick={() => togglePanel('tools')}
         >
           🔧
         </button>
 
-        {/* For desktop, keep settings separate */}
+        {/* Settings button is ALWAYS visible */}
         <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'settings' ? styles.active : ''}`}
+          className={`${styles.toolbarButton} ${openPanel === 'settings' ? styles.active : ''}`}
           title="Settings"
           onClick={() => togglePanel('settings')}
         >

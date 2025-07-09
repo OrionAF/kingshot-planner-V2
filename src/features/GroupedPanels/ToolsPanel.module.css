@@ -1,7 +1,7 @@
 .toolsPanel {
   position: absolute;
   bottom: 65px;
-  right: 55px; /* Aligned to the right, next to settings */
+  right: 65px; /* Pushed over to make room for the settings icon */
   width: 250px;
   z-index: 1001;
   border-radius: 8px;

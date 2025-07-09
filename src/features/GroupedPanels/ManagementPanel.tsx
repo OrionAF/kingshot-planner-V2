@@ -3,11 +3,12 @@ import { useUiStore } from '../../state/useUiStore'
 import styles from './ManagementPanel.module.css'
 
 export function ManagementPanel() {
-  const { openPanel, togglePanel } = useUiStore()
+  const { openPanel, switchPanel } = useUiStore()
   const isOpen = openPanel === 'management'
 
   const handleClick = (panelId: 'alliance' | 'build' | 'player') => {
-    togglePanel(panelId)
+    // Use the new, unambiguous switchPanel action
+    switchPanel(panelId)
   }
 
   return (

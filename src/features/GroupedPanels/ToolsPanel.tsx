@@ -3,13 +3,14 @@ import { useUiStore } from '../../state/useUiStore'
 import styles from './ToolsPanel.module.css'
 
 export function ToolsPanel() {
-  const { openPanel, togglePanel } = useUiStore()
+  const { openPanel, switchPanel } = useUiStore()
   const isOpen = openPanel === 'tools'
 
   const handleClick = (
     panelId: 'nav' | 'overwatch' | 'zoomPresets' | 'minimap'
   ) => {
-    togglePanel(panelId)
+    // Use the new, unambiguous switchPanel action
+    switchPanel(panelId)
   }
 
   return (

@@ -9,10 +9,8 @@ interface PanelProps {
 export function Panel({ children, className }: PanelProps) {
   const combinedClassName = `${styles.panel} ${className || ''}`
 
-  // This is the new click handler.
+  // This is the click handler that stops the event from bubbling.
   const handleClick = (e: MouseEvent) => {
-    // This is the key: it stops the click event from bubbling up
-    // to the ModalOverlay behind this panel.
     e.stopPropagation()
   }
 

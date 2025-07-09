@@ -1,11 +1,7 @@
 import { create } from 'zustand'
 
-interface UiState {
-  openPanel: PanelId
-}
-
 // All possible panels that can be open
-type PanelId =
+export type PanelId =
   | 'alliance'
   | 'build'
   | 'player'
@@ -19,8 +15,13 @@ type PanelId =
   | 'tools'
   | null
 
+interface UiState {
+  openPanel: PanelId
+}
+
 interface UiActions {
   togglePanel: (panelId: PanelId) => void
+  switchPanel: (panelId: PanelId) => void // New action for clean switching
   closeAllPanels: () => void
 }
 
@@ -29,8 +30,12 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
 
   togglePanel: (panelId) =>
     set((state) => ({
+      // If the clicked panel is already open, close it. Otherwise, open it.
       openPanel: state.openPanel === panelId ? null : panelId,
     })),
+
+  // New action to just open a specific panel, guaranteeing any other is closed.
+  switchPanel: (panelId) => set(() => ({ openPanel: panelId })),
 
   closeAllPanels: () => set(() => ({ openPanel: null })),
 }))
