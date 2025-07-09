@@ -36,3 +36,4 @@ src/backlog.md
 backlog.md
 src/config/appConfig.ts.txt
 src/hooks/useInputControls.ts.txt
+src/core/coordinate-utils.ts.txt

@@ -1,3 +1,5 @@
+/* src/features/PlayerManager/PlayerItem.module.css */
+
 .playerItem {
   display: flex;
   align-items: center;
@@ -16,8 +18,6 @@
 .info {
   flex-grow: 1;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .name {
   font-size: 14px;
@@ -31,7 +31,28 @@
   display: flex;
   gap: 4px;
 }
+
+/* General button style for the player item */
 .controls button {
+  background-color: #4f5358;
+  color: #e0e0e0;
+  border: none;
   font-size: 12px;
-  padding: 3px 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.controls button:hover {
+  background-color: #5f6368;
+}
+
+/* Danger style for delete button */
+.controls .danger {
+  background-color: #5a3838;
+  color: #fdd;
+}
+.controls .danger:hover {
+  background-color: #dc3545;
+  color: white;
 }

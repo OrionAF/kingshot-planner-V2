@@ -20,9 +20,9 @@ interface MapState {
 interface MapActions {
   createAlliance: (newAllianceData: Omit<Alliance, 'id'>) => void
   placePlayer: (data: OmitIdAndCoords, x: number, y: number) => void
+  updatePlayer: (id: number, updatedData: Partial<OmitIdAndCoords>) => void // NEW
   deletePlayer: (id: number) => void
   importPlan: (data: { alliances: Alliance[]; players: Player[] }) => void
-  // ADD THIS NEW FUNCTION: It checks for validity but does NOT change state.
   checkPlacementValidity: (
     x: number,
     y: number,
@@ -45,6 +45,7 @@ function processBaseMapData(): {
   buildings: BaseBuilding[]
   map: Map<string, BaseBuilding>
 } {
+  // ... this function remains the same
   const allBuildings: BaseBuilding[] = []
   const buildingMap = new Map<string, BaseBuilding>()
   for (const b of baseMapData.defaultBuildings as RawBuilding[]) {
@@ -92,6 +93,14 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
       return { players: [...state.players, newPlayer] }
     }),
 
+  // NEW update action
+  updatePlayer: (id, updatedData) =>
+    set((state) => ({
+      players: state.players.map((p) =>
+        p.id === id ? { ...p, ...updatedData } : p
+      ),
+    })),
+
   deletePlayer: (id) =>
     set((state) => ({ players: state.players.filter((p) => p.id !== id) })),
 
@@ -101,22 +110,16 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
       players: data.players ?? [],
     })),
 
-  // === New Validity Check Function ===
   checkPlacementValidity: (x, y, w, h) => {
-    // get() gives us access to the current state inside the function
+    // ... this function remains the same
     const { buildingMap, players } = get()
-
     for (let i = 0; i < w; i++) {
       for (let j = 0; j < h; j++) {
         const checkX = x + i
         const checkY = y + j
-
-        // 1. Check for collision with a base building
         if (buildingMap.has(`${checkX},${checkY}`)) {
-          return false // Invalid
+          return false
         }
-
-        // 2. Check for collision with another player
         for (const p of players) {
           if (
             checkX >= p.x &&
@@ -124,11 +127,11 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
             checkY >= p.y &&
             checkY < p.y + p.h
           ) {
-            return false // Invalid
+            return false
           }
         }
       }
     }
-    return true // Valid placement
+    return true
   },
 }))

@@ -1,3 +1,5 @@
+// src/App.tsx
+
 import { BottomToolbar } from './features/Toolbar/BottomToolbar'
 import { MapCanvas } from './features/Map/MapCanvas'
 import { MapOverlay } from './features/Map/MapOverlay'
@@ -6,15 +8,21 @@ import { NavPanel } from './features/Navigation/NavPanel'
 import { ManagementPanel } from './features/GroupedPanels/ManagementPanel'
 import { ToolsPanel } from './features/GroupedPanels/ToolsPanel'
 import { SettingsPanel } from './features/Settings/SettingsPanel'
-import { ModalOverlay } from './components/Modal/ModalOverlay'
 import { PlayerPanel } from './features/PlayerManager/PlayerPanel'
+import { EditPlayerModal } from './features/PlayerManager/EditPlayerModal'
 
 function App() {
   return (
     <main>
       <MapCanvas />
       <MapOverlay />
-      <ModalOverlay />
+
+      {/*
+        This is the old, conflicting singleton ModalOverlay.
+        It is now removed. The EditPlayerModal handles its own overlay.
+      */}
+      {/* <ModalOverlay />  <-- THIS LINE MUST BE DELETED */}
+
       {/* --- ALL UI PANELS --- */}
       <AlliancePanel />
       <NavPanel />
@@ -23,6 +31,9 @@ function App() {
       <ManagementPanel />
       <ToolsPanel />
       <BottomToolbar />
+
+      {/* This component will render the ModalOverlay via the portal when needed */}
+      <EditPlayerModal />
     </main>
   )
 }

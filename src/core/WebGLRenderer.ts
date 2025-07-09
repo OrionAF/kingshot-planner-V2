@@ -121,7 +121,6 @@ export class WebGLRenderer {
     const gl = this.gl
     const camera = useCameraStore.getState()
     const { baseBuildings, players } = useMapStore.getState()
-    // GET THE NEW VALIDITY STATE
     const {
       isPlacingPlayer,
       playerToPlace,
@@ -153,9 +152,12 @@ export class WebGLRenderer {
       this.drawObject(player, 1.0)
     }
 
-    if (isPlacingPlayer && playerToPlace && mouseWorldPosition) {
-      // Use the validity state to determine the ghost color
-      const ghostColor = isValidPlacement ? '#28a745' : '#dc3545' // Green or Red
+    // --- FIX IS HERE ---
+    // Define the isDesktop variable before using it.
+    const isDesktop = window.matchMedia('(min-width: 769px)').matches
+
+    if (isPlacingPlayer && playerToPlace && mouseWorldPosition && isDesktop) {
+      const ghostColor = isValidPlacement ? '#28a745' : '#dc3545'
       const ghostObject: DrawableObject = {
         x: Math.round(mouseWorldPosition.x),
         y: Math.round(mouseWorldPosition.y),

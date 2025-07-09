@@ -1,6 +1,6 @@
 // src/state/useUiStore.ts
 import { create } from 'zustand'
-import { type OmitIdAndCoords } from '../types/map.types'
+import { type OmitIdAndCoords, type Player } from '../types/map.types' // Import Player type
 
 export type PanelId =
   | 'alliance'
@@ -21,7 +21,8 @@ interface UiState {
   isPlacingPlayer: boolean
   playerToPlace: OmitIdAndCoords | null
   mouseWorldPosition: { x: number; y: number } | null
-  isValidPlacement: boolean // NEW: Holds the validity result
+  isValidPlacement: boolean
+  editingPlayer: Player | null // NEW: Holds the full player object being edited
 }
 
 interface UiActions {
@@ -31,7 +32,9 @@ interface UiActions {
   startPlayerPlacement: (playerData: OmitIdAndCoords) => void
   endPlayerPlacement: () => void
   setMouseWorldPosition: (pos: { x: number; y: number }) => void
-  setPlacementValidity: (isValid: boolean) => void // NEW: Setter action
+  setPlacementValidity: (isValid: boolean) => void
+  startEditingPlayer: (player: Player) => void // NEW: Action to open modal
+  endEditingPlayer: () => void // NEW: Action to close modal
 }
 
 export const useUiStore = create<UiState & UiActions>((set) => ({
@@ -39,7 +42,8 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
   isPlacingPlayer: false,
   playerToPlace: null,
   mouseWorldPosition: null,
-  isValidPlacement: true, // Default to true
+  isValidPlacement: true,
+  editingPlayer: null, // Default to closed
 
   togglePanel: (panelId) =>
     set((state) => ({
@@ -54,17 +58,17 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
     set(() => ({
       isPlacingPlayer: true,
       playerToPlace: playerData,
-      isValidPlacement: true, // Reset on start
+      isValidPlacement: true,
     })),
 
   endPlayerPlacement: () =>
-    set(() => ({
-      isPlacingPlayer: false,
-      playerToPlace: null,
-    })),
+    set(() => ({ isPlacingPlayer: false, playerToPlace: null })),
 
   setMouseWorldPosition: (pos) => set(() => ({ mouseWorldPosition: pos })),
 
-  // New action to update our validity flag
   setPlacementValidity: (isValid) => set(() => ({ isValidPlacement: isValid })),
+
+  // New actions for the edit modal
+  startEditingPlayer: (player) => set(() => ({ editingPlayer: player })),
+  endEditingPlayer: () => set(() => ({ editingPlayer: null })),
 }))
