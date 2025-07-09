@@ -15,12 +15,12 @@ type PanelId =
   | 'zoomPresets'
   | 'minimap'
   | 'settings'
-  | 'management' // The new group panel
-  | 'tools' // The new group panel
+  | 'management'
+  | 'tools'
   | null
 
 interface UiActions {
-  togglePanel: (panelId: PanelId) => void // It now accepts any PanelId
+  togglePanel: (panelId: PanelId) => void
   closeAllPanels: () => void
 }
 

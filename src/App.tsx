@@ -7,6 +7,7 @@ import { ManagementPanel } from './features/GroupedPanels/ManagementPanel'
 import { ToolsPanel } from './features/GroupedPanels/ToolsPanel'
 import { SettingsPanel } from './features/Settings/SettingsPanel'
 import { ModalOverlay } from './components/Modal/ModalOverlay'
+import { PlayerPanel } from './features/PlayerManager/PlayerPanel'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <AlliancePanel />
       <NavPanel />
       <SettingsPanel />
+      <PlayerPanel />
       <ManagementPanel />
       <ToolsPanel />
       <BottomToolbar />

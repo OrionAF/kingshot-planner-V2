@@ -1,0 +1,37 @@
+.playerItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border-left: 5px solid transparent;
+}
+.colorSwatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.info {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.name {
+  font-size: 14px;
+  font-weight: bold;
+}
+.power {
+  font-size: 12px;
+  opacity: 0.8;
+}
+.controls {
+  display: flex;
+  gap: 4px;
+}
+.controls button {
+  font-size: 12px;
+  padding: 3px 6px;
+}

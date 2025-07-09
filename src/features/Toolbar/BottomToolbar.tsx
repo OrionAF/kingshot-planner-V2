@@ -4,15 +4,21 @@ import styles from './BottomToolbar.module.css'
 
 export function BottomToolbar() {
   const scale = useCameraStore((state) => state.scale)
-  // Get both the action and the state from the UI store
   const { togglePanel, openPanel } = useUiStore()
   const zoomPct = Math.round(scale * 20)
+
+  // This is the new, better logic for the mobile highlight.
+  // The management group button is active if its own panel OR any child panel is open.
+  const isManagementActive =
+    openPanel === 'management' ||
+    openPanel === 'alliance' ||
+    openPanel === 'player' // We will add 'build' here later
 
   return (
     <div className={styles.bottomToolbar}>
       {/* ====== LEFT GROUP ====== */}
       <div className={`${styles.toolbarGroup} ${styles.left}`}>
-        {/* DESKTOP-ONLY Left Buttons */}
+        {/* DESKTOP-ONLY Buttons */}
         <button
           className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'alliance' ? styles.active : ''}`}
           title="Alliance Management"
@@ -27,8 +33,9 @@ export function BottomToolbar() {
           🛠️
         </button>
         <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'player' ? styles.active : ''}`}
           title="Player Management"
+          onClick={() => togglePanel('player')}
         >
           👤
         </button>
@@ -46,9 +53,9 @@ export function BottomToolbar() {
           🧭
         </button>
 
-        {/* MOBILE-ONLY Left Buttons */}
+        {/* MOBILE-ONLY Buttons */}
         <button
-          className={`${styles.toolbarButton} ${styles.mobileOnly} ${openPanel === 'management' ? styles.active : ''}`}
+          className={`${styles.toolbarButton} ${styles.mobileOnly} ${isManagementActive ? styles.active : ''}`}
           title="Management"
           onClick={() => togglePanel('management')}
         >
@@ -83,38 +90,18 @@ export function BottomToolbar() {
 
       {/* ====== RIGHT GROUP ====== */}
       <div className={`${styles.toolbarGroup} ${styles.right}`}>
-        {/* DESKTOP-ONLY Right Buttons */}
+        {/* This follows the same logic as the management button, but for the tools */}
         <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
-          title="Overwatch"
-        >
-          👁️
-        </button>
-        <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
-          title="Zoom Presets"
-        >
-          🎯
-        </button>
-        <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
-          title="Toggle Minimap"
-        >
-          🗺️
-        </button>
-
-        {/* MOBILE-ONLY Right Button */}
-        <button
-          className={`${styles.toolbarButton} ${styles.mobileOnly} ${openPanel === 'tools' ? styles.active : ''}`}
+          className={`${styles.toolbarButton} ${styles.mobileOnly} ${openPanel === 'tools' || openPanel === 'nav' || openPanel === 'settings' ? styles.active : ''}`}
           title="Tools"
           onClick={() => togglePanel('tools')}
         >
           🔧
         </button>
 
-        {/* Settings button is ALWAYS visible */}
+        {/* For desktop, keep settings separate */}
         <button
-          className={`${styles.toolbarButton} ${openPanel === 'settings' ? styles.active : ''}`}
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'settings' ? styles.active : ''}`}
           title="Settings"
           onClick={() => togglePanel('settings')}
         >

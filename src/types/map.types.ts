@@ -24,3 +24,13 @@ export interface Alliance {
   tag: string
   color: string
 }
+
+export interface Player {
+  id: number
+  name: string
+  rallyCap: string // RENAMED from 'power' to match the label
+  power: string // NEW field for player power
+  tcLevel: string // Your new field
+  notes?: string
+  color: string
+}

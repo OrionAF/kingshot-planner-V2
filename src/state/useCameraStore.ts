@@ -8,9 +8,13 @@ export interface CameraState {
 
 interface CameraActions {
   panBy: (dx: number, dy: number) => void
-  panTo: (x: number, y: number) => void // We will use this action
-  setScale: (newScale: number) => void
+  // The new powerful action that can pan and zoom in one transaction
+  zoomTo: (newCameraState: Partial<CameraState>) => void
 }
+
+// Define zoom limits to prevent zooming too far in or out
+const MIN_ZOOM = 0.05
+const MAX_ZOOM = 20
 
 export const useCameraStore = create<CameraState & CameraActions>((set) => ({
   // === Initial State ===
@@ -25,8 +29,18 @@ export const useCameraStore = create<CameraState & CameraActions>((set) => ({
       y: state.y + dy,
     })),
 
-  // This is the direct action we will call from our component
-  panTo: (x, y) => set(() => ({ x, y })),
+  zoomTo: (newCameraState) =>
+    set((state) => {
+      // Use the incoming scale, but clamp it between our min and max values
+      const clampedScale = Math.max(
+        MIN_ZOOM,
+        Math.min(newCameraState.scale ?? state.scale, MAX_ZOOM)
+      )
 
-  setScale: (newScale) => set(() => ({ scale: newScale })),
+      return {
+        ...state, // Keep existing properties from the current state
+        ...newCameraState, // Overwrite with any new properties provided
+        scale: clampedScale, // But always use the clamped scale
+      }
+    }),
 }))

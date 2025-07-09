@@ -20,7 +20,9 @@ export function ManagementPanel() {
           🏰 Alliance Management
         </button>
         <button className={styles.button}>🛠️ Build Menu</button>
-        <button className={styles.button}>👤 Player Management</button>
+        <button className={styles.button} onClick={() => handleClick('player')}>
+          👤 Player Management
+        </button>
       </div>
     </Panel>
   )

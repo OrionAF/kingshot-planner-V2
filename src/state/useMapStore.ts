@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { type BaseBuilding } from '../types/map.types'
 import { type Alliance } from '../types/map.types'
-
-// This file will hold the data from baseMap.json
+import { type Player } from '../types/map.types'
 import baseMapData from '../assets/baseMap.json'
 
 // Define the shape of our map state. For now, it just holds an
@@ -11,11 +10,13 @@ interface MapState {
   baseBuildings: BaseBuilding[]
   buildingMap: Map<string, BaseBuilding>
   alliances: Alliance[]
+  players: Player[] // Add this
 }
 
 interface MapActions {
   createAlliance: (newAllianceData: Omit<Alliance, 'id'>) => void
-  importPlan: (data: { alliances: Alliance[] }) => void // Add this
+  createPlayer: (newPlayerData: Omit<Player, 'id'>) => void
+  importPlan: (data: { alliances: Alliance[] }) => void
 }
 
 function processBaseMapData(): {
@@ -46,7 +47,8 @@ export const useMapStore = create<MapState & MapActions>((set) => ({
   // === Initial State ===
   baseBuildings: initialMapData.buildings,
   buildingMap: initialMapData.map,
-  alliances: [], // Add initial state for alliances
+  alliances: [],
+  players: [],
 
   // === Actions ===
   createAlliance: (newAllianceData) =>
@@ -62,8 +64,15 @@ export const useMapStore = create<MapState & MapActions>((set) => ({
 
   importPlan: (data) =>
     set(() => ({
-      // Simply overwrite the existing alliances with the data from the file.
       alliances: data.alliances,
-      // We can add buildings and players here later
     })),
+
+  createPlayer: (newPlayerData) =>
+    set((state) => {
+      const newPlayer: Player = {
+        id: Date.now(),
+        ...newPlayerData,
+      }
+      return { players: [...state.players, newPlayer] }
+    }),
 }))
