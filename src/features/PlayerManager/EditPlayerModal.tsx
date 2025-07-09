@@ -10,7 +10,6 @@ export function EditPlayerModal() {
   const { editingPlayer, endEditingPlayer } = useUiStore()
   const { updatePlayer } = useMapStore()
 
-  // Local state for the form fields
   const [name, setName] = useState('')
   const [power, setPower] = useState('')
   const [rallyCap, setRallyCap] = useState('')
@@ -18,7 +17,6 @@ export function EditPlayerModal() {
   const [notes, setNotes] = useState('')
   const [color, setColor] = useState('#9400d3')
 
-  // When the modal opens, populate the form with the player's data
   useEffect(() => {
     if (editingPlayer) {
       setName(editingPlayer.name)
@@ -46,7 +44,6 @@ export function EditPlayerModal() {
   if (!editingPlayer) return null
 
   return (
-    // Pass the closing function to the overlay's new `onClose` prop
     <ModalOverlay onClose={endEditingPlayer}>
       <Panel className={styles.modalPanel}>
         <h4 className={styles.sectionTitle}>Edit Player</h4>
@@ -57,40 +54,40 @@ export function EditPlayerModal() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            placeholder="e.g., BigKev"
           />
-
           <label htmlFor="editPlayerPower">Power:</label>
           <input
             id="editPlayerPower"
             type="text"
             value={power}
             onChange={(e) => setPower(e.target.value)}
+            placeholder="e.g., 420.69M"
           />
-
           <label htmlFor="editPlayerRallyCap">Rally Cap:</label>
           <input
             id="editPlayerRallyCap"
             type="text"
             value={rallyCap}
             onChange={(e) => setRallyCap(e.target.value)}
+            placeholder="e.g., 2.45M"
           />
-
           <label htmlFor="editPlayerTcLevel">TC Level:</label>
           <input
             id="editPlayerTcLevel"
             type="text"
             value={tcLevel}
             onChange={(e) => setTcLevel(e.target.value)}
+            placeholder="e.g., 25"
           />
-
           <label htmlFor="editPlayerNotes">Notes:</label>
           <textarea
             id="editPlayerNotes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
+            placeholder="e.g., Rally lead, has T5..."
           />
-
           <label htmlFor="editPlayerColor">Color:</label>
           <input
             id="editPlayerColor"
@@ -101,10 +98,12 @@ export function EditPlayerModal() {
         </div>
         <div className={styles.modalFooter}>
           <button className={styles.secondaryButton} onClick={endEditingPlayer}>
-            Cancel
+            {' '}
+            Cancel{' '}
           </button>
           <button className={styles.primaryButton} onClick={handleSaveChanges}>
-            Save Changes
+            {' '}
+            Save Changes{' '}
           </button>
         </div>
       </Panel>

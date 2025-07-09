@@ -1,3 +1,4 @@
+// src/features/PlayerManager/PlayerPanel.tsx
 import { useState } from 'react'
 import { Panel } from '../../components/Panel/Panel'
 import { useMapStore } from '../../state/useMapStore'
@@ -9,7 +10,6 @@ export function PlayerPanel() {
   const players = useMapStore((state) => state.players)
   const uiStore = useUiStore()
 
-  // State for all form fields
   const [name, setName] = useState('')
   const [power, setPower] = useState('')
   const [rallyCap, setRallyCap] = useState('')
@@ -17,11 +17,8 @@ export function PlayerPanel() {
   const [notes, setNotes] = useState('')
   const [color, setColor] = useState('#9400d3')
 
-  // Renamed to reflect its new purpose
   const handleStartPlacement = () => {
     if (!name.trim()) return alert('Player name cannot be empty.')
-
-    // 1. Activate placement mode with the form data
     uiStore.startPlayerPlacement({
       name,
       power,
@@ -30,11 +27,7 @@ export function PlayerPanel() {
       notes,
       color,
     })
-
-    // 2. Close the panel to give the user a clear view of the map
     uiStore.closeAllPanels()
-
-    // 3. Clear fields for the next time the panel is opened
     setName('')
     setPower('')
     setRallyCap('')
@@ -61,13 +54,13 @@ export function PlayerPanel() {
       <div className={styles.createPlayerContainer}>
         <h4 className={styles.sectionTitle}>Create Player</h4>
         <div className={styles.formGrid}>
-          {/* ... all your form inputs remain the same ... */}
           <label htmlFor="playerName">Name:</label>
           <input
             id="playerName"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            placeholder="e.g., BigKev"
           />
 
           <label htmlFor="playerPower">Power:</label>
@@ -76,6 +69,7 @@ export function PlayerPanel() {
             type="text"
             value={power}
             onChange={(e) => setPower(e.target.value)}
+            placeholder="e.g., 420.69M"
           />
 
           <label htmlFor="playerRallyCap">Rally Cap:</label>
@@ -84,6 +78,7 @@ export function PlayerPanel() {
             type="text"
             value={rallyCap}
             onChange={(e) => setRallyCap(e.target.value)}
+            placeholder="e.g., 2.45M"
           />
 
           <label htmlFor="playerTcLevel">TC Level:</label>
@@ -92,6 +87,7 @@ export function PlayerPanel() {
             type="text"
             value={tcLevel}
             onChange={(e) => setTcLevel(e.target.value)}
+            placeholder="e.g., 25"
           />
 
           <label htmlFor="playerNotes">Notes:</label>
@@ -100,6 +96,7 @@ export function PlayerPanel() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
+            placeholder="e.g., Rally lead, has T5..."
           />
 
           <label htmlFor="playerColor">Color:</label>

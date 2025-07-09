@@ -2,6 +2,7 @@ import { AppConfig } from '../config/appConfig'
 import { useCameraStore } from '../state/useCameraStore'
 import { useMapStore } from '../state/useMapStore'
 import { useUiStore } from '../state/useUiStore'
+import { screenToWorld } from './coordinate-utils' // Import screenToWorld
 import {
   mapFragmentShaderSource,
   mapVertexShaderSource,
@@ -131,6 +132,7 @@ export class WebGLRenderer {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
     gl.clearColor(0.06, 0.06, 0.06, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT)
+
     gl.useProgram(this.mapProgram)
 
     const projectionMatrix = this.calculateProjectionMatrix(
@@ -141,7 +143,6 @@ export class WebGLRenderer {
     gl.uniformMatrix3fv(this.projectionUniformLocation, false, projectionMatrix)
     gl.uniform1f(this.gridThicknessLocation, AppConfig.webgl.gridThickness)
     gl.uniform1f(this.gridDarknessLocation, AppConfig.webgl.gridDarkness)
-
     this.drawMapPlane()
 
     gl.uniform1f(this.isDrawingObjectLocation, 1.0)
@@ -152,20 +153,42 @@ export class WebGLRenderer {
       this.drawObject(player, 1.0)
     }
 
-    // --- FIX IS HERE ---
-    // Define the isDesktop variable before using it.
+    // Check device type once
     const isDesktop = window.matchMedia('(min-width: 769px)').matches
 
+    // --- RENDER DESKTOP GHOST (on hover) ---
     if (isPlacingPlayer && playerToPlace && mouseWorldPosition && isDesktop) {
       const ghostColor = isValidPlacement ? '#28a745' : '#dc3545'
-      const ghostObject: DrawableObject = {
-        x: Math.round(mouseWorldPosition.x),
-        y: Math.round(mouseWorldPosition.y),
-        w: AppConfig.player.width,
-        h: AppConfig.player.height,
-        color: ghostColor,
-      }
-      this.drawObject(ghostObject, 0.6)
+      this.drawObject(
+        {
+          x: Math.round(mouseWorldPosition.x),
+          y: Math.round(mouseWorldPosition.y),
+          w: AppConfig.player.width,
+          h: AppConfig.player.height,
+          color: ghostColor,
+        },
+        0.6
+      )
+    }
+
+    // --- RENDER MOBILE GHOST (at center) ---
+    if (isPlacingPlayer && playerToPlace && !isDesktop) {
+      const [centerX, centerY] = screenToWorld(
+        gl.canvas.width / 2,
+        gl.canvas.height / 2,
+        camera
+      )
+      const ghostColor = isValidPlacement ? '#28a745' : '#dc3545'
+      this.drawObject(
+        {
+          x: Math.round(centerX),
+          y: Math.round(centerY),
+          w: AppConfig.player.width,
+          h: AppConfig.player.height,
+          color: ghostColor,
+        },
+        0.6
+      )
     }
   }
 
