@@ -111,15 +111,26 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
     })),
 
   checkPlacementValidity: (x, y, w, h) => {
-    // ... this function remains the same
     const { buildingMap, players } = get()
+    const N = AppConfig.N
+
+    // Loop through each tile the object would occupy
     for (let i = 0; i < w; i++) {
       for (let j = 0; j < h; j++) {
         const checkX = x + i
         const checkY = y + j
-        if (buildingMap.has(`${checkX},${checkY}`)) {
-          return false
+
+        // 1. NEW: Check if the tile is outside the map boundaries.
+        if (checkX < 0 || checkX >= N || checkY < 0 || checkY >= N) {
+          return false // Invalid: Out of bounds
         }
+
+        // 2. Check for collision with a base building
+        if (buildingMap.has(`${checkX},${checkY}`)) {
+          return false // Invalid: Collision with building
+        }
+
+        // 3. Check for collision with another player
         for (const p of players) {
           if (
             checkX >= p.x &&
@@ -127,11 +138,11 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
             checkY >= p.y &&
             checkY < p.y + p.h
           ) {
-            return false
+            return false // Invalid: Collision with player
           }
         }
       }
     }
-    return true
+    return true // If all checks pass, placement is valid
   },
 }))
