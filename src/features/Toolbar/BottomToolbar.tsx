@@ -4,65 +4,119 @@ import styles from './BottomToolbar.module.css'
 
 export function BottomToolbar() {
   const scale = useCameraStore((state) => state.scale)
-  const { togglePanel } = useUiStore()
-
+  // Get both the action and the state from the UI store
+  const { togglePanel, openPanel } = useUiStore()
   const zoomPct = Math.round(scale * 20)
 
   return (
     <div className={styles.bottomToolbar}>
-      {/* Left Group */}
-      <div className={styles.toolbarGroup}>
+      {/* ====== LEFT GROUP ====== */}
+      <div className={`${styles.toolbarGroup} ${styles.left}`}>
+        {/* DESKTOP-ONLY Left Buttons */}
         <button
-          className={styles.toolbarButton}
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'alliance' ? styles.active : ''}`}
           title="Alliance Management"
           onClick={() => togglePanel('alliance')}
         >
           🏰
         </button>
-        <button className={styles.toolbarButton} title="Build Menu">
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Build Menu"
+        >
           🛠️
         </button>
-        <button className={styles.toolbarButton} title="Player Management">
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Player Management"
+        >
           👤
         </button>
-        <button className={styles.toolbarButton} title="Pinned Landmarks">
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Pinned Landmarks"
+        >
           📌
         </button>
         <button
-          className={styles.toolbarButton}
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'nav' ? styles.active : ''}`}
           title="Navigation"
           onClick={() => togglePanel('nav')}
         >
           🧭
         </button>
+
+        {/* MOBILE-ONLY Left Buttons */}
+        <button
+          className={`${styles.toolbarButton} ${styles.mobileOnly} ${openPanel === 'management' ? styles.active : ''}`}
+          title="Management"
+          onClick={() => togglePanel('management')}
+        >
+          🧰
+        </button>
+        <button
+          className={`${styles.toolbarButton} ${styles.mobileOnly}`}
+          title="Pinned Landmarks"
+        >
+          📌
+        </button>
       </div>
 
-      {/* Center Group */}
-      <div className={styles.toolbarGroup}>
-        <button className={styles.toolbarButton} title="Zoom Out">
+      {/* ====== CENTER GROUP ====== */}
+      <div className={`${styles.toolbarGroup} ${styles.center}`}>
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Zoom Out"
+        >
           -
         </button>
-        <span className={styles.zoomLevel}>Zoom: {zoomPct}%</span>
-        <button className={styles.toolbarButton} title="Zoom In">
+        <div className={styles.zoomLevel} title="Tap to set zoom">
+          Zoom: {zoomPct}%
+        </div>
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Zoom In"
+        >
           +
         </button>
       </div>
 
-      {/* Right Group */}
-      <div className={styles.toolbarGroup}>
-        <button className={styles.toolbarButton} title="Overwatch">
+      {/* ====== RIGHT GROUP ====== */}
+      <div className={`${styles.toolbarGroup} ${styles.right}`}>
+        {/* DESKTOP-ONLY Right Buttons */}
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Overwatch"
+        >
           👁️
         </button>
-        <button className={styles.toolbarButton} title="Zoom Presets">
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Zoom Presets"
+        >
           🎯
         </button>
-        <button className={styles.toolbarButton} title="Toggle Minimap">
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          title="Toggle Minimap"
+        >
           🗺️
         </button>
+
+        {/* MOBILE-ONLY Right Button */}
         <button
-          className={styles.toolbarButton}
+          className={`${styles.toolbarButton} ${styles.mobileOnly} ${openPanel === 'tools' ? styles.active : ''}`}
+          title="Tools"
+          onClick={() => togglePanel('tools')}
+        >
+          🔧
+        </button>
+
+        {/* Settings button is ALWAYS visible */}
+        <button
+          className={`${styles.toolbarButton} ${openPanel === 'settings' ? styles.active : ''}`}
           title="Settings"
-          onClick={() => togglePanel('settings')} // Add this
+          onClick={() => togglePanel('settings')}
         >
           ⚙️
         </button>

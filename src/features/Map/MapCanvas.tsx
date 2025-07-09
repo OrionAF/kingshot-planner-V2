@@ -4,7 +4,6 @@ import { createInputHandlers } from '../../hooks/useInputControls'
 import styles from './MapCanvas.module.css'
 import { WebGLRenderer } from '../../core/WebGLRenderer'
 
-// We can clean this up now since we aren't using the CanvasRenderer for now.
 type Renderer = WebGLRenderer
 
 export function MapCanvas() {
@@ -12,6 +11,7 @@ export function MapCanvas() {
   const rendererRef = useRef<Renderer | null>(null)
 
   useAnimationLoop(() => {
+    // The renderFrame will only run if the renderer exists.
     rendererRef.current?.renderFrame()
   })
 
@@ -19,7 +19,7 @@ export function MapCanvas() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const context = canvas.getContext('webgl')
+    const context = canvas.getContext('webgl', { antialias: true })
     if (!context) {
       console.error('This browser does not support WebGL.')
       return
@@ -27,14 +27,28 @@ export function MapCanvas() {
 
     rendererRef.current = new WebGLRenderer(context)
 
-    // Input handlers are now self-sufficient
-    const { handleMouseDown, handleMouseMove, handleMouseUp, handleWheel } =
-      createInputHandlers()
+    const {
+      handleMouseDown,
+      handleMouseMove,
+      handleMouseUp,
+      handleMouseLeave, // Add this
+      handleWheel,
+      handleTouchStart,
+      handleTouchMove,
+    } = createInputHandlers()
 
+    // Attach Mouse listeners
     canvas.addEventListener('mousedown', handleMouseDown)
     window.addEventListener('mousemove', handleMouseMove)
-    canvas.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('mouseup', handleMouseUp) // Listen on window for release
+    canvas.addEventListener('mouseleave', handleMouseLeave) // Add this
     canvas.addEventListener('wheel', handleWheel)
+
+    // Attach Touch listeners
+    canvas.addEventListener('touchstart', handleTouchStart)
+    canvas.addEventListener('touchmove', handleTouchMove)
+
+    // No touchend needed anymore
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth
@@ -44,10 +58,14 @@ export function MapCanvas() {
     window.addEventListener('resize', resizeCanvas)
 
     return () => {
+      // Cleanup
       canvas.removeEventListener('mousedown', handleMouseDown)
       window.removeEventListener('mousemove', handleMouseMove)
-      canvas.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('mouseup', handleMouseUp)
+      canvas.removeEventListener('mouseleave', handleMouseLeave) // Add this
       canvas.removeEventListener('wheel', handleWheel)
+      canvas.removeEventListener('touchstart', handleTouchStart)
+      canvas.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('resize', resizeCanvas)
     }
   }, [])

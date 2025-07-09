@@ -1,0 +1,19 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* A semi-transparent black */
+  z-index: 1000; /* High, but below our panels */
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none; /* Invisible to clicks when hidden */
+}
+
+@media (max-width: 768px) {
+  .visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

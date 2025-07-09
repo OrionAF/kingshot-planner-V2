@@ -1,0 +1,28 @@
+.moreToolsPanel {
+  position: absolute;
+  bottom: 65px;
+  right: 10px; /* Position it above its button */
+  width: 200px;
+  z-index: 999;
+  border-radius: 8px;
+
+  /* Standard panel hide/show styles */
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+  pointer-events: none;
+}
+
+.moreToolsPanel.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.buttonList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

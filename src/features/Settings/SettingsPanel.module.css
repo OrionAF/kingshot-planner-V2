@@ -3,7 +3,7 @@
   bottom: 65px; /* toolbar height + 10px margin */
   right: 10px; /* Positioned on the right side */
   width: 320px;
-  z-index: 999;
+  z-index: 1001;
   border-radius: 8px;
   opacity: 0;
   transform: translateY(10px);

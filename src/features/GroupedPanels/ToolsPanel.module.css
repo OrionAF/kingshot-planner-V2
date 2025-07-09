@@ -1,0 +1,45 @@
+.toolsPanel {
+  position: absolute;
+  bottom: 65px;
+  right: 55px; /* Aligned to the right, next to settings */
+  width: 250px;
+  z-index: 1001;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+  pointer-events: none;
+}
+.toolsPanel.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.buttonList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.button {
+  width: 100%;
+  text-align: left;
+  padding: 10px;
+}
+
+/* === MOBILE OVERRIDES === */
+@media (max-width: 768px) {
+  .toolsPanel {
+    /* On mobile, center it instead of anchoring to the right */
+    left: 50%;
+    right: auto; /* Reset the hardcoded 'right' property */
+    transform: translateX(-50%) translateY(10px);
+    width: 90vw;
+    max-width: 400px;
+  }
+
+  .toolsPanel.open {
+    transform: translateX(-50%) translateY(0);
+  }
+}

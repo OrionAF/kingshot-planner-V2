@@ -1,13 +1,14 @@
+/* === BASE DESKTOP STYLES (Applies to all screen sizes first) === */
 .bottomToolbar {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 55px; /* From --toolbar-height */
-  background: rgba(25, 28, 32, 0.75); /* From --toolbar-bg */
+  height: 55px;
+  background: rgba(25, 28, 32, 0.75);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-top: 1px solid #444; /* From --border-color */
+  border-top: 1px solid #444;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -15,17 +16,15 @@
   box-sizing: border-box;
   z-index: 1000;
 }
-
 .toolbarGroup {
   display: flex;
   align-items: center;
   gap: 5px;
 }
-
 .toolbarButton {
   background: none;
   border: none;
-  color: #e0e0e0; /* From --text-color */
+  color: #e0e0e0;
   font-size: 24px;
   padding: 8px;
   border-radius: 8px;
@@ -33,15 +32,64 @@
   transition: background-color 0.2s;
   line-height: 1;
 }
-
 .toolbarButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
-
+.toolbarButton.active {
+  background-color: #2a9fd6; /* This is the --highlight-color */
+  color: white;
+}
 .zoomLevel {
   font-size: 14px;
   min-width: 90px;
   text-align: center;
   color: #e0e0e0;
   user-select: none;
+}
+.left {
+  flex: 1;
+  justify-content: flex-start;
+}
+.center {
+  flex: 0;
+  justify-content: center;
+} /* Center group should stay centered */
+.right {
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* By default, HIDE the mobile-only buttons on desktop */
+.mobileOnly {
+  display: none;
+}
+
+/* === MOBILE OVERRIDE STYLES === */
+@media (max-width: 768px) {
+  /* Show mobile buttons... */
+  .mobileOnly {
+    display: block;
+  }
+
+  /* ...and hide desktop buttons */
+  .desktopOnly {
+    display: none;
+  }
+
+  /* Adjust general layout */
+  .bottomToolbar {
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    height: auto;
+  }
+  .toolbarButton {
+    font-size: 26px;
+    padding: 10px;
+  }
+
+  /* Make the zoom level tappable on mobile */
+  .zoomLevel {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+  }
 }

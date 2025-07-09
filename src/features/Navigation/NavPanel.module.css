@@ -3,7 +3,7 @@
   bottom: 65px;
   left: 170px;
   width: 320px;
-  z-index: 999;
+  z-index: 1001;
   border-radius: 8px;
   opacity: 0;
   transform: translateY(10px);
@@ -81,4 +81,20 @@
   padding: 8px 5px;
   font-size: 14px;
   border-bottom: 1px solid #3a3a3a;
+}
+
+/* === MOBILE OVERRIDES === */
+@media (max-width: 768px) {
+  .navPanel {
+    /* On mobile, ignore the fixed 'left' and center the panel */
+    left: 50%;
+    transform: translateX(-50%) translateY(10px); /* Center horizontally, keep the starting "up" anim */
+    width: 90vw; /* Use viewport width for responsive sizing */
+    max-width: 400px; /* But don't let it get too wide on big phones */
+  }
+
+  /* When it's open, the transform is different for the centering animation */
+  .navPanel.open {
+    transform: translateX(-50%) translateY(0);
+  }
 }
