@@ -7,22 +7,34 @@ import styles from './PlayerPanel.module.css'
 
 export function PlayerPanel() {
   const players = useMapStore((state) => state.players)
-  const createPlayer = useMapStore((state) => state.createPlayer)
-  const openPanel = useUiStore((state) => state.openPanel)
+  const uiStore = useUiStore()
 
   // State for all form fields
   const [name, setName] = useState('')
-  const [power, setPower] = useState('') // New Power field
-  const [rallyCap, setRallyCap] = useState('') // Renamed for clarity
+  const [power, setPower] = useState('')
+  const [rallyCap, setRallyCap] = useState('')
   const [tcLevel, setTcLevel] = useState('')
   const [notes, setNotes] = useState('')
   const [color, setColor] = useState('#9400d3')
 
-  const handleCreate = () => {
+  // Renamed to reflect its new purpose
+  const handleStartPlacement = () => {
     if (!name.trim()) return alert('Player name cannot be empty.')
-    // Call the createPlayer action with the CORRECT property names
-    createPlayer({ name, power, rallyCap, tcLevel, notes, color })
-    // Clear all fields
+
+    // 1. Activate placement mode with the form data
+    uiStore.startPlayerPlacement({
+      name,
+      power,
+      rallyCap,
+      tcLevel,
+      notes,
+      color,
+    })
+
+    // 2. Close the panel to give the user a clear view of the map
+    uiStore.closeAllPanels()
+
+    // 3. Clear fields for the next time the panel is opened
     setName('')
     setPower('')
     setRallyCap('')
@@ -30,21 +42,26 @@ export function PlayerPanel() {
     setNotes('')
   }
 
-  const isOpen = openPanel === 'player'
+  const isOpen = uiStore.openPanel === 'player'
   const panelClassName = `${styles.sidebarPanel} ${isOpen ? styles.open : ''}`
 
   return (
     <Panel className={panelClassName}>
       <div className={styles.playerListContainer}>
         <h4 className={styles.sectionTitle}>Players</h4>
-        {players.map((player) => (
-          <PlayerItem key={player.id} player={player} />
-        ))}
+        {players.length > 0 ? (
+          players.map((player) => (
+            <PlayerItem key={player.id} player={player} />
+          ))
+        ) : (
+          <p className={styles.noPlayersText}>No players have been placed.</p>
+        )}
       </div>
 
       <div className={styles.createPlayerContainer}>
         <h4 className={styles.sectionTitle}>Create Player</h4>
         <div className={styles.formGrid}>
+          {/* ... all your form inputs remain the same ... */}
           <label htmlFor="playerName">Name:</label>
           <input
             id="playerName"
@@ -93,8 +110,8 @@ export function PlayerPanel() {
             onChange={(e) => setColor(e.target.value)}
           />
         </div>
-        <button className={styles.primaryButton} onClick={handleCreate}>
-          Create Player
+        <button className={styles.primaryButton} onClick={handleStartPlacement}>
+          Place on Map
         </button>
       </div>
     </Panel>

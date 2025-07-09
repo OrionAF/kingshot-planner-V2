@@ -33,3 +33,6 @@ src/core/webgl/map-shaders.ts.txt
 src/core/webgl/webgl-utils.ts.txt
 src/core/WebGLRenderer.ts.txt
 src/backlog.md
+backlog.md
+src/config/appConfig.ts.txt
+src/hooks/useInputControls.ts.txt

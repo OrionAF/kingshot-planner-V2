@@ -1,36 +1,38 @@
-// A generic structure for any object that has a position and size on the map.
+// src/types/map.types.ts
+
+// A generic object that can be drawn on the map
 export interface MapObject {
-  id: string | number // A unique identifier
   x: number
   y: number
   w: number
   h: number
+  color: string // The main fill color for the object
+  borderColor?: string // Optional border color
 }
 
-// This represents a static, default building that comes from baseMap.json.
-// It "extends" MapObject, meaning it has all of its properties, plus some more.
 export interface BaseBuilding extends MapObject {
-  id: string // For base buildings, the ID is usually their coordinate string
+  id: string
   displayName: string
-  fillColor: string
-  borderColor: string
   imageKey?: string // Optional property for buildings with special images
-  // We will add more properties like 'ruins', etc. as needed.
+}
+
+// Data needed from the form to start player placement
+export interface OmitIdAndCoords {
+  name: string
+  power: string
+  rallyCap: string
+  tcLevel: string
+  notes: string
+  color: string
+}
+
+export interface Player extends OmitIdAndCoords, MapObject {
+  id: number
 }
 
 export interface Alliance {
   id: number
   name: string
   tag: string
-  color: string
-}
-
-export interface Player {
-  id: number
-  name: string
-  rallyCap: string // RENAMED from 'power' to match the label
-  power: string // NEW field for player power
-  tcLevel: string // Your new field
-  notes?: string
   color: string
 }

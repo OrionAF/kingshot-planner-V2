@@ -13,6 +13,13 @@ export const AppConfig = {
   pingColor: '#fff',
   pingDuration: 500,
   baseScale: 5,
+
+  // Add this new section for player configuration
+  player: {
+    width: 2,
+    height: 2,
+  },
+
   infoBannerThreshold: 50, // How many tiles away from center to show info banner
   imageBreakpoints: {
     highZoom: 80, // % zoom level to use base imageScale

@@ -1,7 +1,7 @@
 import { AppConfig } from '../config/appConfig'
 import { useCameraStore } from '../state/useCameraStore'
-import { useMapStore } from '../state/useMapStore' // We now need map data
-import { type BaseBuilding } from '../types/map.types' // And the building type
+import { useMapStore } from '../state/useMapStore'
+import { useUiStore } from '../state/useUiStore'
 import {
   mapFragmentShaderSource,
   mapVertexShaderSource,
@@ -10,19 +10,34 @@ import { createProgramFromSources } from './webgl/webgl-utils'
 
 type Matrix3 = number[]
 
-// A small helper to parse colors like 'rgb(r,g,b)' into [r,g,b] arrays
-function parseRgb(rgbString: string): [number, number, number] {
-  return (
-    (rgbString.match(/\d+/g)?.map(Number) as [number, number, number]) || [
-      0, 0, 0,
-    ]
-  )
+function parseColor(colorString: string): [number, number, number] {
+  if (colorString.startsWith('#')) {
+    const r = parseInt(colorString.slice(1, 3), 16) / 255
+    const g = parseInt(colorString.slice(3, 5), 16) / 255
+    const b = parseInt(colorString.slice(5, 7), 16) / 255
+    return [r, g, b]
+  } else if (colorString.startsWith('rgb')) {
+    return (
+      (colorString.match(/\d+/g)?.map(Number) as [number, number, number]) || [
+        0, 0, 0,
+      ]
+    ).map((c) => c / 255) as [number, number, number]
+  }
+  return [0, 0, 0]
+}
+
+type DrawableObject = {
+  x: number
+  y: number
+  w: number
+  h: number
+  color?: string
 }
 
 export class WebGLRenderer {
   private gl: WebGLRenderingContext
   private mapProgram: WebGLProgram
-
+  // ... attributes and most uniforms ...
   private worldPosAttrLocation: number
   private projectionUniformLocation: WebGLUniformLocation | null
   private fertileColorLocation: WebGLUniformLocation | null
@@ -30,19 +45,17 @@ export class WebGLRenderer {
   private badlandsColorLocation: WebGLUniformLocation | null
   private gridThicknessLocation: WebGLUniformLocation | null
   private gridDarknessLocation: WebGLUniformLocation | null
-
-  // New uniform locations for object drawing
   private objectColorLocation: WebGLUniformLocation | null
   private isDrawingObjectLocation: WebGLUniformLocation | null
+  private objectAlphaLocation: WebGLUniformLocation | null
 
-  // A single, reusable buffer for drawing all our buildings
+  // ... buffers ...
   private objectBuffer: WebGLBuffer | null
-
+  private mapPlaneBuffer: WebGLBuffer | null
   private derivativesSupported = false
 
   constructor(gl: WebGLRenderingContext) {
     this.gl = gl
-
     const derivativesExt = gl.getExtension('OES_standard_derivatives')
     if (derivativesExt) {
       this.derivativesSupported = true
@@ -52,17 +65,14 @@ export class WebGLRenderer {
       gl,
       mapVertexShaderSource,
       mapFragmentShaderSource,
-      {
-        USE_DERIVATIVES: this.derivativesSupported ? 1 : 0,
-      }
+      { USE_DERIVATIVES: this.derivativesSupported ? 1 : 0 }
     )
 
+    // ... all location lookups remain the same ...
     this.worldPosAttrLocation = gl.getAttribLocation(
       this.mapProgram,
       'a_worldPosition'
     )
-
-    // --- Look up ALL uniform locations ---
     this.projectionUniformLocation = gl.getUniformLocation(
       this.mapProgram,
       'u_projection'
@@ -95,22 +105,33 @@ export class WebGLRenderer {
       this.mapProgram,
       'u_isDrawingObject'
     )
+    this.objectAlphaLocation = gl.getUniformLocation(
+      this.mapProgram,
+      'u_objectAlpha'
+    )
 
-    // Create one buffer that we can reuse for all objects.
     this.objectBuffer = gl.createBuffer()
-
+    this.mapPlaneBuffer = this.createMapPlaneBuffer()
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
     console.log('WebGLRenderer Initialized!')
   }
 
   public renderFrame() {
     const gl = this.gl
     const camera = useCameraStore.getState()
-    const { baseBuildings } = useMapStore.getState() // Get building data
+    const { baseBuildings, players } = useMapStore.getState()
+    // GET THE NEW VALIDITY STATE
+    const {
+      isPlacingPlayer,
+      playerToPlace,
+      mouseWorldPosition,
+      isValidPlacement,
+    } = useUiStore.getState()
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
     gl.clearColor(0.06, 0.06, 0.06, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT)
-
     gl.useProgram(this.mapProgram)
 
     const projectionMatrix = this.calculateProjectionMatrix(
@@ -122,44 +143,35 @@ export class WebGLRenderer {
     gl.uniform1f(this.gridThicknessLocation, AppConfig.webgl.gridThickness)
     gl.uniform1f(this.gridDarknessLocation, AppConfig.webgl.gridDarkness)
 
-    // === Draw Base Map ===
-    // We'll create a dedicated plane for the map background now.
     this.drawMapPlane()
 
-    // === Draw Buildings ===
-    gl.uniform1f(this.isDrawingObjectLocation, 1.0) // Turn "Object Mode" ON
+    gl.uniform1f(this.isDrawingObjectLocation, 1.0)
     for (const building of baseBuildings) {
-      this.drawBuilding(building)
+      this.drawObject(building)
+    }
+    for (const player of players) {
+      this.drawObject(player, 1.0)
+    }
+
+    if (isPlacingPlayer && playerToPlace && mouseWorldPosition) {
+      // Use the validity state to determine the ghost color
+      const ghostColor = isValidPlacement ? '#28a745' : '#dc3545' // Green or Red
+      const ghostObject: DrawableObject = {
+        x: Math.round(mouseWorldPosition.x),
+        y: Math.round(mouseWorldPosition.y),
+        w: AppConfig.player.width,
+        h: AppConfig.player.height,
+        color: ghostColor,
+      }
+      this.drawObject(ghostObject, 0.6)
     }
   }
 
-  private drawMapPlane() {
+  // No changes needed below this line
+  private drawObject(obj: DrawableObject, alpha = 1.0) {
     const gl = this.gl
-    const N = AppConfig.N
-    const positions = [0, 0, N, 0, 0, N, 0, N, N, 0, N, N]
-
-    // For drawing the map, bind a dedicated map buffer (good practice).
-    const mapBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, mapBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW)
-
-    gl.enableVertexAttribArray(this.worldPosAttrLocation)
-    gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0)
-
-    // Set map uniforms
-    gl.uniform1f(this.isDrawingObjectLocation, 0.0) // Turn "Object Mode" OFF
-    gl.uniform3fv(this.fertileColorLocation, [109 / 255, 159 / 255, 62 / 255])
-    gl.uniform3fv(this.plainsColorLocation, [158 / 255, 180 / 255, 103 / 255])
-    gl.uniform3fv(this.badlandsColorLocation, [191 / 255, 208 / 255, 152 / 255])
-
-    gl.drawArrays(gl.TRIANGLES, 0, 6)
-  }
-
-  private drawBuilding(b: BaseBuilding) {
-    const gl = this.gl
-    const { x, y, w, h } = b
-
-    // Generate the vertices for this building's diamond shape.
+    const { x, y, w, h, color } = obj
+    if (!color) return
     const positions = [
       x,
       y,
@@ -174,22 +186,45 @@ export class WebGLRenderer {
       x + w,
       y + h,
     ]
-
-    // Use our single, reusable object buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, this.objectBuffer)
-    // Put the geometry data for the CURRENT building into the buffer
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.DYNAMIC_DRAW)
-
-    // Set up the attribute pointer again for this buffer
     gl.enableVertexAttribArray(this.worldPosAttrLocation)
     gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0)
-
-    // Set the color uniform for this specific building
-    const [r, g, b_color] = parseRgb(b.fillColor)
-    gl.uniform3fv(this.objectColorLocation, [r / 255, g / 255, b_color / 255])
-
-    // Draw the building
+    const [r, g, b] = parseColor(color)
+    gl.uniform3fv(this.objectColorLocation, [r, g, b])
+    gl.uniform1f(this.objectAlphaLocation, alpha)
     gl.drawArrays(gl.TRIANGLES, 0, 6)
+  }
+
+  private drawMapPlane() {
+    const gl = this.gl
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.mapPlaneBuffer)
+    gl.enableVertexAttribArray(this.worldPosAttrLocation)
+    gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0)
+    gl.uniform1f(this.isDrawingObjectLocation, 0.0)
+    gl.uniform3fv(
+      this.fertileColorLocation,
+      parseColor(AppConfig.biomeColors.fertile)
+    )
+    gl.uniform3fv(
+      this.plainsColorLocation,
+      parseColor(AppConfig.biomeColors.plains)
+    )
+    gl.uniform3fv(
+      this.badlandsColorLocation,
+      parseColor(AppConfig.biomeColors.badlands)
+    )
+    gl.drawArrays(gl.TRIANGLES, 0, 6)
+  }
+
+  private createMapPlaneBuffer(): WebGLBuffer | null {
+    const gl = this.gl
+    const N = AppConfig.N
+    const positions = [0, 0, N, 0, 0, N, 0, N, N, 0, N, N]
+    const buffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW)
+    return buffer
   }
 
   private calculateProjectionMatrix(
