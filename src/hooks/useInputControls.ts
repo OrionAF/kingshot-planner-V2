@@ -136,6 +136,24 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       const dy = touch.clientY - lastPanPos.y
       panBy(dx, dy)
       lastPanPos = { x: touch.clientX, y: touch.clientY }
+      // Update placement validity when panning on mobile
+      const { isPlacingPlayer, setPlacementValidity } = useUiStore.getState()
+      if (isPlacingPlayer) {
+        const camera = useCameraStore.getState()
+        const { checkPlacementValidity } = useMapStore.getState()
+        const [worldX, worldY] = screenToWorld(
+          window.innerWidth / 2,
+          window.innerHeight / 2,
+          camera
+        )
+        const isValid = checkPlacementValidity(
+          Math.round(worldX),
+          Math.round(worldY),
+          AppConfig.player.width,
+          AppConfig.player.height
+        )
+        setPlacementValidity(isValid)
+      }
     } else if (e.touches.length >= 2) {
       const touch1 = e.touches[0]
       const touch2 = e.touches[1]
@@ -160,8 +178,37 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         const newCamX = focalPoint.x - screenXAfter * newScale
         const newCamY = focalPoint.y - screenYAfter * newScale
         zoomTo({ x: newCamX, y: newCamY, scale: newScale })
+
+        // Update placement validity when pinching to zoom
+        const { isPlacingPlayer, setPlacementValidity } = useUiStore.getState()
+        if (isPlacingPlayer) {
+          const camera = useCameraStore.getState()
+          const { checkPlacementValidity } = useMapStore.getState()
+          const [centerX, centerY] = screenToWorld(
+            window.innerWidth / 2,
+            window.innerHeight / 2,
+            camera
+          )
+          const isValid = checkPlacementValidity(
+            Math.round(centerX),
+            Math.round(centerY),
+            AppConfig.player.width,
+            AppConfig.player.height
+          )
+          setPlacementValidity(isValid)
+        }
       }
       lastPinchDist = newDist
+    }
+  }
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0]
+      lastPanPos = { x: touch.clientX, y: touch.clientY }
+    }
+    if (e.touches.length < 2) {
+      lastPinchDist = 0
     }
   }
 
@@ -173,5 +220,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     handleWheel,
     handleTouchStart,
     handleTouchMove,
+    handleTouchEnd,
   }
 }

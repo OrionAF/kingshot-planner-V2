@@ -36,6 +36,7 @@ export function MapCanvas() {
       handleWheel,
       handleTouchStart,
       handleTouchMove,
+      handleTouchEnd,
     } = createInputHandlers(canvas) // Pass it here
 
     // Attach Mouse listeners
@@ -46,10 +47,9 @@ export function MapCanvas() {
     canvas.addEventListener('wheel', handleWheel)
 
     // Attach Touch listeners
-    canvas.addEventListener('touchstart', handleTouchStart)
-    canvas.addEventListener('touchmove', handleTouchMove)
-
-    // No touchend needed anymore
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false })
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+    canvas.addEventListener('touchend', handleTouchEnd)
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth
@@ -67,6 +67,7 @@ export function MapCanvas() {
       canvas.removeEventListener('wheel', handleWheel)
       canvas.removeEventListener('touchstart', handleTouchStart)
       canvas.removeEventListener('touchmove', handleTouchMove)
+      canvas.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('resize', resizeCanvas)
     }
   }, [])
