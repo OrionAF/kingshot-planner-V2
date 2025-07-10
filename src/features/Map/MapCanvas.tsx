@@ -1,3 +1,5 @@
+// src/features/Map/MapCanvas.tsx
+
 import { useEffect, useRef } from 'react'
 import { useAnimationLoop } from '../../hooks/useAnimationLoop'
 import { createInputHandlers } from '../../hooks/useInputControls'
@@ -11,7 +13,6 @@ export function MapCanvas() {
   const rendererRef = useRef<Renderer | null>(null)
 
   useAnimationLoop(() => {
-    // The renderFrame will only run if the renderer exists.
     rendererRef.current?.renderFrame()
   })
 
@@ -31,11 +32,11 @@ export function MapCanvas() {
       handleMouseDown,
       handleMouseMove,
       handleMouseUp,
-      handleMouseLeave, // Add this
+      handleMouseLeave,
       handleWheel,
       handleTouchStart,
       handleTouchMove,
-    } = createInputHandlers()
+    } = createInputHandlers(canvas) // Pass it here
 
     // Attach Mouse listeners
     canvas.addEventListener('mousedown', handleMouseDown)

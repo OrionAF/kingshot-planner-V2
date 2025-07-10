@@ -10,7 +10,7 @@ import { AppConfig } from '../config/appConfig'
  * Creates all the event handlers for map interaction, connecting them
  * to our state stores for player placement and other interactions.
  */
-export function createInputHandlers() {
+export function createInputHandlers(canvas: HTMLCanvasElement) {
   const { panBy, zoomTo } = useCameraStore.getState()
 
   let isPointerDown = false
@@ -18,14 +18,11 @@ export function createInputHandlers() {
   let clickStartPos = { x: 0, y: 0 }
   let lastPinchDist = 0
 
-  // === MOUSE HANDLERS ===
-
   const handleMouseDown = (e: MouseEvent) => {
     isPointerDown = true
     clickStartPos = { x: e.clientX, y: e.clientY }
     lastPanPos = { x: e.clientX, y: e.clientY }
-    if (e.currentTarget instanceof HTMLElement)
-      e.currentTarget.style.cursor = 'grabbing'
+    canvas.style.cursor = 'grabbing'
   }
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -90,15 +87,13 @@ export function createInputHandlers() {
       }
     }
     isPointerDown = false
-    if (e.currentTarget instanceof HTMLElement)
-      e.currentTarget.style.cursor = 'grab'
+    canvas.style.cursor = 'grab'
   }
 
   // Other handlers (handleMouseLeave, handleWheel, touch handlers) remain the same.
-  const handleMouseLeave = (e: MouseEvent) => {
+  const handleMouseLeave = () => {
     isPointerDown = false
-    if (e.currentTarget instanceof HTMLElement)
-      e.currentTarget.style.cursor = 'grab'
+    canvas.style.cursor = 'grab'
   }
 
   const handleWheel = (e: WheelEvent) => {

@@ -1,32 +1,23 @@
+// src/features/Navigation/NavPanel.tsx
+
 import { useState } from 'react'
 import { Panel } from '../../components/Panel/Panel'
 import { useCameraStore } from '../../state/useCameraStore'
 import { useMapStore } from '../../state/useMapStore'
 import { useUiStore } from '../../state/useUiStore'
 import styles from './NavPanel.module.css'
-import { AppConfig } from '../../config/appConfig' // We need this for tile sizes
 
 type ActiveTab = 'goTo' | 'landmarks'
 
-// This is the correct place for this helper function for now,
-// as it is only used by this component.
-function worldToScreen(x: number, y: number): [number, number] {
-  const screenX = (x - y) * (AppConfig.tileW / 2)
-  const screenY = (x + y) * (AppConfig.tileH / 2)
-  return [screenX, screenY]
-}
-
 export function NavPanel() {
-  // === Global State Connections ===
   const openPanel = useUiStore((state) => state.openPanel)
   const baseBuildings = useMapStore((state) => state.baseBuildings)
-  // Get the correct action from the camera store
+  // FIX: Get the panTo action directly
   const { panTo } = useCameraStore.getState()
 
-  // === Internal Component State ===
   const [activeTab, setActiveTab] = useState<ActiveTab>('goTo')
-  const [xInput, setXInput] = useState('600') // Default to castle
-  const [yInput, setYInput] = useState('600') // Default to castle
+  const [xInput, setXInput] = useState('600')
+  const [yInput, setYInput] = useState('600')
 
   const landmarks = baseBuildings.filter(
     (b) =>
@@ -34,18 +25,9 @@ export function NavPanel() {
       b.displayName.includes('Fortress')
   )
 
-  // === Event Handlers ===
   const handleGoTo = (x: number, y: number) => {
-    // At the moment of the click, get the LATEST state from the store.
-    const latestScale = useCameraStore.getState().scale
-
-    const [targetScreenX, targetScreenY] = worldToScreen(x, y)
-
-    const newCameraX = window.innerWidth / 2 - targetScreenX * latestScale
-    const newCameraY = window.innerHeight / 2 - targetScreenY * latestScale
-
-    // Call the panTo action with the correctly calculated coordinates.
-    panTo(newCameraX, newCameraY)
+    // FIX: Simplified logic. Just call panTo with world coordinates.
+    panTo(x, y)
   }
 
   const isOpen = openPanel === 'nav'
@@ -72,7 +54,6 @@ export function NavPanel() {
         </button>
       </div>
 
-      {/* Go To Tab Content */}
       {activeTab === 'goTo' && (
         <div className={styles.tabContent}>
           <div className={styles.goToForm}>
@@ -98,7 +79,6 @@ export function NavPanel() {
         </div>
       )}
 
-      {/* Landmarks Tab Content */}
       {activeTab === 'landmarks' && (
         <div className={`${styles.tabContent} ${styles.landmarkList}`}>
           {landmarks.map((b) => (

@@ -1,3 +1,5 @@
+// src/core/CanvasRenderer.ts
+
 import { useSelectionStore } from '../state/useSelectionStore'
 import { AppConfig } from '../config/appConfig'
 import { useCameraStore } from '../state/useCameraStore'
@@ -121,8 +123,6 @@ export class CanvasRenderer {
 
     this.ctx.fillStyle = AppConfig.biomeColors[this.getBiomeForTile(x, y)]
     this.ctx.fill()
-
-    // We'll add a border later to avoid visual noise for now.
   }
 
   /**
@@ -156,25 +156,20 @@ export class CanvasRenderer {
 
     // 3. Draw the final shape by connecting these four extreme points.
     this.ctx.beginPath()
-    // The X of the top point is the same as the top-left tile's center X.
     this.ctx.moveTo(topLeftTile_sx, topVertex_sy)
-    // The Y of the right point is the same as the top-right tile's center Y.
     this.ctx.lineTo(rightVertex_sx, topRightTile_sy)
-    // The X of the bottom point is the same as the bottom-right tile's center X.
     this.ctx.lineTo(bottomRightTile_sx, bottomVertex_sy)
-    // The Y of the left point is the same as the bottom-left tile's center Y.
     this.ctx.lineTo(leftVertex_sx, bottomLeftTile_sy)
     this.ctx.closePath()
 
     if (isHighlight) {
-      // For a highlight, we don't fill the shape, just draw a thick border.
       this.ctx.lineWidth = 0.7
       this.ctx.strokeStyle = AppConfig.selectionColor
       this.ctx.stroke()
     } else {
-      // For a normal draw, do what we did before.
-      this.ctx.fillStyle = b.fillColor
-      this.ctx.strokeStyle = b.borderColor
+      // FIX: Use 'color' instead of 'fillColor'
+      this.ctx.fillStyle = b.color
+      this.ctx.strokeStyle = b.borderColor ?? AppConfig.borderColor // Use default if borderColor is missing
       this.ctx.lineWidth = 0.3
       this.ctx.fill()
       this.ctx.stroke()
@@ -190,26 +185,19 @@ export class CanvasRenderer {
     sy: number,
     camera: { x: number; y: number; scale: number }
   ): [number, number] {
-    // This math is complex, but it's a direct and corrected port from the original.
     const tileW_half = AppConfig.tileW / 2
     const tileH_half = AppConfig.tileH / 2
-
-    // Adjust screen coordinates by camera offset and scale
     const lx = (sx - camera.x) / camera.scale
     const ly = (sy - camera.y) / camera.scale
-
     const u = lx / tileW_half
     const v = ly / tileH_half
-
     const worldX = (u + v) / 2
     const worldY = (v - u) / 2
-
     return [worldX, worldY]
   }
 
   private worldToScreen(x: number, y: number): [number, number] {
     const screenX = (x - y) * (AppConfig.tileW / 2)
-    // Y-axis is positive going down in screen space, so we use '+'
     const screenY = (x + y) * (AppConfig.tileH / 2)
     return [screenX, screenY]
   }

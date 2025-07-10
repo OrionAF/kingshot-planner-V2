@@ -1,4 +1,7 @@
+// src/state/useCameraStore.ts
+
 import { create } from 'zustand'
+import { worldToScreen } from '../core/coordinate-utils'
 
 export interface CameraState {
   x: number
@@ -8,11 +11,10 @@ export interface CameraState {
 
 interface CameraActions {
   panBy: (dx: number, dy: number) => void
-  // The new powerful action that can pan and zoom in one transaction
   zoomTo: (newCameraState: Partial<CameraState>) => void
+  panTo: (worldX: number, worldY: number) => void // FIX: Add the new action
 }
 
-// Define zoom limits to prevent zooming too far in or out
 const MIN_ZOOM = 0.05
 const MAX_ZOOM = 20
 
@@ -31,16 +33,24 @@ export const useCameraStore = create<CameraState & CameraActions>((set) => ({
 
   zoomTo: (newCameraState) =>
     set((state) => {
-      // Use the incoming scale, but clamp it between our min and max values
       const clampedScale = Math.max(
         MIN_ZOOM,
         Math.min(newCameraState.scale ?? state.scale, MAX_ZOOM)
       )
-
       return {
-        ...state, // Keep existing properties from the current state
-        ...newCameraState, // Overwrite with any new properties provided
-        scale: clampedScale, // But always use the clamped scale
+        ...state,
+        ...newCameraState,
+        scale: clampedScale,
+      }
+    }),
+
+  // FIX: New panTo action to jump to a specific world coordinate
+  panTo: (worldX, worldY) =>
+    set((state) => {
+      const [targetScreenX, targetScreenY] = worldToScreen(worldX, worldY)
+      return {
+        x: window.innerWidth / 2 - targetScreenX * state.scale,
+        y: window.innerHeight / 2 - targetScreenY * state.scale,
       }
     }),
 }))

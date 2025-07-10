@@ -1,6 +1,11 @@
 // src/state/useUiStore.ts
+
 import { create } from 'zustand'
-import { type OmitIdAndCoords, type Player } from '../types/map.types' // Import Player type
+import { type OmitIdAndCoords, type Player } from '../types/map.types'
+import { useMapStore } from './useMapStore'
+import { useCameraStore } from './useCameraStore'
+import { screenToWorld } from '../core/coordinate-utils'
+import { AppConfig } from '../config/appConfig'
 
 export type PanelId =
   | 'alliance'
@@ -22,7 +27,7 @@ interface UiState {
   playerToPlace: OmitIdAndCoords | null
   mouseWorldPosition: { x: number; y: number } | null
   isValidPlacement: boolean
-  editingPlayer: Player | null // NEW: Holds the full player object being edited
+  editingPlayer: Player | null
 }
 
 interface UiActions {
@@ -33,8 +38,8 @@ interface UiActions {
   endPlayerPlacement: () => void
   setMouseWorldPosition: (pos: { x: number; y: number }) => void
   setPlacementValidity: (isValid: boolean) => void
-  startEditingPlayer: (player: Player) => void // NEW: Action to open modal
-  endEditingPlayer: () => void // NEW: Action to close modal
+  startEditingPlayer: (player: Player) => void
+  endEditingPlayer: () => void
 }
 
 export const useUiStore = create<UiState & UiActions>((set) => ({
@@ -43,32 +48,47 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
   playerToPlace: null,
   mouseWorldPosition: null,
   isValidPlacement: true,
-  editingPlayer: null, // Default to closed
+  editingPlayer: null,
 
   togglePanel: (panelId) =>
     set((state) => ({
       openPanel: state.openPanel === panelId ? null : panelId,
     })),
-
   switchPanel: (panelId) => set(() => ({ openPanel: panelId })),
-
   closeAllPanels: () => set(() => ({ openPanel: null })),
 
-  startPlayerPlacement: (playerData) =>
+  startPlayerPlacement: (playerData) => {
+    // FIX: Check initial placement validity immediately
+    const isDesktop = window.matchMedia('(min-width: 769px)').matches
+    let initialValidity = true
+
+    if (!isDesktop) {
+      // On mobile, check the center of the screen
+      const camera = useCameraStore.getState()
+      const { checkPlacementValidity } = useMapStore.getState()
+      const [worldX, worldY] = screenToWorld(
+        window.innerWidth / 2,
+        window.innerHeight / 2,
+        camera
+      )
+      initialValidity = checkPlacementValidity(
+        Math.round(worldX),
+        Math.round(worldY),
+        AppConfig.player.width,
+        AppConfig.player.height
+      )
+    }
+
     set(() => ({
       isPlacingPlayer: true,
       playerToPlace: playerData,
-      isValidPlacement: true,
-    })),
-
+      isValidPlacement: initialValidity,
+    }))
+  },
   endPlayerPlacement: () =>
     set(() => ({ isPlacingPlayer: false, playerToPlace: null })),
-
   setMouseWorldPosition: (pos) => set(() => ({ mouseWorldPosition: pos })),
-
   setPlacementValidity: (isValid) => set(() => ({ isValidPlacement: isValid })),
-
-  // New actions for the edit modal
   startEditingPlayer: (player) => set(() => ({ editingPlayer: player })),
   endEditingPlayer: () => set(() => ({ editingPlayer: null })),
 }))
