@@ -8,7 +8,11 @@ import { screenToWorld } from '../../core/coordinate-utils'
 import styles from './MapOverlay.module.css'
 
 export function MapOverlay() {
-  const cameraState = useCameraStore()
+  const cameraState = useCameraStore((state) => ({
+    x: state.x,
+    y: state.y,
+    scale: state.scale,
+  }))
   const {
     buildMode,
     isPlacingPlayer,

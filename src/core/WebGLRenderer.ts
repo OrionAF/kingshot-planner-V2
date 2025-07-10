@@ -109,7 +109,9 @@ export class WebGLRenderer {
     this.mapPlaneBuffer = this.createMapPlaneBuffer()
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-    console.log('WebGLRenderer Initialized!')
+    if (import.meta.env.DEV) {
+      console.log('WebGLRenderer Initialized!')
+    }
   }
 
   public renderFrame() {

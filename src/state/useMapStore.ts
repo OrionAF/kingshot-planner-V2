@@ -11,6 +11,7 @@ import {
 } from '../types/map.types'
 import baseMapData from '../assets/baseMap.json'
 import { AppConfig } from '../config/appConfig'
+import { generateId } from '../utils/idGenerator'
 
 interface MapState {
   baseBuildings: BaseBuilding[]
@@ -94,7 +95,7 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
   // === Actions ===
   createAlliance: (newAllianceData) =>
     set((state) => ({
-      alliances: [...state.alliances, { id: Date.now(), ...newAllianceData }],
+      alliances: [...state.alliances, { id: generateId(), ...newAllianceData }],
     })),
 
   // Player actions remain the same
@@ -102,7 +103,7 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
     set((state) => {
       const newPlayer: Player = {
         ...data,
-        id: Date.now(),
+        id: generateId(),
         x,
         y,
         w: AppConfig.player.width,
@@ -130,7 +131,7 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
       if (!definition || !alliance) return {} // Safety check
 
       const newBuilding: UserBuilding = {
-        id: Date.now(),
+        id: generateId(),
         type,
         x,
         y,

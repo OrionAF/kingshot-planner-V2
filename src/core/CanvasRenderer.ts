@@ -11,7 +11,9 @@ export class CanvasRenderer {
 
   constructor(context: CanvasRenderingContext2D) {
     this.ctx = context
-    console.log('CanvasRenderer Initialized!')
+    if (import.meta.env.DEV) {
+      console.log('CanvasRenderer Initialized!')
+    }
   }
 
   // =================================================================

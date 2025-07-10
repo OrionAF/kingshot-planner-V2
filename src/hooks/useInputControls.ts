@@ -106,7 +106,9 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           }
           // Intentionally do not deselect for rapid building
         } else {
-          console.log(`Click at: ${roundedX}, ${roundedY}`)
+          if (import.meta.env.DEV) {
+            console.log(`Click at: ${roundedX}, ${roundedY}`)
+          }
         }
       }
     }
