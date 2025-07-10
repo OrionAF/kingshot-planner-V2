@@ -4,7 +4,7 @@ import { AppConfig } from '../config/appConfig'
 import { useCameraStore } from '../state/useCameraStore'
 import { useMapStore } from '../state/useMapStore'
 import { useUiStore } from '../state/useUiStore'
-// FIX: Unused import 'screenToWorld' is removed.
+import { screenToWorld } from './coordinate-utils'
 import {
   mapFragmentShaderSource,
   mapVertexShaderSource,
@@ -12,8 +12,6 @@ import {
 import { createProgramFromSources } from './webgl/webgl-utils'
 
 type Matrix3 = number[]
-
-// FIX: 'DrawableObject' is now only defined once.
 type DrawableObject = {
   x: number
   y: number
@@ -61,14 +59,12 @@ export class WebGLRenderer {
     if (derivativesExt) {
       this.derivativesSupported = true
     }
-
     this.mapProgram = createProgramFromSources(
       gl,
       mapVertexShaderSource,
       mapFragmentShaderSource,
       { USE_DERIVATIVES: this.derivativesSupported ? 1 : 0 }
     )
-
     this.worldPosAttrLocation = gl.getAttribLocation(
       this.mapProgram,
       'a_worldPosition'
@@ -109,7 +105,6 @@ export class WebGLRenderer {
       this.mapProgram,
       'u_objectAlpha'
     )
-
     this.objectBuffer = gl.createBuffer()
     this.mapPlaneBuffer = this.createMapPlaneBuffer()
     gl.enable(gl.BLEND)
@@ -124,7 +119,7 @@ export class WebGLRenderer {
       useMapStore.getState()
     const {
       isPlacingPlayer,
-      playerToPlace,
+      playerToPlace, // FIX: This will now be used
       buildMode,
       mouseWorldPosition,
       isValidPlacement,
@@ -134,6 +129,7 @@ export class WebGLRenderer {
     gl.clearColor(0.06, 0.06, 0.06, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.useProgram(this.mapProgram)
+
     const projectionMatrix = this.calculateProjectionMatrix(
       camera.x,
       camera.y,
@@ -142,6 +138,7 @@ export class WebGLRenderer {
     gl.uniformMatrix3fv(this.projectionUniformLocation, false, projectionMatrix)
     gl.uniform1f(this.gridThicknessLocation, AppConfig.webgl.gridThickness)
     gl.uniform1f(this.gridDarknessLocation, AppConfig.webgl.gridDarkness)
+
     this.drawMapPlane()
 
     gl.uniform1f(this.isDrawingObjectLocation, 1.0)
@@ -155,43 +152,70 @@ export class WebGLRenderer {
       this.drawObject(player, 1.0)
     }
 
+    // --- GHOST RENDERING LOGIC ---
     const isDesktop = window.matchMedia('(min-width: 769px)').matches
     const isPlacingSomething =
       isPlacingPlayer || !!buildMode.selectedBuildingType
 
-    if (isPlacingSomething && mouseWorldPosition && isDesktop) {
+    if (isPlacingSomething) {
       let w = 0,
-        h = 0
+        h = 0,
+        coverage = 0
+      let ghostBaseColor = '#ffffff' // Default color
+      let ghostPosition = { x: 0, y: 0 }
 
-      // We will set the ghost's base color, and then override it with green/red
-      let ghostBaseColor = '#ffffff'
+      const ghostColor = isValidPlacement ? undefined : '#dc3545' // Use undefined for valid, red for invalid
 
       if (isPlacingPlayer && playerToPlace) {
         w = AppConfig.player.width
         h = AppConfig.player.height
-        ghostBaseColor = playerToPlace.color
+        ghostBaseColor = playerToPlace.color // FIX: Correctly use playerToPlace
       } else if (buildMode.selectedBuildingType && buildMode.activeAllianceId) {
         const def = AppConfig.BUILDING_CATALOG[buildMode.selectedBuildingType]
         const alliance = alliances.find(
           (a) => a.id === buildMode.activeAllianceId
-        )
+        ) // FIX: Correctly use alliances
         w = def.w
         h = def.h
+        coverage = def.coverage
         ghostBaseColor = alliance?.color ?? '#ffffff'
       }
 
+      // This logic now correctly works for BOTH desktop and mobile
       if (w > 0) {
-        // FIX: The unused 'color' variable is now used as 'ghostBaseColor'.
-        // Then, if placement is invalid, we override it with red.
-        const finalGhostColor = isValidPlacement ? ghostBaseColor : '#dc3545'
-        this.drawObject(
-          {
+        if (isDesktop && mouseWorldPosition) {
+          ghostPosition = {
             x: Math.round(mouseWorldPosition.x),
             y: Math.round(mouseWorldPosition.y),
-            w,
-            h,
-            color: finalGhostColor,
-          },
+          }
+        } else {
+          // Mobile or no mouse position
+          const [centerX, centerY] = screenToWorld(
+            gl.canvas.width / 2,
+            gl.canvas.height / 2,
+            camera
+          )
+          ghostPosition = { x: Math.round(centerX), y: Math.round(centerY) }
+        }
+
+        // Draw the coverage range if applicable
+        if (coverage > 0) {
+          const radius = Math.floor(coverage / 2)
+          this.drawObject(
+            {
+              x: ghostPosition.x + Math.floor(w / 2) - radius,
+              y: ghostPosition.y + Math.floor(h / 2) - radius,
+              w: coverage,
+              h: coverage,
+              color: ghostColor ?? ghostBaseColor, // Use red if invalid, otherwise the base color
+            },
+            0.15
+          )
+        }
+
+        // Draw the main ghost object
+        this.drawObject(
+          { ...ghostPosition, w, h, color: ghostColor ?? ghostBaseColor },
           0.6
         )
       }

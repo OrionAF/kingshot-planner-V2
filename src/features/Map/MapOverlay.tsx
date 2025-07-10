@@ -4,42 +4,56 @@ import { AppConfig } from '../../config/appConfig'
 import { useCameraStore } from '../../state/useCameraStore'
 import { useMapStore } from '../../state/useMapStore'
 import { useUiStore } from '../../state/useUiStore'
-import { screenToWorld } from '../../core/coordinate-utils' // Correctly import your utility
+import { screenToWorld } from '../../core/coordinate-utils'
 import styles from './MapOverlay.module.css'
 
 export function MapOverlay() {
-  // Select the entire state object. This is often more performant than
-  // multiple individual selectors if you need more than one value.
   const cameraState = useCameraStore()
   const {
+    buildMode,
     isPlacingPlayer,
     playerToPlace,
     endPlayerPlacement,
+    setSelectedBuildingType,
     isValidPlacement,
   } = useUiStore()
-  const { placePlayer } = useMapStore()
+  const { placePlayer, placeBuilding } = useMapStore()
+
+  const isPlacingSomething = isPlacingPlayer || !!buildMode.selectedBuildingType
 
   const [worldX, worldY] = screenToWorld(
     window.innerWidth / 2,
     window.innerHeight / 2,
-    cameraState // Pass the state object that matches the function's type
+    cameraState
   )
 
   const handleConfirmPlacement = () => {
-    if (playerToPlace && isValidPlacement) {
-      placePlayer(playerToPlace, Math.round(worldX), Math.round(worldY))
+    if (isValidPlacement) {
+      const roundedX = Math.round(worldX)
+      const roundedY = Math.round(worldY)
+
+      if (isPlacingPlayer && playerToPlace) {
+        placePlayer(playerToPlace, roundedX, roundedY)
+      } else if (buildMode.selectedBuildingType && buildMode.activeAllianceId) {
+        placeBuilding(
+          buildMode.selectedBuildingType,
+          roundedX,
+          roundedY,
+          buildMode.activeAllianceId
+        )
+      }
     }
-    endPlayerPlacement()
+    handleCancelPlacement()
   }
 
   const handleCancelPlacement = () => {
     endPlayerPlacement()
+    setSelectedBuildingType(null)
   }
 
   return (
     <div className={styles.overlayContainer}>
-      {/* --- Standard Overlay Items --- */}
-      {!isPlacingPlayer && (
+      {!isPlacingSomething && (
         <>
           <div className={`${styles.overlayItem} ${styles.versionDisplay}`}>
             v{AppConfig.CURRENT_VERSION}
@@ -50,8 +64,7 @@ export function MapOverlay() {
         </>
       )}
 
-      {/* --- Mobile Placement UI --- */}
-      {isPlacingPlayer && (
+      {isPlacingSomething && (
         <>
           <div className={styles.crosshair}>+</div>
           <div className={styles.placementControls}>

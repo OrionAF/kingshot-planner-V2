@@ -6,10 +6,6 @@ import { useUiStore } from '../state/useUiStore'
 import { useMapStore } from '../state/useMapStore'
 import { AppConfig } from '../config/appConfig'
 
-/**
- * Creates all the event handlers for map interaction, connecting them
- * to our state stores for player placement and other interactions.
- */
 export function createInputHandlers(canvas: HTMLCanvasElement) {
   const { panBy, zoomTo } = useCameraStore.getState()
 
@@ -19,6 +15,8 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
   let lastPinchDist = 0
 
   const handleMouseDown = (e: MouseEvent) => {
+    // Only start panning if it's a left click
+    if (e.button !== 0) return
     isPointerDown = true
     clickStartPos = { x: e.clientX, y: e.clientY }
     lastPanPos = { x: e.clientX, y: e.clientY }
@@ -29,22 +27,21 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     const camera = useCameraStore.getState()
     const {
       isPlacingPlayer,
-      buildMode, // Get the build mode state
+      buildMode,
       setMouseWorldPosition,
       setPlacementValidity,
     } = useUiStore.getState()
     const { checkPlacementValidity } = useMapStore.getState()
-
     const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera)
     const roundedX = Math.round(worldX)
     const roundedY = Math.round(worldY)
 
     setMouseWorldPosition({ x: roundedX, y: roundedY })
 
-    // --- UNIFIED PLACEMENT VALIDITY ---
     if (isPlacingPlayer || buildMode.selectedBuildingType) {
       let objectW = 0,
-        objectH = 0
+        objectH = 0,
+        rule = 'any'
 
       if (isPlacingPlayer) {
         objectW = AppConfig.player.width
@@ -53,6 +50,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         const def = AppConfig.BUILDING_CATALOG[buildMode.selectedBuildingType]
         objectW = def.w
         objectH = def.h
+        rule = def.rule
       }
 
       const isValid = checkPlacementValidity(
@@ -60,7 +58,8 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         roundedY,
         objectW,
         objectH,
-        buildMode.activeAllianceId
+        buildMode.activeAllianceId,
+        rule
       )
       setPlacementValidity(isValid)
     }
@@ -71,6 +70,9 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
   }
 
   const handleMouseUp = (e: MouseEvent) => {
+    // Only handle mouseup for left clicks
+    if (e.button !== 0) return
+
     if (isPointerDown) {
       const dist = Math.hypot(
         e.clientX - clickStartPos.x,
@@ -85,7 +87,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         const roundedX = Math.round(worldX)
         const roundedY = Math.round(worldY)
 
-        // --- UNIFIED PLACEMENT CLICK ---
         if (uiState.isPlacingPlayer && uiState.playerToPlace) {
           if (uiState.isValidPlacement) {
             mapActions.placePlayer(uiState.playerToPlace, roundedX, roundedY)
@@ -103,7 +104,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
               uiState.buildMode.activeAllianceId
             )
           }
-          // Do not deselect building after placement, for rapid building.
+          // Intentionally do not deselect for rapid building
         } else {
           console.log(`Click at: ${roundedX}, ${roundedY}`)
         }
@@ -113,19 +114,60 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     canvas.style.cursor = 'grab'
   }
 
-  // New handler for keyboard shortcuts
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      const { endPlayerPlacement, buildMode, setSelectedBuildingType } =
-        useUiStore.getState()
-      endPlayerPlacement() // Cancel player placement
-      if (buildMode.selectedBuildingType) {
-        setSelectedBuildingType(null) // Cancel building placement
+  const handleContextMenu = (e: MouseEvent) => {
+    e.preventDefault()
+
+    const { buildMode, isPlacingPlayer } = useUiStore.getState()
+    if (isPlacingPlayer || buildMode.selectedBuildingType) return
+
+    const { userBuildings, deleteBuilding, players, deletePlayer } =
+      useMapStore.getState()
+    const camera = useCameraStore.getState()
+    const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera)
+    const roundedX = Math.round(worldX)
+    const roundedY = Math.round(worldY)
+
+    const buildingToDelete = userBuildings.find(
+      (b) =>
+        roundedX >= b.x &&
+        roundedX < b.x + b.w &&
+        roundedY >= b.y &&
+        roundedY < b.y + b.h
+    )
+
+    if (buildingToDelete) {
+      if (window.confirm(`Delete this building?`)) {
+        deleteBuilding(buildingToDelete.id)
+      }
+      return // Stop after finding a building
+    }
+
+    const playerToDelete = players.find(
+      (p) =>
+        roundedX >= p.x &&
+        roundedX < p.x + p.w &&
+        roundedY >= p.y &&
+        roundedY < p.y + p.h
+    )
+
+    if (playerToDelete) {
+      if (window.confirm(`Delete player "${playerToDelete.name}"?`)) {
+        deletePlayer(playerToDelete.id)
       }
     }
   }
 
-  // Other handlers (handleMouseLeave, handleWheel, touch handlers) remain the same.
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      const { endPlayerPlacement, buildMode, setSelectedBuildingType } =
+        useUiStore.getState()
+      endPlayerPlacement()
+      if (buildMode.selectedBuildingType) {
+        setSelectedBuildingType(null)
+      }
+    }
+  }
+
   const handleMouseLeave = () => {
     isPointerDown = false
     canvas.style.cursor = 'grab'
@@ -175,9 +217,10 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       const dy = touch.clientY - lastPanPos.y
       panBy(dx, dy)
       lastPanPos = { x: touch.clientX, y: touch.clientY }
-      // Update placement validity when panning on mobile
-      const { isPlacingPlayer, setPlacementValidity } = useUiStore.getState()
-      if (isPlacingPlayer) {
+      // Unified placement validity on mobile pan
+      const { isPlacingPlayer, buildMode, setPlacementValidity } =
+        useUiStore.getState()
+      if (isPlacingPlayer || buildMode.selectedBuildingType) {
         const camera = useCameraStore.getState()
         const { checkPlacementValidity } = useMapStore.getState()
         const [worldX, worldY] = screenToWorld(
@@ -185,11 +228,25 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           window.innerHeight / 2,
           camera
         )
+        let w = 0,
+          h = 0,
+          rule = 'any'
+        if (isPlacingPlayer) {
+          w = AppConfig.player.width
+          h = AppConfig.player.height
+        } else if (buildMode.selectedBuildingType) {
+          const def = AppConfig.BUILDING_CATALOG[buildMode.selectedBuildingType]
+          w = def.w
+          h = def.h
+          rule = def.rule
+        }
         const isValid = checkPlacementValidity(
           Math.round(worldX),
           Math.round(worldY),
-          AppConfig.player.width,
-          AppConfig.player.height
+          w,
+          h,
+          buildMode.activeAllianceId,
+          rule
         )
         setPlacementValidity(isValid)
       }
@@ -247,8 +304,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
 
   const handleTouchEnd = (e: TouchEvent) => {
     if (e.touches.length === 1) {
-      const touch = e.touches[0]
-      lastPanPos = { x: touch.clientX, y: touch.clientY }
+      lastPanPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }
     }
     if (e.touches.length < 2) {
       lastPinchDist = 0
@@ -265,5 +321,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     handleTouchMove,
     handleTouchEnd,
     handleKeyDown,
+    handleContextMenu,
   }
 }
