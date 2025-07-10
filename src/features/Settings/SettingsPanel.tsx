@@ -4,29 +4,35 @@ import { useRef } from 'react'
 import { Panel } from '../../components/Panel/Panel'
 import { useMapStore } from '../../state/useMapStore'
 import { useUiStore } from '../../state/useUiStore'
-import { type Alliance, type Player } from '../../types/map.types' // Import Player
+import {
+  type Alliance,
+  type Player,
+  type UserBuilding,
+} from '../../types/map.types'
 import styles from './SettingsPanel.module.css'
 
 interface PlanFile {
   version: number
   alliances: Alliance[]
-  players: Player[] // FIX: Add players to the plan format
+  players: Player[]
+  userBuildings: UserBuilding[]
 }
 
 export function SettingsPanel() {
   const openPanel = useUiStore((state) => state.openPanel)
-  // FIX: Get players from the store for export
-  const { alliances, players, importPlan } = useMapStore.getState()
+  // FIX: Get userBuildings from the store for export
+  const { alliances, players, userBuildings, importPlan } =
+    useMapStore.getState()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleExport = () => {
     const planData: PlanFile = {
-      version: 1.1, // Bump version for the new format
+      version: 1.2,
       alliances,
-      players, // FIX: Include players in the exported data
+      players,
+      userBuildings,
     }
-
     const jsonString = JSON.stringify(planData, null, 2)
     const blob = new Blob([jsonString], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -53,23 +59,19 @@ export function SettingsPanel() {
         const result = event.target?.result
         const data = JSON.parse(result as string) as PlanFile
 
-        // FIX: Update validation to check for the new format and handle old format gracefully
-        if (
-          data &&
-          (data.version === 1 || data.version === 1.1) &&
-          Array.isArray(data.alliances)
-        ) {
+        if (data && data.version >= 1 && Array.isArray(data.alliances)) {
           if (
             window.confirm(
               'This will overwrite your current plan. Are you sure?'
             )
           ) {
-            // Ensure players is an array, even if importing an old file
             const planToImport = {
               alliances: data.alliances,
               players: data.players ?? [],
+              // FIX: Add userBuildings, defaulting to an empty array
+              userBuildings: data.userBuildings ?? [],
             }
-            importPlan(planToImport)
+            importPlan(planToImport) // This now sends the correct object shape
             alert('Plan imported successfully!')
           }
         } else {

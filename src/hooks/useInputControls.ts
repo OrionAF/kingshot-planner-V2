@@ -27,8 +27,12 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
 
   const handleMouseMove = (e: MouseEvent) => {
     const camera = useCameraStore.getState()
-    const { isPlacingPlayer, setMouseWorldPosition, setPlacementValidity } =
-      useUiStore.getState()
+    const {
+      isPlacingPlayer,
+      buildMode, // Get the build mode state
+      setMouseWorldPosition,
+      setPlacementValidity,
+    } = useUiStore.getState()
     const { checkPlacementValidity } = useMapStore.getState()
 
     const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera)
@@ -37,13 +41,26 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
 
     setMouseWorldPosition({ x: roundedX, y: roundedY })
 
-    // If we're in placement mode, run a validity check on every move
-    if (isPlacingPlayer) {
+    // --- UNIFIED PLACEMENT VALIDITY ---
+    if (isPlacingPlayer || buildMode.selectedBuildingType) {
+      let objectW = 0,
+        objectH = 0
+
+      if (isPlacingPlayer) {
+        objectW = AppConfig.player.width
+        objectH = AppConfig.player.height
+      } else if (buildMode.selectedBuildingType) {
+        const def = AppConfig.BUILDING_CATALOG[buildMode.selectedBuildingType]
+        objectW = def.w
+        objectH = def.h
+      }
+
       const isValid = checkPlacementValidity(
         roundedX,
         roundedY,
-        AppConfig.player.width,
-        AppConfig.player.height
+        objectW,
+        objectH,
+        buildMode.activeAllianceId
       )
       setPlacementValidity(isValid)
     }
@@ -59,28 +76,34 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         e.clientX - clickStartPos.x,
         e.clientY - clickStartPos.y
       )
-
       if (dist < 5) {
-        // --- This was a click, not a drag ---
         const camera = useCameraStore.getState()
-        const {
-          isPlacingPlayer,
-          playerToPlace,
-          isValidPlacement,
-          endPlayerPlacement,
-        } = useUiStore.getState()
-        const { placePlayer } = useMapStore.getState()
+        const uiState = useUiStore.getState()
+        const mapActions = useMapStore.getState()
 
         const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera)
         const roundedX = Math.round(worldX)
         const roundedY = Math.round(worldY)
 
-        if (isPlacingPlayer && playerToPlace) {
-          // Only place the player if the final position is valid
-          if (isValidPlacement) {
-            placePlayer(playerToPlace, roundedX, roundedY)
+        // --- UNIFIED PLACEMENT CLICK ---
+        if (uiState.isPlacingPlayer && uiState.playerToPlace) {
+          if (uiState.isValidPlacement) {
+            mapActions.placePlayer(uiState.playerToPlace, roundedX, roundedY)
           }
-          endPlayerPlacement()
+          uiState.endPlayerPlacement()
+        } else if (
+          uiState.buildMode.selectedBuildingType &&
+          uiState.buildMode.activeAllianceId
+        ) {
+          if (uiState.isValidPlacement) {
+            mapActions.placeBuilding(
+              uiState.buildMode.selectedBuildingType,
+              roundedX,
+              roundedY,
+              uiState.buildMode.activeAllianceId
+            )
+          }
+          // Do not deselect building after placement, for rapid building.
         } else {
           console.log(`Click at: ${roundedX}, ${roundedY}`)
         }
@@ -88,6 +111,18 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     }
     isPointerDown = false
     canvas.style.cursor = 'grab'
+  }
+
+  // New handler for keyboard shortcuts
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      const { endPlayerPlacement, buildMode, setSelectedBuildingType } =
+        useUiStore.getState()
+      endPlayerPlacement() // Cancel player placement
+      if (buildMode.selectedBuildingType) {
+        setSelectedBuildingType(null) // Cancel building placement
+      }
+    }
   }
 
   // Other handlers (handleMouseLeave, handleWheel, touch handlers) remain the same.
@@ -100,7 +135,11 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     e.preventDefault()
     const cameraBeforeZoom = useCameraStore.getState()
     const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9
-    const newScale = cameraBeforeZoom.scale * zoomFactor
+    let newScale = cameraBeforeZoom.scale * zoomFactor
+    newScale = Math.max(
+      AppConfig.camera.minScale,
+      Math.min(newScale, AppConfig.camera.maxScale)
+    )
     const focalPoint = { x: e.clientX, y: e.clientY }
     const [worldX, worldY] = screenToWorld(
       focalPoint.x,
@@ -168,7 +207,11 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       )
       if (lastPinchDist > 0) {
         const zoomFactor = newDist / lastPinchDist
-        const newScale = cameraBeforeZoom.scale * zoomFactor
+        let newScale = cameraBeforeZoom.scale * zoomFactor
+        newScale = Math.max(
+          AppConfig.camera.minScale,
+          Math.min(newScale, AppConfig.camera.maxScale)
+        )
         const [worldX, worldY] = screenToWorld(
           focalPoint.x,
           focalPoint.y,
@@ -221,5 +264,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    handleKeyDown,
   }
 }

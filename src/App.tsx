@@ -10,29 +10,22 @@ import { ToolsPanel } from './features/GroupedPanels/ToolsPanel'
 import { SettingsPanel } from './features/Settings/SettingsPanel'
 import { PlayerPanel } from './features/PlayerManager/PlayerPanel'
 import { EditPlayerModal } from './features/PlayerManager/EditPlayerModal'
+import { BuildPanel } from './features/Build/BuildPanel' // 1. IMPORT THE NEW PANEL
 
 function App() {
   return (
     <main>
       <MapCanvas />
       <MapOverlay />
-
-      {/*
-        This is the old, conflicting singleton ModalOverlay.
-        It is now removed. The EditPlayerModal handles its own overlay.
-      */}
-      {/* <ModalOverlay />  <-- THIS LINE MUST BE DELETED */}
-
       {/* --- ALL UI PANELS --- */}
       <AlliancePanel />
       <NavPanel />
       <SettingsPanel />
       <PlayerPanel />
+      <BuildPanel /> {/* 2. ADD THE BUILD PANEL */}
       <ManagementPanel />
       <ToolsPanel />
       <BottomToolbar />
-
-      {/* This component will render the ModalOverlay via the portal when needed */}
       <EditPlayerModal />
     </main>
   )

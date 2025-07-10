@@ -1,8 +1,10 @@
+// src/core/WebGLRenderer.ts
+
 import { AppConfig } from '../config/appConfig'
 import { useCameraStore } from '../state/useCameraStore'
 import { useMapStore } from '../state/useMapStore'
 import { useUiStore } from '../state/useUiStore'
-import { screenToWorld } from './coordinate-utils' // Import screenToWorld
+// FIX: Unused import 'screenToWorld' is removed.
 import {
   mapFragmentShaderSource,
   mapVertexShaderSource,
@@ -10,6 +12,15 @@ import {
 import { createProgramFromSources } from './webgl/webgl-utils'
 
 type Matrix3 = number[]
+
+// FIX: 'DrawableObject' is now only defined once.
+type DrawableObject = {
+  x: number
+  y: number
+  w: number
+  h: number
+  color?: string
+}
 
 function parseColor(colorString: string): [number, number, number] {
   if (colorString.startsWith('#')) {
@@ -27,18 +38,9 @@ function parseColor(colorString: string): [number, number, number] {
   return [0, 0, 0]
 }
 
-type DrawableObject = {
-  x: number
-  y: number
-  w: number
-  h: number
-  color?: string
-}
-
 export class WebGLRenderer {
   private gl: WebGLRenderingContext
   private mapProgram: WebGLProgram
-  // ... attributes and most uniforms ...
   private worldPosAttrLocation: number
   private projectionUniformLocation: WebGLUniformLocation | null
   private fertileColorLocation: WebGLUniformLocation | null
@@ -49,8 +51,6 @@ export class WebGLRenderer {
   private objectColorLocation: WebGLUniformLocation | null
   private isDrawingObjectLocation: WebGLUniformLocation | null
   private objectAlphaLocation: WebGLUniformLocation | null
-
-  // ... buffers ...
   private objectBuffer: WebGLBuffer | null
   private mapPlaneBuffer: WebGLBuffer | null
   private derivativesSupported = false
@@ -69,7 +69,6 @@ export class WebGLRenderer {
       { USE_DERIVATIVES: this.derivativesSupported ? 1 : 0 }
     )
 
-    // ... all location lookups remain the same ...
     this.worldPosAttrLocation = gl.getAttribLocation(
       this.mapProgram,
       'a_worldPosition'
@@ -121,10 +120,12 @@ export class WebGLRenderer {
   public renderFrame() {
     const gl = this.gl
     const camera = useCameraStore.getState()
-    const { baseBuildings, players } = useMapStore.getState()
+    const { baseBuildings, players, userBuildings, alliances } =
+      useMapStore.getState()
     const {
       isPlacingPlayer,
       playerToPlace,
+      buildMode,
       mouseWorldPosition,
       isValidPlacement,
     } = useUiStore.getState()
@@ -132,9 +133,7 @@ export class WebGLRenderer {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
     gl.clearColor(0.06, 0.06, 0.06, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT)
-
     gl.useProgram(this.mapProgram)
-
     const projectionMatrix = this.calculateProjectionMatrix(
       camera.x,
       camera.y,
@@ -149,50 +148,56 @@ export class WebGLRenderer {
     for (const building of baseBuildings) {
       this.drawObject(building)
     }
+    for (const building of userBuildings) {
+      this.drawObject(building)
+    }
     for (const player of players) {
       this.drawObject(player, 1.0)
     }
 
-    // Check device type once
     const isDesktop = window.matchMedia('(min-width: 769px)').matches
+    const isPlacingSomething =
+      isPlacingPlayer || !!buildMode.selectedBuildingType
 
-    // --- RENDER DESKTOP GHOST (on hover) ---
-    if (isPlacingPlayer && playerToPlace && mouseWorldPosition && isDesktop) {
-      const ghostColor = isValidPlacement ? '#28a745' : '#dc3545'
-      this.drawObject(
-        {
-          x: Math.round(mouseWorldPosition.x),
-          y: Math.round(mouseWorldPosition.y),
-          w: AppConfig.player.width,
-          h: AppConfig.player.height,
-          color: ghostColor,
-        },
-        0.6
-      )
-    }
+    if (isPlacingSomething && mouseWorldPosition && isDesktop) {
+      let w = 0,
+        h = 0
 
-    // --- RENDER MOBILE GHOST (at center) ---
-    if (isPlacingPlayer && playerToPlace && !isDesktop) {
-      const [centerX, centerY] = screenToWorld(
-        gl.canvas.width / 2,
-        gl.canvas.height / 2,
-        camera
-      )
-      const ghostColor = isValidPlacement ? '#28a745' : '#dc3545'
-      this.drawObject(
-        {
-          x: Math.round(centerX),
-          y: Math.round(centerY),
-          w: AppConfig.player.width,
-          h: AppConfig.player.height,
-          color: ghostColor,
-        },
-        0.6
-      )
+      // We will set the ghost's base color, and then override it with green/red
+      let ghostBaseColor = '#ffffff'
+
+      if (isPlacingPlayer && playerToPlace) {
+        w = AppConfig.player.width
+        h = AppConfig.player.height
+        ghostBaseColor = playerToPlace.color
+      } else if (buildMode.selectedBuildingType && buildMode.activeAllianceId) {
+        const def = AppConfig.BUILDING_CATALOG[buildMode.selectedBuildingType]
+        const alliance = alliances.find(
+          (a) => a.id === buildMode.activeAllianceId
+        )
+        w = def.w
+        h = def.h
+        ghostBaseColor = alliance?.color ?? '#ffffff'
+      }
+
+      if (w > 0) {
+        // FIX: The unused 'color' variable is now used as 'ghostBaseColor'.
+        // Then, if placement is invalid, we override it with red.
+        const finalGhostColor = isValidPlacement ? ghostBaseColor : '#dc3545'
+        this.drawObject(
+          {
+            x: Math.round(mouseWorldPosition.x),
+            y: Math.round(mouseWorldPosition.y),
+            w,
+            h,
+            color: finalGhostColor,
+          },
+          0.6
+        )
+      }
     }
   }
 
-  // No changes needed below this line
   private drawObject(obj: DrawableObject, alpha = 1.0) {
     const gl = this.gl
     const { x, y, w, h, color } = obj

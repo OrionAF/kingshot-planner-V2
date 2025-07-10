@@ -1,7 +1,11 @@
 // src/state/useUiStore.ts
 
 import { create } from 'zustand'
-import { type OmitIdAndCoords, type Player } from '../types/map.types'
+import {
+  type OmitIdAndCoords,
+  type Player,
+  type BuildingType,
+} from '../types/map.types' // Import BuildingType
 import { useMapStore } from './useMapStore'
 import { useCameraStore } from './useCameraStore'
 import { screenToWorld } from '../core/coordinate-utils'
@@ -21,6 +25,11 @@ export type PanelId =
   | 'tools'
   | null
 
+interface BuildModeState {
+  activeAllianceId: number | null
+  selectedBuildingType: BuildingType | null
+}
+
 interface UiState {
   openPanel: PanelId
   isPlacingPlayer: boolean
@@ -28,6 +37,7 @@ interface UiState {
   mouseWorldPosition: { x: number; y: number } | null
   isValidPlacement: boolean
   editingPlayer: Player | null
+  buildMode: BuildModeState
 }
 
 interface UiActions {
@@ -40,16 +50,24 @@ interface UiActions {
   setPlacementValidity: (isValid: boolean) => void
   startEditingPlayer: (player: Player) => void
   endEditingPlayer: () => void
+  setActiveAllianceId: (id: number | null) => void
+  setSelectedBuildingType: (type: BuildingType | null) => void
 }
 
-export const useUiStore = create<UiState & UiActions>((set) => ({
+export const useUiStore = create<UiState & UiActions>((set, get) => ({
+  // === State ===
   openPanel: null,
   isPlacingPlayer: false,
   playerToPlace: null,
   mouseWorldPosition: null,
   isValidPlacement: true,
   editingPlayer: null,
+  buildMode: {
+    activeAllianceId: null,
+    selectedBuildingType: null,
+  },
 
+  // === Actions ===
   togglePanel: (panelId) =>
     set((state) => ({
       openPanel: state.openPanel === panelId ? null : panelId,
@@ -86,9 +104,36 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
     }))
   },
   endPlayerPlacement: () =>
-    set(() => ({ isPlacingPlayer: false, playerToPlace: null })),
+    set((state) => {
+      // Also ensure we exit build mode if a player placement is ended.
+      if (state.buildMode.selectedBuildingType) {
+        return {
+          isPlacingPlayer: false,
+          playerToPlace: null,
+          buildMode: { ...state.buildMode, selectedBuildingType: null },
+        }
+      }
+      return { isPlacingPlayer: false, playerToPlace: null }
+    }),
+
   setMouseWorldPosition: (pos) => set(() => ({ mouseWorldPosition: pos })),
   setPlacementValidity: (isValid) => set(() => ({ isValidPlacement: isValid })),
   startEditingPlayer: (player) => set(() => ({ editingPlayer: player })),
   endEditingPlayer: () => set(() => ({ editingPlayer: null })),
+
+  // NEW build mode actions
+  setActiveAllianceId: (id) =>
+    set((state) => ({
+      buildMode: { ...state.buildMode, activeAllianceId: id },
+    })),
+
+  setSelectedBuildingType: (type) =>
+    set((state) => {
+      // If the same building type is clicked again, deselect it.
+      const newType =
+        state.buildMode.selectedBuildingType === type ? null : type
+      return {
+        buildMode: { ...state.buildMode, selectedBuildingType: newType },
+      }
+    }),
 }))

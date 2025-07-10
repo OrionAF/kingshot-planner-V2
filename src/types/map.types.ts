@@ -13,7 +13,7 @@ export interface MapObject {
 export interface BaseBuilding extends MapObject {
   id: string
   displayName: string
-  imageKey?: string // Optional property for buildings with special images
+  imageKey?: string
 }
 
 // Data needed from the form to start player placement
@@ -35,4 +35,16 @@ export interface Alliance {
   name: string
   tag: string
   color: string
+}
+
+// --- FIX: ADDED AND EXPORTED MISSING TYPES ---
+// Derives a union type of all possible building keys from our config
+export type BuildingType =
+  keyof (typeof import('../config/appConfig').AppConfig)['BUILDING_CATALOG']
+
+// Defines a building that a user has placed on the map
+export interface UserBuilding extends MapObject {
+  id: number
+  type: BuildingType
+  allianceId: number
 }

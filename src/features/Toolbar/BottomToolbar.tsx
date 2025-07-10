@@ -1,3 +1,5 @@
+// src/features/Toolbar/BottomToolbar.tsx
+
 import { useCameraStore } from '../../state/useCameraStore'
 import { useUiStore } from '../../state/useUiStore'
 import styles from './BottomToolbar.module.css'
@@ -31,12 +33,17 @@ export function BottomToolbar() {
         >
           🏰
         </button>
+
+        {/* --- FIX IS HERE --- */}
         <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'build' ? styles.active : ''}`}
           title="Build Menu"
+          onClick={() => togglePanel('build')}
         >
           🛠️
         </button>
+        {/* --- END FIX --- */}
+
         <button
           className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'player' ? styles.active : ''}`}
           title="Player Management"

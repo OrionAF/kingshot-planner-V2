@@ -1,5 +1,18 @@
+// src/config/appConfig.ts
+
+// Define a type for a single entry in our building catalog for type safety
+export interface BuildingDefinition {
+  name: string
+  w: number
+  h: number
+  coverage: number // Territory coverage radius
+  // FIX: Added 'territory' as a new, more precise placement rule.
+  rule: 'any' | 'claimed' | 'territory' | 'fertile' | 'plains' | 'badlands'
+  limit?: number // Optional limit per alliance
+}
+
 export const AppConfig = {
-  CURRENT_VERSION: '0.0.0.1',
+  CURRENT_VERSION: '0.0.1.0',
   enableDevMode: false,
   N: 1200,
   tileW: 10,
@@ -13,19 +26,90 @@ export const AppConfig = {
   pingColor: '#fff',
   pingDuration: 500,
   baseScale: 5,
-
-  // Add this new section for player configuration
+  camera: {
+    minScale: 0.05,
+    maxScale: 20,
+  },
   player: {
     width: 2,
     height: 2,
   },
 
-  infoBannerThreshold: 50, // How many tiles away from center to show info banner
+  // --- COMPLETE AND CORRECTED BUILDING CATALOG ---
+  BUILDING_CATALOG: {
+    // FIX: Alliance Towers can be placed on unclaimed land OR own land, but not enemy land.
+    alliance_tower: {
+      name: 'Alliance Tower',
+      w: 1,
+      h: 1,
+      coverage: 7,
+      rule: 'territory',
+    },
+    hq_badlands: {
+      name: 'Badlands HQ',
+      w: 3,
+      h: 3,
+      coverage: 15,
+      rule: 'badlands',
+      limit: 1,
+    },
+    hq_plains: {
+      name: 'Plains HQ',
+      w: 3,
+      h: 3,
+      coverage: 15,
+      rule: 'plains',
+      limit: 1,
+    },
+    hq_fertile: {
+      name: 'Fertile Lands HQ',
+      w: 3,
+      h: 3,
+      coverage: 15,
+      rule: 'fertile',
+      limit: 1,
+    },
+    // These must be placed on already claimed territory.
+    pitfall: {
+      name: 'Pitfall Trap',
+      w: 3,
+      h: 3,
+      coverage: 0,
+      rule: 'claimed',
+      limit: 1,
+    },
+    statue1: {
+      name: 'Prestige Statue 1',
+      w: 2,
+      h: 2,
+      coverage: 0,
+      rule: 'claimed',
+      limit: 1,
+    },
+    statue2: {
+      name: 'Prestige Statue 2',
+      w: 2,
+      h: 2,
+      coverage: 0,
+      rule: 'claimed',
+      limit: 1,
+    },
+    statue3: {
+      name: 'Prestige Statue 3',
+      w: 2,
+      h: 2,
+      coverage: 0,
+      rule: 'claimed',
+      limit: 1,
+    },
+  } satisfies Record<string, BuildingDefinition>,
+
+  infoBannerThreshold: 50,
   imageBreakpoints: {
-    highZoom: 80, // % zoom level to use base imageScale
-    midZoom: 25, // % zoom level to use imageScaleBreakpoint_1
-    lowZoom: 10, // % zoom level to use imageScaleBreakpoint_2
-    imageRenderThreshold: 4.5, // % zoom level to start rendering images
+    highZoom: 80,
+    midZoom: 25,
+    lowZoom: 10,
+    imageRenderThreshold: 4.5,
   },
   biomeColors: {
     fertile: 'rgb(109, 159, 62)',

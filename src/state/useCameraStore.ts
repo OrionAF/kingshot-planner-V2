@@ -2,6 +2,7 @@
 
 import { create } from 'zustand'
 import { worldToScreen } from '../core/coordinate-utils'
+import { AppConfig } from '../config/appConfig'
 
 export interface CameraState {
   x: number
@@ -15,8 +16,8 @@ interface CameraActions {
   panTo: (worldX: number, worldY: number) => void // FIX: Add the new action
 }
 
-const MIN_ZOOM = 0.05
-const MAX_ZOOM = 20
+const MIN_ZOOM = AppConfig.camera.minScale
+const MAX_ZOOM = AppConfig.camera.maxScale
 
 export const useCameraStore = create<CameraState & CameraActions>((set) => ({
   // === Initial State ===

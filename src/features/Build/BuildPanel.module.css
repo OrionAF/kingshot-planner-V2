@@ -1,0 +1,82 @@
+/* src/features/Build/BuildPanel.module.css */
+
+.buildPanel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 350px;
+  height: 100%;
+  background: rgba(35, 38, 43, 0.9);
+  border-right: 1px solid #444;
+  backdrop-filter: blur(10px);
+  transform: translateX(-105%);
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  padding-bottom: 75px; /* Space for bottom toolbar */
+  box-sizing: border-box;
+}
+.buildPanel.open {
+  transform: translateX(0);
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  color: #aaa;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-bottom: 1px solid #444;
+  padding-bottom: 8px;
+}
+
+.allianceList,
+.buildingList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Specific item styles */
+.allianceItem,
+.buildingItem {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid #333;
+  color: #e0e0e0;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.allianceItem:hover,
+.buildingItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #555;
+}
+.allianceItem.selected,
+.buildingItem.selected {
+  background-color: #2a9fd6;
+  border-color: #3aafe6;
+  color: white;
+  font-weight: bold;
+}
+.allianceItem.selected:hover {
+  background-color: #3aafe6;
+}
+
+.placeholder {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  padding: 20px;
+  border: 1px dashed #444;
+  border-radius: 4px;
+}
