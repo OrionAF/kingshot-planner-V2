@@ -18,7 +18,7 @@ interface MapState {
   buildingMap: Map<string, BaseBuilding>
   alliances: Alliance[]
   players: Player[]
-  userBuildings: UserBuilding[] // NEW: Array for user buildings
+  userBuildings: UserBuilding[]
 }
 
 interface MapActions {
@@ -31,14 +31,14 @@ interface MapActions {
     x: number,
     y: number,
     allianceId: number
-  ) => void // NEW
-  deleteBuilding: (id: number) => void // NEW
+  ) => void
+  deleteBuilding: (id: number) => void
   importPlan: (data: {
     alliances: Alliance[]
     players: Player[]
     userBuildings: UserBuilding[]
-  }) => void // Updated
-  // Updated signature to accept more context for rules
+  }) => void
+
   checkPlacementValidity: (
     x: number,
     y: number,
@@ -85,20 +85,17 @@ function processBaseMapData(): {
 const initialMapData = processBaseMapData()
 
 export const useMapStore = create<MapState & MapActions>((set, get) => ({
-  // === State ===
   baseBuildings: initialMapData.buildings,
   buildingMap: initialMapData.map,
   alliances: [],
   players: [],
-  userBuildings: [], // NEW
+  userBuildings: [],
 
-  // === Actions ===
   createAlliance: (newAllianceData) =>
     set((state) => ({
       alliances: [...state.alliances, { id: generateId(), ...newAllianceData }],
     })),
 
-  // Player actions remain the same
   placePlayer: (data, x, y) =>
     set((state) => {
       const newPlayer: Player = {
@@ -112,7 +109,6 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
       return { players: [...state.players, newPlayer] }
     }),
 
-  // NEW update action
   updatePlayer: (id, updatedData) =>
     set((state) => ({
       players: state.players.map((p) =>
@@ -123,12 +119,11 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
   deletePlayer: (id) =>
     set((state) => ({ players: state.players.filter((p) => p.id !== id) })),
 
-  // NEW building actions
   placeBuilding: (type, x, y, allianceId) =>
     set((state) => {
       const definition = AppConfig.BUILDING_CATALOG[type]
       const alliance = state.alliances.find((a) => a.id === allianceId)
-      if (!definition || !alliance) return {} // Safety check
+      if (!definition || !alliance) return {}
 
       const newBuilding: UserBuilding = {
         id: generateId(),
@@ -151,11 +146,10 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
     set(() => ({
       alliances: data.alliances ?? [],
       players: data.players ?? [],
-      userBuildings: data.userBuildings ?? [], // NEW
+      userBuildings: data.userBuildings ?? [],
     })),
 
   checkPlacementValidity: (x, y, w, h, allianceId = null, rule = 'any') => {
-    // get() gives us access to the current state inside the function
     const { buildingMap, players, userBuildings } = get()
     const N = AppConfig.N
 
@@ -166,7 +160,6 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
 
         if (checkX < 0 || checkX >= N || checkY < 0 || checkY >= N) return false
 
-        // Check for collision with a base or user building
         if (buildingMap.has(`${checkX},${checkY}`)) return false
         for (const b of userBuildings) {
           if (
@@ -178,7 +171,6 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
             return false
         }
 
-        // Check for collision with a player
         for (const p of players) {
           if (
             checkX >= p.x &&
@@ -188,8 +180,6 @@ export const useMapStore = create<MapState & MapActions>((set, get) => ({
           )
             return false
         }
-
-        // FUTURE: This is where we will check territory rules based on allianceId and rule
       }
     }
     return true

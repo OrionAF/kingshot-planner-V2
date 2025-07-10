@@ -15,7 +15,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
   let lastPinchDist = 0
 
   const handleMouseDown = (e: MouseEvent) => {
-    // Only start panning if it's a left click
     if (e.button !== 0) return
     isPointerDown = true
     clickStartPos = { x: e.clientX, y: e.clientY }
@@ -70,7 +69,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
   }
 
   const handleMouseUp = (e: MouseEvent) => {
-    // Only handle mouseup for left clicks
     if (e.button !== 0) return
 
     if (isPointerDown) {
@@ -104,7 +102,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
               uiState.buildMode.activeAllianceId
             )
           }
-          // Intentionally do not deselect for rapid building
         } else {
           if (import.meta.env.DEV) {
             console.log(`Click at: ${roundedX}, ${roundedY}`)
@@ -141,7 +138,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       if (window.confirm(`Delete this building?`)) {
         deleteBuilding(buildingToDelete.id)
       }
-      return // Stop after finding a building
+      return
     }
 
     const playerToDelete = players.find(
@@ -219,7 +216,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       const dy = touch.clientY - lastPanPos.y
       panBy(dx, dy)
       lastPanPos = { x: touch.clientX, y: touch.clientY }
-      // Unified placement validity on mobile pan
+
       const { isPlacingPlayer, buildMode, setPlacementValidity } =
         useUiStore.getState()
       if (isPlacingPlayer || buildMode.selectedBuildingType) {
@@ -281,7 +278,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         const newCamY = focalPoint.y - screenYAfter * newScale
         zoomTo({ x: newCamX, y: newCamY, scale: newScale })
 
-        // Update placement validity when pinching to zoom
         const { isPlacingPlayer, setPlacementValidity } = useUiStore.getState()
         if (isPlacingPlayer) {
           const camera = useCameraStore.getState()

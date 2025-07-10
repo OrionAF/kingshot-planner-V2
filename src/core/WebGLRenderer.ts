@@ -121,7 +121,7 @@ export class WebGLRenderer {
       useMapStore.getState()
     const {
       isPlacingPlayer,
-      playerToPlace, // FIX: This will now be used
+      playerToPlace,
       buildMode,
       mouseWorldPosition,
       isValidPlacement,
@@ -154,7 +154,6 @@ export class WebGLRenderer {
       this.drawObject(player, 1.0)
     }
 
-    // --- GHOST RENDERING LOGIC ---
     const isDesktop = window.matchMedia('(min-width: 769px)').matches
     const isPlacingSomething =
       isPlacingPlayer || !!buildMode.selectedBuildingType
@@ -163,27 +162,26 @@ export class WebGLRenderer {
       let w = 0,
         h = 0,
         coverage = 0
-      let ghostBaseColor = '#ffffff' // Default color
+      let ghostBaseColor = '#ffffff'
       let ghostPosition = { x: 0, y: 0 }
 
-      const ghostColor = isValidPlacement ? undefined : '#dc3545' // Use undefined for valid, red for invalid
+      const ghostColor = isValidPlacement ? undefined : '#dc3545'
 
       if (isPlacingPlayer && playerToPlace) {
         w = AppConfig.player.width
         h = AppConfig.player.height
-        ghostBaseColor = playerToPlace.color // FIX: Correctly use playerToPlace
+        ghostBaseColor = playerToPlace.color
       } else if (buildMode.selectedBuildingType && buildMode.activeAllianceId) {
         const def = AppConfig.BUILDING_CATALOG[buildMode.selectedBuildingType]
         const alliance = alliances.find(
           (a) => a.id === buildMode.activeAllianceId
-        ) // FIX: Correctly use alliances
+        )
         w = def.w
         h = def.h
         coverage = def.coverage
         ghostBaseColor = alliance?.color ?? '#ffffff'
       }
 
-      // This logic now correctly works for BOTH desktop and mobile
       if (w > 0) {
         if (isDesktop && mouseWorldPosition) {
           ghostPosition = {
@@ -191,7 +189,6 @@ export class WebGLRenderer {
             y: Math.round(mouseWorldPosition.y),
           }
         } else {
-          // Mobile or no mouse position
           const [centerX, centerY] = screenToWorld(
             gl.canvas.width / 2,
             gl.canvas.height / 2,
@@ -200,7 +197,6 @@ export class WebGLRenderer {
           ghostPosition = { x: Math.round(centerX), y: Math.round(centerY) }
         }
 
-        // Draw the coverage range if applicable
         if (coverage > 0) {
           const radius = Math.floor(coverage / 2)
           this.drawObject(
@@ -209,13 +205,12 @@ export class WebGLRenderer {
               y: ghostPosition.y + Math.floor(h / 2) - radius,
               w: coverage,
               h: coverage,
-              color: ghostColor ?? ghostBaseColor, // Use red if invalid, otherwise the base color
+              color: ghostColor ?? ghostBaseColor,
             },
             0.15
           )
         }
 
-        // Draw the main ghost object
         this.drawObject(
           { ...ghostPosition, w, h, color: ghostColor ?? ghostBaseColor },
           0.6
