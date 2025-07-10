@@ -5,7 +5,7 @@ import {
   type OmitIdAndCoords,
   type Player,
   type BuildingType,
-} from '../types/map.types' // Import BuildingType
+} from '../types/map.types'
 import { useMapStore } from './useMapStore'
 import { useCameraStore } from './useCameraStore'
 import { screenToWorld } from '../core/coordinate-utils'
@@ -55,7 +55,6 @@ interface UiActions {
 }
 
 export const useUiStore = create<UiState & UiActions>((set, get) => ({
-  // === State ===
   openPanel: null,
   isPlacingPlayer: false,
   playerToPlace: null,
@@ -67,7 +66,6 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
     selectedBuildingType: null,
   },
 
-  // === Actions ===
   togglePanel: (panelId) =>
     set((state) => ({
       openPanel: state.openPanel === panelId ? null : panelId,
@@ -76,12 +74,10 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
   closeAllPanels: () => set(() => ({ openPanel: null })),
 
   startPlayerPlacement: (playerData) => {
-    // FIX: Check initial placement validity immediately
     const isDesktop = window.matchMedia('(min-width: 769px)').matches
     let initialValidity = true
 
     if (!isDesktop) {
-      // On mobile, check the center of the screen
       const camera = useCameraStore.getState()
       const { checkPlacementValidity } = useMapStore.getState()
       const [worldX, worldY] = screenToWorld(
@@ -105,7 +101,6 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
   },
   endPlayerPlacement: () =>
     set((state) => {
-      // Also ensure we exit build mode if a player placement is ended.
       if (state.buildMode.selectedBuildingType) {
         return {
           isPlacingPlayer: false,
@@ -121,7 +116,6 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
   startEditingPlayer: (player) => set(() => ({ editingPlayer: player })),
   endEditingPlayer: () => set(() => ({ editingPlayer: null })),
 
-  // NEW build mode actions
   setActiveAllianceId: (id) =>
     set((state) => ({
       buildMode: { ...state.buildMode, activeAllianceId: id },
@@ -129,7 +123,6 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
 
   setSelectedBuildingType: (type) =>
     set((state) => {
-      // If the same building type is clicked again, deselect it.
       const newType =
         state.buildMode.selectedBuildingType === type ? null : type
       return {
