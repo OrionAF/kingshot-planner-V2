@@ -11,11 +11,9 @@ export function BuildPanel() {
   const { buildMode, setActiveAllianceId, setSelectedBuildingType } =
     useUiStore()
 
-  // Get the catalog directly from the AppConfig
   const buildingCatalog = AppConfig.BUILDING_CATALOG
 
   const handleAllianceSelect = (id: number) => {
-    // If the same alliance is clicked, deselect it. Otherwise, select it.
     setActiveAllianceId(buildMode.activeAllianceId === id ? null : id)
   }
 

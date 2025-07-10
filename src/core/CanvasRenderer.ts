@@ -16,14 +16,6 @@ export class CanvasRenderer {
     }
   }
 
-  // =================================================================
-  // == The Main Render Function ==
-  // =================================================================
-
-  /**
-   * The main render function, called on every animation frame.
-   * It calculates the visible area and draws only the tiles within it.
-   */
   public renderFrame() {
     const { width, height } = this.ctx.canvas
 
@@ -31,28 +23,22 @@ export class CanvasRenderer {
     this.ctx.fillStyle = '#111'
     this.ctx.fillRect(0, 0, width, height)
 
-    // Get the current, live camera state from our global store.
     const camera = useCameraStore.getState()
 
-    // Apply the camera's view transformation
     this.ctx.setTransform(camera.scale, 0, 0, camera.scale, camera.x, camera.y)
 
-    // --- Calculate which tiles are visible ---
     const [tl_x, tl_y] = this.screenToWorld(0, 0, camera)
     const [tr_x, tr_y] = this.screenToWorld(width, 0, camera)
     const [bl_x, bl_y] = this.screenToWorld(0, height, camera)
     const [br_x, br_y] = this.screenToWorld(width, height, camera)
 
-    // Find the min/max bounds of the visible coordinates, with a little padding.
     const minX = Math.min(tl_x, tr_x, bl_x, br_x) - 1
     const maxX = Math.max(tl_x, tr_x, bl_x, br_x) + 1
     const minY = Math.min(tl_y, tr_y, bl_y, br_y) - 1
     const maxY = Math.max(tl_y, tr_y, bl_y, br_y) + 1
 
-    // --- Draw the visible tiles ---
     for (let x = Math.floor(minX); x <= maxX; x++) {
       for (let y = Math.floor(minY); y <= maxY; y++) {
-        // Make sure we don't try to draw tiles outside the map's actual bounds
         if (x < 0 || x >= AppConfig.N || y < 0 || y >= AppConfig.N) {
           continue
         }
@@ -60,11 +46,8 @@ export class CanvasRenderer {
       }
     }
 
-    // === NEW BLOCK START ===
-    // --- Draw the buildings ---
     const { baseBuildings } = useMapStore.getState()
 
-    // Filter to only draw buildings that are currently in the camera's view
     for (const building of baseBuildings) {
       if (
         building.x > maxX ||
@@ -72,26 +55,20 @@ export class CanvasRenderer {
         building.y > maxY ||
         building.y + building.h - 1 < minY
       ) {
-        continue // Skip buildings that are off-screen
+        continue
       }
       this.drawBuilding(building)
     }
-    // === NEW BLOCK END ===
 
-    // --- Draw the selection highlight ---
     const { selection } = useSelectionStore.getState()
 
     if (selection) {
       this.ctx.strokeStyle = AppConfig.selectionColor
       this.ctx.lineWidth = 0.5
 
-      // Check the TYPE of selection
       if (selection.type === 'building') {
-        // If it's a building, reuse our existing drawBuilding logic,
-        // but tell it not to fill the shape, only draw the border.
-        this.drawBuilding(selection.data, true) // Pass 'true' to indicate it's a highlight
+        this.drawBuilding(selection.data, true)
       } else if (selection.type === 'tile') {
-        // If it's just a tile, draw the simple single-tile highlight.
         const { x, y } = selection.data
         const [screenX, screenY] = this.worldToScreen(x, y)
 
@@ -106,13 +83,6 @@ export class CanvasRenderer {
     }
   }
 
-  // =================================================================
-  // == Coordinate and Drawing Helper Methods ==
-  // =================================================================
-
-  /**
-   * Draws a single isometric tile on the canvas.
-   */
   private drawTile(x: number, y: number) {
     const [screenX, screenY] = this.worldToScreen(x, y)
 
@@ -127,14 +97,10 @@ export class CanvasRenderer {
     this.ctx.fill()
   }
 
-  /**
-   * Draws the footprint of a building.
-   */
   private drawBuilding(b: BaseBuilding, isHighlight = false) {
     const { x: x0, y: y0, w, h } = b
     const { tileW, tileH } = AppConfig
 
-    // 1. Calculate the screen center points of the four CORNER TILES.
     const [topLeftTile_sx, topLeftTile_sy] = this.worldToScreen(x0, y0)
     const [topRightTile_sx, topRightTile_sy] = this.worldToScreen(
       x0 + w - 1,
@@ -149,14 +115,11 @@ export class CanvasRenderer {
       y0 + h - 1
     )
 
-    // 2. Use the centers of the corner tiles to find the true outer vertices
-    //    of the entire building's diamond footprint.
     const topVertex_sy = topLeftTile_sy - tileH / 2
     const rightVertex_sx = topRightTile_sx + tileW / 2
     const bottomVertex_sy = bottomRightTile_sy + tileH / 2
     const leftVertex_sx = bottomLeftTile_sx - tileW / 2
 
-    // 3. Draw the final shape by connecting these four extreme points.
     this.ctx.beginPath()
     this.ctx.moveTo(topLeftTile_sx, topVertex_sy)
     this.ctx.lineTo(rightVertex_sx, topRightTile_sy)
@@ -169,19 +132,14 @@ export class CanvasRenderer {
       this.ctx.strokeStyle = AppConfig.selectionColor
       this.ctx.stroke()
     } else {
-      // FIX: Use 'color' instead of 'fillColor'
       this.ctx.fillStyle = b.color
-      this.ctx.strokeStyle = b.borderColor ?? AppConfig.borderColor // Use default if borderColor is missing
+      this.ctx.strokeStyle = b.borderColor ?? AppConfig.borderColor
       this.ctx.lineWidth = 0.3
       this.ctx.fill()
       this.ctx.stroke()
     }
   }
 
-  /**
-   * Translates a screen pixel coordinate (sx, sy) into a map coordinate.
-   * We will pass the camera state into this method.
-   */
   public screenToWorld(
     sx: number,
     sy: number,
