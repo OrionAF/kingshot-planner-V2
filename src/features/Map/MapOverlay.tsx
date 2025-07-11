@@ -8,17 +8,15 @@ import { screenToWorld } from '../../core/coordinate-utils';
 import styles from './MapOverlay.module.css';
 
 export function MapOverlay() {
-  const cameraState = useCameraStore((state) => ({
-    x: state.x,
-    y: state.y,
-    scale: state.scale,
-  }));
+  // FIX: Select the state object directly or individual primitives.
+  // We'll select the whole state object here for simplicity as the camera values change together.
+  const cameraState = useCameraStore((state) => state);
+
   const {
     buildMode,
     isPlacingPlayer,
     playerToPlace,
-    endPlayerPlacement,
-    setSelectedBuildingType,
+    exitPlacementMode, // Use the corrected cancellation action
     isValidPlacement,
   } = useUiStore();
   const { placePlayer, placeBuilding } = useMapStore();
@@ -26,6 +24,7 @@ export function MapOverlay() {
   const isPlacingSomething =
     isPlacingPlayer || !!buildMode.selectedBuildingType;
 
+  // This calculation is now safe because cameraState is a stable reference
   const [worldX, worldY] = screenToWorld(
     window.innerWidth / 2,
     window.innerHeight / 2,
@@ -48,12 +47,12 @@ export function MapOverlay() {
         );
       }
     }
-    handleCancelPlacement();
+    // Always exit placement mode after a confirm action
+    exitPlacementMode();
   };
 
   const handleCancelPlacement = () => {
-    endPlayerPlacement();
-    setSelectedBuildingType(null);
+    exitPlacementMode();
   };
 
   return (

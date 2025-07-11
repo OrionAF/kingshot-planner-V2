@@ -9,7 +9,6 @@ import {
 import { useMapStore } from './useMapStore';
 import { useCameraStore } from './useCameraStore';
 import { screenToWorld } from '../core/coordinate-utils';
-import { AppConfig } from '../config/appConfig';
 
 export type PanelId =
   | 'alliance'
@@ -46,6 +45,7 @@ interface UiActions {
   closeAllPanels: () => void;
   startPlayerPlacement: (playerData: OmitIdAndCoords) => void;
   endPlayerPlacement: () => void;
+  exitPlacementMode: () => void;
   setMouseWorldPosition: (pos: { x: number; y: number }) => void;
   setPlacementValidity: (isValid: boolean) => void;
   startEditingPlayer: (player: Player) => void;
@@ -54,7 +54,7 @@ interface UiActions {
   setSelectedBuildingType: (type: BuildingType | null) => void;
 }
 
-export const useUiStore = create<UiState & UiActions>((set, get) => ({
+export const useUiStore = create<UiState & UiActions>((set) => ({
   openPanel: null,
   isPlacingPlayer: false,
   playerToPlace: null,
@@ -85,11 +85,11 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
         window.innerHeight / 2,
         camera,
       );
+      // FIX: Correctly call the validity check for a player
       initialValidity = checkPlacementValidity(
         Math.round(worldX),
         Math.round(worldY),
-        AppConfig.player.width,
-        AppConfig.player.height,
+        'player',
       );
     }
 
@@ -97,19 +97,28 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
       isPlacingPlayer: true,
       playerToPlace: playerData,
       isValidPlacement: initialValidity,
+      buildMode: {
+        activeAllianceId: null,
+        selectedBuildingType: null,
+      },
     }));
   },
   endPlayerPlacement: () =>
-    set((state) => {
-      if (state.buildMode.selectedBuildingType) {
-        return {
-          isPlacingPlayer: false,
-          playerToPlace: null,
-          buildMode: { ...state.buildMode, selectedBuildingType: null },
-        };
-      }
-      return { isPlacingPlayer: false, playerToPlace: null };
-    }),
+    set(() => ({
+      isPlacingPlayer: false,
+      playerToPlace: null,
+    })),
+
+  exitPlacementMode: () => {
+    set((state) => ({
+      isPlacingPlayer: false,
+      playerToPlace: null,
+      buildMode: {
+        ...state.buildMode,
+        selectedBuildingType: null,
+      },
+    }));
+  },
 
   setMouseWorldPosition: (pos) => set(() => ({ mouseWorldPosition: pos })),
   setPlacementValidity: (isValid) => set(() => ({ isValidPlacement: isValid })),
@@ -117,16 +126,32 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
   endEditingPlayer: () => set(() => ({ editingPlayer: null })),
 
   setActiveAllianceId: (id) =>
-    set((state) => ({
-      buildMode: { ...state.buildMode, activeAllianceId: id },
-    })),
+    set((state) => {
+      const shouldClearBuilding =
+        state.buildMode.activeAllianceId === id ||
+        (id !== null && state.buildMode.activeAllianceId !== id);
+
+      return {
+        buildMode: {
+          activeAllianceId: state.buildMode.activeAllianceId === id ? null : id,
+          selectedBuildingType: shouldClearBuilding
+            ? null
+            : state.buildMode.selectedBuildingType,
+        },
+      };
+    }),
 
   setSelectedBuildingType: (type) =>
     set((state) => {
       const newType =
         state.buildMode.selectedBuildingType === type ? null : type;
+
+      if (!state.buildMode.activeAllianceId) return state;
+
       return {
         buildMode: { ...state.buildMode, selectedBuildingType: newType },
+        isPlacingPlayer: false,
+        playerToPlace: null,
       };
     }),
 }));

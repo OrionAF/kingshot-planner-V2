@@ -10,6 +10,7 @@ import {
   mapVertexShaderSource,
 } from './webgl/map-shaders';
 import { createProgramFromSources } from './webgl/webgl-utils';
+import type { Alliance } from '../types/map.types';
 
 type Matrix3 = number[];
 type DrawableObject = {
@@ -20,6 +21,7 @@ type DrawableObject = {
   color?: string;
 };
 
+// Utility to parse CSS color strings into normalized [r, g, b]
 function parseColor(colorString: string): [number, number, number] {
   if (colorString.startsWith('#')) {
     const r = parseInt(colorString.slice(1, 3), 16) / 255;
@@ -27,13 +29,14 @@ function parseColor(colorString: string): [number, number, number] {
     const b = parseInt(colorString.slice(5, 7), 16) / 255;
     return [r, g, b];
   } else if (colorString.startsWith('rgb')) {
-    return (
-      (colorString.match(/\d+/g)?.map(Number) as [number, number, number]) || [
-        0, 0, 0,
-      ]
-    ).map((c) => c / 255) as [number, number, number];
+    const parts = colorString.match(/\d+/g);
+    if (parts) {
+      return (parts.map(Number) as [number, number, number]).map(
+        (c) => c / 255,
+      ) as [number, number, number];
+    }
   }
-  return [0, 0, 0];
+  return [0, 0, 0]; // Default to black on parse error
 }
 
 export class WebGLRenderer {
@@ -50,8 +53,10 @@ export class WebGLRenderer {
   private isDrawingObjectLocation: WebGLUniformLocation | null;
   private objectAlphaLocation: WebGLUniformLocation | null;
   private objectBuffer: WebGLBuffer | null;
+  private territoryBuffer: WebGLBuffer | null; // Buffer specifically for territory
   private mapPlaneBuffer: WebGLBuffer | null;
   private derivativesSupported = false;
+  private isDrawingTerritoryLocation: WebGLUniformLocation | null;
 
   constructor(gl: WebGLRenderingContext) {
     this.gl = gl;
@@ -101,11 +106,16 @@ export class WebGLRenderer {
       this.mapProgram,
       'u_isDrawingObject',
     );
+    this.isDrawingTerritoryLocation = gl.getUniformLocation(
+      this.mapProgram,
+      'u_isDrawingTerritory',
+    );
     this.objectAlphaLocation = gl.getUniformLocation(
       this.mapProgram,
       'u_objectAlpha',
     );
     this.objectBuffer = gl.createBuffer();
+    this.territoryBuffer = gl.createBuffer();
     this.mapPlaneBuffer = this.createMapPlaneBuffer();
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -117,8 +127,13 @@ export class WebGLRenderer {
   public renderFrame() {
     const gl = this.gl;
     const camera = useCameraStore.getState();
-    const { baseBuildings, players, userBuildings, alliances } =
-      useMapStore.getState();
+    const {
+      baseBuildings,
+      players,
+      userBuildings,
+      alliances,
+      claimedTerritory,
+    } = useMapStore.getState();
     const {
       isPlacingPlayer,
       playerToPlace,
@@ -147,6 +162,13 @@ export class WebGLRenderer {
 
     this.drawMapPlane();
 
+    claimedTerritory.forEach((tiles, allianceId) => {
+      const alliance = alliances.find((a) => a.id === allianceId);
+      if (alliance && tiles.size > 0) {
+        this.drawTerritory(alliance, tiles);
+      }
+    });
+
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
     for (const building of baseBuildings) {
       this.drawObject(building);
@@ -168,9 +190,7 @@ export class WebGLRenderer {
         coverage = 0;
       let ghostBaseColor = '#ffffff';
       let ghostPosition = { x: 0, y: 0 };
-
       const ghostColor = isValidPlacement ? undefined : '#dc3545';
-
       if (isPlacingPlayer && playerToPlace) {
         w = AppConfig.player.width;
         h = AppConfig.player.height;
@@ -185,7 +205,6 @@ export class WebGLRenderer {
         coverage = def.coverage;
         ghostBaseColor = alliance?.color ?? '#ffffff';
       }
-
       if (w > 0) {
         if (isDesktop && mouseWorldPosition) {
           ghostPosition = {
@@ -200,8 +219,8 @@ export class WebGLRenderer {
           );
           ghostPosition = { x: Math.round(centerX), y: Math.round(centerY) };
         }
-
         if (coverage > 0) {
+          // FIX: Declare the 'radius' variable before using it.
           const radius = Math.floor(coverage / 2);
           this.drawObject(
             {
@@ -214,7 +233,6 @@ export class WebGLRenderer {
             0.15,
           );
         }
-
         this.drawObject(
           { ...ghostPosition, w, h, color: ghostColor ?? ghostBaseColor },
           0.6,
@@ -223,10 +241,47 @@ export class WebGLRenderer {
     }
   }
 
+  private drawTerritory(alliance: Alliance, tiles: Set<string>) {
+    const gl = this.gl;
+
+    gl.uniform1f(this.isDrawingObjectLocation, 0.0);
+    gl.uniform1f(this.isDrawingTerritoryLocation, 1.0);
+
+    const [r, g, b] = parseColor(alliance.color);
+    gl.uniform3fv(this.objectColorLocation, [r, g, b]);
+    gl.uniform1f(this.objectAlphaLocation, 0.25);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.territoryBuffer);
+    gl.enableVertexAttribArray(this.worldPosAttrLocation);
+    gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0);
+
+    const positions: number[] = [];
+    tiles.forEach((coordStr) => {
+      const [x, y] = coordStr.split(',').map(Number);
+      positions.push(x, y, x + 1, y, x, y + 1);
+      positions.push(x, y + 1, x + 1, y, x + 1, y + 1);
+    });
+
+    if (positions.length > 0) {
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array(positions),
+        gl.DYNAMIC_DRAW,
+      );
+      gl.drawArrays(gl.TRIANGLES, 0, positions.length / 2);
+    }
+
+    gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
+  }
+
   private drawObject(obj: DrawableObject, alpha = 1.0) {
     const gl = this.gl;
     const { x, y, w, h, color } = obj;
     if (!color) return;
+
+    gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
+    gl.uniform1f(this.isDrawingObjectLocation, 1.0);
+
     const positions = [
       x,
       y,
@@ -261,6 +316,7 @@ export class WebGLRenderer {
     gl.enableVertexAttribArray(this.worldPosAttrLocation);
     gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0);
     gl.uniform1f(this.isDrawingObjectLocation, 0.0);
+    gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
     gl.uniform3fv(
       this.fertileColorLocation,
       parseColor(AppConfig.biomeColors.fertile),
@@ -299,8 +355,9 @@ export class WebGLRenderer {
     const b = (tileH / 2) * camScale * clipY;
     const c = (-tileW / 2) * camScale * clipX;
     const d = (tileH / 2) * camScale * clipY;
-    const tx = camX * clipX - 1;
-    const ty = camY * clipY + 1;
+    const tx = camX * clipX - 1.0;
+    const ty = camY * clipY + 1.0;
+
     return [a, b, 0, c, d, 0, tx, ty, 1];
   }
 }

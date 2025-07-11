@@ -19,7 +19,10 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     isPointerDown = true;
     clickStartPos = { x: e.clientX, y: e.clientY };
     lastPanPos = { x: e.clientX, y: e.clientY };
-    canvas.style.cursor = 'grabbing';
+    const { isPlacingPlayer, buildMode } = useUiStore.getState();
+    if (!isPlacingPlayer && !buildMode.selectedBuildingType) {
+      canvas.style.cursor = 'grabbing';
+    }
   };
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -30,35 +33,28 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       setMouseWorldPosition,
       setPlacementValidity,
     } = useUiStore.getState();
-    const { checkPlacementValidity } = useMapStore.getState();
+
+    if (isPlacingPlayer || buildMode.selectedBuildingType) {
+      canvas.style.cursor = 'crosshair';
+    } else if (isPointerDown) {
+      canvas.style.cursor = 'grabbing';
+    } else {
+      canvas.style.cursor = 'grab';
+    }
+
     const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera);
     const roundedX = Math.round(worldX);
     const roundedY = Math.round(worldY);
-
     setMouseWorldPosition({ x: roundedX, y: roundedY });
 
     if (isPlacingPlayer || buildMode.selectedBuildingType) {
-      let objectW = 0,
-        objectH = 0,
-        rule = 'any';
-
-      if (isPlacingPlayer) {
-        objectW = AppConfig.player.width;
-        objectH = AppConfig.player.height;
-      } else if (buildMode.selectedBuildingType) {
-        const def = AppConfig.BUILDING_CATALOG[buildMode.selectedBuildingType];
-        objectW = def.w;
-        objectH = def.h;
-        rule = def.rule;
-      }
-
+      const { checkPlacementValidity } = useMapStore.getState();
+      const type = isPlacingPlayer ? 'player' : buildMode.selectedBuildingType!;
       const isValid = checkPlacementValidity(
         roundedX,
         roundedY,
-        objectW,
-        objectH,
+        type,
         buildMode.activeAllianceId,
-        rule,
       );
       setPlacementValidity(isValid);
     }
@@ -77,30 +73,43 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         e.clientY - clickStartPos.y,
       );
       if (dist < 5) {
+        const uiStore = useUiStore.getState();
+        const mapStore = useMapStore.getState();
         const camera = useCameraStore.getState();
-        const uiState = useUiStore.getState();
-        const mapActions = useMapStore.getState();
 
         const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera);
         const roundedX = Math.round(worldX);
         const roundedY = Math.round(worldY);
 
-        if (uiState.isPlacingPlayer && uiState.playerToPlace) {
-          if (uiState.isValidPlacement) {
-            mapActions.placePlayer(uiState.playerToPlace, roundedX, roundedY);
+        const {
+          isPlacingPlayer,
+          playerToPlace,
+          endPlayerPlacement,
+          buildMode,
+          setSelectedBuildingType,
+          isValidPlacement,
+        } = uiStore;
+
+        if (isPlacingPlayer && playerToPlace) {
+          if (isValidPlacement) {
+            mapStore.placePlayer(playerToPlace, roundedX, roundedY);
+            endPlayerPlacement();
           }
-          uiState.endPlayerPlacement();
         } else if (
-          uiState.buildMode.selectedBuildingType &&
-          uiState.buildMode.activeAllianceId
+          buildMode.selectedBuildingType &&
+          buildMode.activeAllianceId
         ) {
-          if (uiState.isValidPlacement) {
-            mapActions.placeBuilding(
-              uiState.buildMode.selectedBuildingType,
+          if (isValidPlacement) {
+            mapStore.placeBuilding(
+              buildMode.selectedBuildingType,
               roundedX,
               roundedY,
-              uiState.buildMode.activeAllianceId,
+              buildMode.activeAllianceId,
             );
+            // Auto-deselect if it's not a tower
+            if (buildMode.selectedBuildingType !== 'alliance_tower') {
+              setSelectedBuildingType(null);
+            }
           }
         } else {
           if (import.meta.env.DEV) {
@@ -116,9 +125,17 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
   const handleContextMenu = (e: MouseEvent) => {
     e.preventDefault();
 
-    const { buildMode, isPlacingPlayer } = useUiStore.getState();
-    if (isPlacingPlayer || buildMode.selectedBuildingType) return;
+    const { isPlacingPlayer, buildMode, exitPlacementMode } =
+      useUiStore.getState();
 
+    // If in any placement mode, right-click cancels it.
+    if (isPlacingPlayer || buildMode.selectedBuildingType) {
+      exitPlacementMode();
+      canvas.style.cursor = 'grab';
+      return;
+    }
+
+    // Otherwise, attempt to delete an object.
     const { userBuildings, deleteBuilding, players, deletePlayer } =
       useMapStore.getState();
     const camera = useCameraStore.getState();
@@ -158,15 +175,13 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
-      const { endPlayerPlacement, buildMode, setSelectedBuildingType } =
-        useUiStore.getState();
-      endPlayerPlacement();
-      if (buildMode.selectedBuildingType) {
-        setSelectedBuildingType(null);
-      }
+      const { exitPlacementMode } = useUiStore.getState();
+      exitPlacementMode();
+      canvas.style.cursor = 'grab';
     }
   };
 
+  // ... (mouse leave, wheel, and touch handlers are unchanged)
   const handleMouseLeave = () => {
     isPointerDown = false;
     canvas.style.cursor = 'grab';
@@ -187,9 +202,12 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       focalPoint.y,
       cameraBeforeZoom,
     );
-    const [screenXAfter, screenYAfter] = worldToScreen(worldX, worldY);
+    const [screenXAfter] = worldToScreen(worldX, worldY);
+    // Y-coordinate has inverted screen space, need to recalculate Y differently
+    const screenYAfterFrom0 = (worldX + worldY) * (AppConfig.tileH / 2);
+
     const newCamX = focalPoint.x - screenXAfter * newScale;
-    const newCamY = focalPoint.y - screenYAfter * newScale;
+    const newCamY = focalPoint.y - screenYAfterFrom0 * newScale;
     zoomTo({ x: newCamX, y: newCamY, scale: newScale });
   };
 
@@ -227,26 +245,14 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           window.innerHeight / 2,
           camera,
         );
-        let w = 0,
-          h = 0,
-          rule = 'any';
-        if (isPlacingPlayer) {
-          w = AppConfig.player.width;
-          h = AppConfig.player.height;
-        } else if (buildMode.selectedBuildingType) {
-          const def =
-            AppConfig.BUILDING_CATALOG[buildMode.selectedBuildingType];
-          w = def.w;
-          h = def.h;
-          rule = def.rule;
-        }
+        const type = isPlacingPlayer
+          ? 'player'
+          : buildMode.selectedBuildingType!;
         const isValid = checkPlacementValidity(
           Math.round(worldX),
           Math.round(worldY),
-          w,
-          h,
+          type,
           buildMode.activeAllianceId,
-          rule,
         );
         setPlacementValidity(isValid);
       }
@@ -274,13 +280,15 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           focalPoint.y,
           cameraBeforeZoom,
         );
-        const [screenXAfter, screenYAfter] = worldToScreen(worldX, worldY);
+        const [screenXAfter] = worldToScreen(worldX, worldY);
+        const screenYAfterFrom0 = (worldX + worldY) * (AppConfig.tileH / 2);
         const newCamX = focalPoint.x - screenXAfter * newScale;
-        const newCamY = focalPoint.y - screenYAfter * newScale;
+        const newCamY = focalPoint.y - screenYAfterFrom0 * newScale;
         zoomTo({ x: newCamX, y: newCamY, scale: newScale });
 
-        const { isPlacingPlayer, setPlacementValidity } = useUiStore.getState();
-        if (isPlacingPlayer) {
+        const { isPlacingPlayer, setPlacementValidity, buildMode } =
+          useUiStore.getState();
+        if (isPlacingPlayer || buildMode.selectedBuildingType) {
           const camera = useCameraStore.getState();
           const { checkPlacementValidity } = useMapStore.getState();
           const [centerX, centerY] = screenToWorld(
@@ -288,11 +296,14 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
             window.innerHeight / 2,
             camera,
           );
+          const type = isPlacingPlayer
+            ? 'player'
+            : buildMode.selectedBuildingType!;
           const isValid = checkPlacementValidity(
             Math.round(centerX),
             Math.round(centerY),
-            AppConfig.player.width,
-            AppConfig.player.height,
+            type,
+            buildMode.activeAllianceId,
           );
           setPlacementValidity(isValid);
         }
@@ -309,7 +320,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       lastPinchDist = 0;
     }
   };
-
   return {
     handleMouseDown,
     handleMouseMove,
