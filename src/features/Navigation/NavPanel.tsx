@@ -12,7 +12,6 @@ type ActiveTab = 'goTo' | 'landmarks';
 export function NavPanel() {
   const openPanel = useUiStore((state) => state.openPanel);
   const baseBuildings = useMapStore((state) => state.baseBuildings);
-  // FIX: Get the panTo action directly
   const { panTo } = useCameraStore.getState();
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('goTo');
@@ -26,7 +25,6 @@ export function NavPanel() {
   );
 
   const handleGoTo = (x: number, y: number) => {
-    // FIX: Simplified logic. Just call panTo with world coordinates.
     panTo(x, y);
   };
 

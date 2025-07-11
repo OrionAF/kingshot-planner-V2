@@ -20,7 +20,6 @@ interface PlanFile {
 
 export function SettingsPanel() {
   const openPanel = useUiStore((state) => state.openPanel);
-  // FIX: Get userBuildings from the store for export
   const { alliances, players, userBuildings, importPlan } =
     useMapStore.getState();
 
@@ -68,10 +67,9 @@ export function SettingsPanel() {
             const planToImport = {
               alliances: data.alliances,
               players: data.players ?? [],
-              // FIX: Add userBuildings, defaulting to an empty array
               userBuildings: data.userBuildings ?? [],
             };
-            importPlan(planToImport); // This now sends the correct object shape
+            importPlan(planToImport);
             alert('Plan imported successfully!');
           }
         } else {

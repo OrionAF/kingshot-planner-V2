@@ -2,7 +2,6 @@ import { Panel } from '../../components/Panel/Panel';
 //import { useUiStore } from '../../state/useUiStore'
 import styles from './MoreToolsPanel.module.css';
 
-// For now this panel is static. We will make it functional later.
 export function MoreToolsPanel() {
   // const openPanel = useUiStore((state) => state.openPanel);
   // const isOpen = openPanel === 'moreTools';

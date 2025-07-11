@@ -1,12 +1,10 @@
 .moreToolsPanel {
   position: absolute;
   bottom: 65px;
-  right: 10px; /* Position it above its button */
+  right: 10px;
   width: 200px;
   z-index: 999;
   border-radius: 8px;
-
-  /* Standard panel hide/show styles */
   opacity: 0;
   transform: translateY(10px);
   transition:

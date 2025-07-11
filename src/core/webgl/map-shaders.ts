@@ -1,4 +1,3 @@
-// === Vertex Shader (Unchanged) ===
 export const mapVertexShaderSource = /* glsl */ `
   attribute vec2 a_worldPosition;
   uniform mat3 u_projection;
@@ -11,9 +10,7 @@ export const mapVertexShaderSource = /* glsl */ `
   }
 `;
 
-// === Fragment Shader (Modified with Conditional Logic) ===
 export const mapFragmentShaderSource = /* glsl */ `
-  // ... (extension and precision lines are unchanged) ...
   #ifdef GL_OES_standard_derivatives
     #extension GL_OES_standard_derivatives : enable
   #endif
@@ -21,30 +18,22 @@ export const mapFragmentShaderSource = /* glsl */ `
 
   varying vec2 v_worldPosition;
 
-  // Biome colors
   uniform vec3 u_fertileColor;
   uniform vec3 u_plainsColor;
   uniform vec3 u_badlandsColor;
 
-  // === NEW UNIFORMS ===
-  // This will be the solid color for drawing objects like buildings
   uniform vec3 u_objectColor;
-  // This will be our "switch" between modes. 1.0 for object, 0.0 for map.
   uniform float u_isDrawingObject;
 
-  // Grid uniforms (no change)
   uniform float u_gridThickness;
   uniform float u_gridDarkness;
 
   void main() {
     vec3 finalColor;
 
-    // === NEW CONDITIONAL LOGIC ===
-    // If the "switch" is on (1.0), just use the object color directly.
     if (u_isDrawingObject == 1.0) {
       finalColor = u_objectColor;
     }
-    // Otherwise, run all the biome and grid logic from before.
     else {
       vec2 fertile_min = vec2(480.0, 480.0);
       vec2 fertile_max = vec2(719.0, 719.0);

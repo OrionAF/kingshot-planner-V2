@@ -1,14 +1,12 @@
 // src/config/appConfig.ts
 
-// Define a type for a single entry in our building catalog for type safety
 export interface BuildingDefinition {
   name: string;
   w: number;
   h: number;
-  coverage: number; // Territory coverage radius
-  // FIX: Added 'territory' as a new, more precise placement rule.
+  coverage: number;
   rule: 'any' | 'claimed' | 'territory' | 'fertile' | 'plains' | 'badlands';
-  limit?: number; // Optional limit per alliance
+  limit?: number;
 }
 
 export const AppConfig = {
@@ -35,15 +33,14 @@ export const AppConfig = {
     height: 2,
   },
 
-  // --- COMPLETE AND CORRECTED BUILDING CATALOG ---
   BUILDING_CATALOG: {
-    // FIX: Alliance Towers can be placed on unclaimed land OR own land, but not enemy land.
     alliance_tower: {
       name: 'Alliance Tower',
       w: 1,
       h: 1,
       coverage: 7,
       rule: 'territory',
+      limit: 9999,
     },
     hq_badlands: {
       name: 'Badlands HQ',
@@ -69,7 +66,6 @@ export const AppConfig = {
       rule: 'fertile',
       limit: 1,
     },
-    // These must be placed on already claimed territory.
     pitfall: {
       name: 'Pitfall Trap',
       w: 3,
@@ -169,7 +165,7 @@ export const AppConfig = {
     mainMapZoomThresholdForMinimapZoom: 0.03,
   },
   webgl: {
-    gridThickness: 1, // A value of 1.0 is ~1 pixel. >1 is thicker, <1 is thinner.
-    gridDarkness: 0.95, // 1.0 is invisible, 0.0 is black. 0.9 is a good default.
+    gridThickness: 1,
+    gridDarkness: 0.95,
   },
 };

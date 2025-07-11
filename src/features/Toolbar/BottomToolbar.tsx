@@ -9,7 +9,6 @@ export function BottomToolbar() {
   const { togglePanel, openPanel } = useUiStore();
   const zoomPct = Math.round(scale * 20);
 
-  // New, robust logic for highlighting group buttons on mobile
   const isManagementActive =
     openPanel === 'management' ||
     openPanel === 'alliance' ||
@@ -34,7 +33,6 @@ export function BottomToolbar() {
           🏰
         </button>
 
-        {/* --- FIX IS HERE --- */}
         <button
           className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'build' ? styles.active : ''}`}
           title="Build Menu"
@@ -42,7 +40,6 @@ export function BottomToolbar() {
         >
           🛠️
         </button>
-        {/* --- END FIX --- */}
 
         <button
           className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'player' ? styles.active : ''}`}

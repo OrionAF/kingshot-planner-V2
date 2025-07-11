@@ -20,12 +20,10 @@ const MIN_ZOOM = AppConfig.camera.minScale;
 const MAX_ZOOM = AppConfig.camera.maxScale;
 
 export const useCameraStore = create<CameraState & CameraActions>((set) => ({
-  // === Initial State ===
   x: window.innerWidth / 2,
   y: window.innerHeight / 3,
   scale: 2,
 
-  // === Actions ===
   panBy: (dx, dy) =>
     set((state) => ({
       x: state.x + dx,
@@ -45,7 +43,6 @@ export const useCameraStore = create<CameraState & CameraActions>((set) => ({
       };
     }),
 
-  // FIX: New panTo action to jump to a specific world coordinate
   panTo: (worldX, worldY) =>
     set((state) => {
       const [targetScreenX, targetScreenY] = worldToScreen(worldX, worldY);

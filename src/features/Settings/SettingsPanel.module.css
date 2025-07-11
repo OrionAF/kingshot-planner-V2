@@ -1,7 +1,7 @@
 .settingsPanel {
   position: absolute;
-  bottom: 65px; /* toolbar height + 10px margin */
-  right: 10px; /* Positioned on the right side */
+  bottom: 65px;
+  right: 10px;
   width: 320px;
   z-index: 1001;
   border-radius: 8px;

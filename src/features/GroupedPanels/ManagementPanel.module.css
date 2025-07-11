@@ -1,9 +1,9 @@
 .managementPanel {
   position: absolute;
   bottom: 65px;
-  left: 10px; /* Aligned to the left */
+  left: 10px;
   width: 250px;
-  z-index: 1001; /* Higher than the toolbar */
+  z-index: 1001;
   border-radius: 8px;
 
   opacity: 0;
@@ -24,13 +24,11 @@
   gap: 8px;
 }
 .button {
-  /* Generic button style for inside panels */
   width: 100%;
   text-align: left;
   padding: 10px;
 }
 
-/* === MOBILE OVERRIDES === */
 @media (max-width: 768px) {
   .managementPanel {
     left: 50%;

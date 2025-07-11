@@ -1,7 +1,7 @@
 .toolsPanel {
   position: absolute;
   bottom: 65px;
-  right: 65px; /* Pushed over to make room for the settings icon */
+  right: 65px;
   width: 250px;
   z-index: 1001;
   border-radius: 8px;
@@ -28,12 +28,10 @@
   padding: 10px;
 }
 
-/* === MOBILE OVERRIDES === */
 @media (max-width: 768px) {
   .toolsPanel {
-    /* On mobile, center it instead of anchoring to the right */
     left: 50%;
-    right: auto; /* Reset the hardcoded 'right' property */
+    right: auto;
     transform: translateX(-50%) translateY(10px);
     width: 90vw;
     max-width: 400px;

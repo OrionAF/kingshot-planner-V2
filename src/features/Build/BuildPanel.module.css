@@ -14,7 +14,7 @@
   display: flex;
   flex-direction: column;
   padding: 15px;
-  padding-bottom: 75px; /* Space for bottom toolbar */
+  padding-bottom: 75px;
   box-sizing: border-box;
 }
 .buildPanel.open {
@@ -42,7 +42,6 @@
   gap: 8px;
 }
 
-/* Specific item styles */
 .allianceItem,
 .buildingItem {
   background-color: rgba(0, 0, 0, 0.2);

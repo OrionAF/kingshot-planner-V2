@@ -1,17 +1,15 @@
 import { useState } from 'react';
-import { Panel } from '../../components/Panel/Panel'; // Our reusable panel
+import { Panel } from '../../components/Panel/Panel';
 import { useMapStore } from '../../state/useMapStore';
 import { useUiStore } from '../../state/useUiStore';
 import { AllianceItem } from './AllianceItem';
 import styles from './AlliancePanel.module.css';
 
 export function AlliancePanel() {
-  // Get state and actions from our stores
   const alliances = useMapStore((state) => state.alliances);
   const createAlliance = useMapStore((state) => state.createAlliance);
   const openPanel = useUiStore((state) => state.openPanel);
 
-  // Local state for the input fields
   const [name, setName] = useState('');
   const [tag, setTag] = useState('');
   const [color, setColor] = useState('#d6662b');
@@ -21,15 +19,12 @@ export function AlliancePanel() {
       alert('Alliance Name and Tag cannot be empty.');
       return;
     }
-    // Call the action from our store
     createAlliance({ name, tag, color });
-    // Clear the form fields
     setName('');
     setTag('');
   };
 
   const isOpen = openPanel === 'alliance';
-  // Combine base style with 'open' style if needed
   const panelClassName = `${styles.sidebarPanel} ${isOpen ? styles.open : ''}`;
 
   return (

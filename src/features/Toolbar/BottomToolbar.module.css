@@ -1,4 +1,3 @@
-/* === BASE DESKTOP STYLES (Applies to all screen sizes first) === */
 .bottomToolbar {
   position: fixed;
   bottom: 0;
@@ -36,7 +35,7 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 .toolbarButton.active {
-  background-color: #2a9fd6; /* This is the --highlight-color */
+  background-color: #2a9fd6;
   color: white;
 }
 .zoomLevel {
@@ -53,30 +52,25 @@
 .center {
   flex: 0;
   justify-content: center;
-} /* Center group should stay centered */
+}
 .right {
   flex: 1;
   justify-content: flex-end;
 }
 
-/* By default, HIDE the mobile-only buttons on desktop */
 .mobileOnly {
   display: none;
 }
 
-/* === MOBILE OVERRIDE STYLES === */
 @media (max-width: 768px) {
-  /* Show mobile buttons... */
   .mobileOnly {
     display: block;
   }
 
-  /* ...and hide desktop buttons */
   .desktopOnly {
     display: none;
   }
 
-  /* Adjust general layout */
   .bottomToolbar {
     padding-bottom: max(10px, env(safe-area-inset-bottom));
     height: auto;
@@ -86,7 +80,6 @@
     padding: 10px;
   }
 
-  /* Make the zoom level tappable on mobile */
   .zoomLevel {
     cursor: pointer;
     padding: 8px;

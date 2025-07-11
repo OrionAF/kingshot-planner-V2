@@ -32,16 +32,14 @@
   transform: translateX(-50%);
 }
 
-/* Default state: mobile UI is hidden on desktop */
 .crosshair,
 .placementControls {
   display: none;
 }
 
-/* Apply mobile styles ONLY on smaller screens */
 @media (max-width: 768px) {
   .crosshair {
-    display: block; /* Show the crosshair */
+    display: block;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -53,7 +51,7 @@
   }
 
   .placementControls {
-    display: flex; /* Show the buttons */
+    display: flex;
     position: absolute;
     bottom: 80px;
     left: 50%;

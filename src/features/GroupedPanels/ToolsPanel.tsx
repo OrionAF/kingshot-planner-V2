@@ -9,7 +9,6 @@ export function ToolsPanel() {
   const handleClick = (
     panelId: 'nav' | 'overwatch' | 'zoomPresets' | 'minimap',
   ) => {
-    // Use the new, unambiguous switchPanel action
     switchPanel(panelId);
   };
 

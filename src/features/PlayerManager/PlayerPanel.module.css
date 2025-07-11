@@ -14,9 +14,6 @@
   display: flex;
   flex-direction: column;
   padding: 15px;
-  /* --- FIX IS HERE --- */
-  /* Add padding to the bottom to make space for the toolbar */
-  /* Assumes a toolbar height of 60px + 15px extra space */
   padding-bottom: 75px;
   box-sizing: border-box;
 }

@@ -10,7 +10,7 @@ import { ToolsPanel } from './features/GroupedPanels/ToolsPanel';
 import { SettingsPanel } from './features/Settings/SettingsPanel';
 import { PlayerPanel } from './features/PlayerManager/PlayerPanel';
 import { EditPlayerModal } from './features/PlayerManager/EditPlayerModal';
-import { BuildPanel } from './features/Build/BuildPanel'; // 1. IMPORT THE NEW PANEL
+import { BuildPanel } from './features/Build/BuildPanel';
 
 function App() {
   return (
@@ -22,7 +22,7 @@ function App() {
       <NavPanel />
       <SettingsPanel />
       <PlayerPanel />
-      <BuildPanel /> {/* 2. ADD THE BUILD PANEL */}
+      <BuildPanel />
       <ManagementPanel />
       <ToolsPanel />
       <BottomToolbar />

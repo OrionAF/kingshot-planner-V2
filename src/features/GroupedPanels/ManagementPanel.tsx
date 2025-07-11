@@ -7,7 +7,6 @@ export function ManagementPanel() {
   const isOpen = openPanel === 'management';
 
   const handleClick = (panelId: 'alliance' | 'build' | 'player') => {
-    // Use the new, unambiguous switchPanel action
     switchPanel(panelId);
   };
 

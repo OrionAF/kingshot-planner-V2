@@ -1,7 +1,7 @@
 // src/features/PlayerManager/PlayerItem.tsx
 
 import { type Player } from '../../types/map.types';
-import styles from './PlayerItem.module.css'; // Using this component's specific CSS
+import styles from './PlayerItem.module.css';
 import { useMapStore } from '../../state/useMapStore';
 import { useUiStore } from '../../state/useUiStore';
 

@@ -31,8 +31,6 @@
   display: flex;
   gap: 4px;
 }
-
-/* General button style for the player item */
 .controls button {
   background-color: #4f5358;
   color: #e0e0e0;
@@ -46,8 +44,6 @@
 .controls button:hover {
   background-color: #5f6368;
 }
-
-/* Danger style for delete button */
 .controls .danger {
   background-color: #5a3838;
   color: #fdd;
