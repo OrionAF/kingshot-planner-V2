@@ -2,42 +2,38 @@
 
 import { useRef } from 'react';
 import { Panel } from '../../components/Panel/Panel';
+import { AppConfig } from '../../config/appConfig';
 import { useMapStore } from '../../state/useMapStore';
 import { useUiStore } from '../../state/useUiStore';
-import {
-  type Alliance,
-  type Player,
-  type UserBuilding,
-} from '../../types/map.types';
+import { type PlanFile } from '../../types/map.types'; // <-- Import the shared type
 import styles from './SettingsPanel.module.css';
-
-interface PlanFile {
-  version: number;
-  alliances: Alliance[];
-  players: Player[];
-  userBuildings: UserBuilding[];
-}
 
 export function SettingsPanel() {
   const openPanel = useUiStore((state) => state.openPanel);
+  // Get a non-reactive reference to the store's state for exporting
   const { alliances, players, userBuildings, importPlan } =
     useMapStore.getState();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
+    // We get the latest state directly here to ensure the export is always fresh
+    const latestState = useMapStore.getState();
     const planData: PlanFile = {
-      version: 1.2,
-      alliances,
-      players,
-      userBuildings,
+      version: AppConfig.CURRENT_VERSION, // Use dynamic version
+      alliances: latestState.alliances,
+      players: latestState.players,
+      userBuildings: latestState.userBuildings,
     };
     const jsonString = JSON.stringify(planData, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `kingshot-plan-v1.1-${new Date().toISOString().slice(0, 10)}.json`;
+    // Create a more descriptive filename
+    a.download = `kingshot-plan-v${AppConfig.CURRENT_VERSION}-${new Date()
+      .toISOString()
+      .slice(0, 10)}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -56,16 +52,19 @@ export function SettingsPanel() {
     reader.onload = (event) => {
       try {
         const result = event.target?.result;
-        const data = JSON.parse(result as string) as PlanFile;
+        if (typeof result !== 'string')
+          throw new Error('File could not be read');
+        const data = JSON.parse(result) as PlanFile;
 
-        if (data && data.version >= 1 && Array.isArray(data.alliances)) {
+        // Loosened version check to accept any file that has the required data arrays
+        if (data && Array.isArray(data.alliances)) {
           if (
             window.confirm(
               'This will overwrite your current plan. Are you sure?',
             )
           ) {
             const planToImport = {
-              alliances: data.alliances,
+              alliances: data.alliances ?? [],
               players: data.players ?? [],
               userBuildings: data.userBuildings ?? [],
             };
@@ -78,7 +77,9 @@ export function SettingsPanel() {
       } catch (error) {
         console.error(error);
         alert(
-          `Error importing plan: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Error importing plan: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }`,
         );
       }
     };

@@ -1,5 +1,11 @@
+// src/state/useSelectionStore.ts
+
 import { create } from 'zustand';
-import { type BaseBuilding } from '../types/map.types';
+import {
+  type BaseBuilding,
+  type Player,
+  type UserBuilding,
+} from '../types/map.types';
 
 interface MapTile {
   x: number;
@@ -8,7 +14,9 @@ interface MapTile {
 
 export type Selection =
   | { type: 'tile'; data: MapTile }
-  | { type: 'building'; data: BaseBuilding }
+  | { type: 'baseBuilding'; data: BaseBuilding }
+  | { type: 'userBuilding'; data: UserBuilding }
+  | { type: 'player'; data: Player }
   | null;
 
 interface SelectionState {

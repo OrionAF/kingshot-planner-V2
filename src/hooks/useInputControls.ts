@@ -4,7 +4,36 @@ import { useCameraStore } from '../state/useCameraStore';
 import { screenToWorld, worldToScreen } from '../core/coordinate-utils';
 import { useUiStore } from '../state/useUiStore';
 import { useMapStore } from '../state/useMapStore';
+import { useSelectionStore, type Selection } from '../state/useSelectionStore';
 import { AppConfig } from '../config/appConfig';
+import type { BaseBuilding, Player, UserBuilding } from '../types/map.types';
+
+// Define a more specific return type for hit detection results
+type HitDetectionResult =
+  | { type: 'player'; data: Player }
+  | { type: 'userBuilding'; data: UserBuilding }
+  | { type: 'baseBuilding'; data: BaseBuilding }
+  | null;
+
+// FIX: Add an explicit return type to the helper function.
+function getObjectAtCoords(x: number, y: number): HitDetectionResult {
+  const { players, userBuildings, buildingMap } = useMapStore.getState();
+
+  const player = players.find(
+    (p) => x >= p.x && x < p.x + p.w && y >= p.y && y < p.y + p.h,
+  );
+  if (player) return { type: 'player', data: player };
+
+  const userBuilding = userBuildings.find(
+    (b) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h,
+  );
+  if (userBuilding) return { type: 'userBuilding', data: userBuilding };
+
+  const baseBuilding = buildingMap.get(`${x},${y}`);
+  if (baseBuilding) return { type: 'baseBuilding', data: baseBuilding };
+
+  return null;
+}
 
 export function createInputHandlers(canvas: HTMLCanvasElement) {
   const { panBy, zoomTo } = useCameraStore.getState();
@@ -76,6 +105,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         const uiStore = useUiStore.getState();
         const mapStore = useMapStore.getState();
         const camera = useCameraStore.getState();
+        const { setSelection } = useSelectionStore.getState();
 
         const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera);
         const roundedX = Math.round(worldX);
@@ -106,14 +136,16 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
               roundedY,
               buildMode.activeAllianceId,
             );
-            // Auto-deselect if it's not a tower
             if (buildMode.selectedBuildingType !== 'alliance_tower') {
               setSelectedBuildingType(null);
             }
           }
         } else {
-          if (import.meta.env.DEV) {
-            console.log(`Click at: ${roundedX}, ${roundedY}`);
+          const clickedObject = getObjectAtCoords(roundedX, roundedY);
+          if (clickedObject) {
+            setSelection(clickedObject);
+          } else {
+            setSelection({ type: 'tile', data: { x: roundedX, y: roundedY } });
           }
         }
       }
@@ -128,47 +160,27 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     const { isPlacingPlayer, buildMode, exitPlacementMode } =
       useUiStore.getState();
 
-    // If in any placement mode, right-click cancels it.
     if (isPlacingPlayer || buildMode.selectedBuildingType) {
       exitPlacementMode();
       canvas.style.cursor = 'grab';
       return;
     }
 
-    // Otherwise, attempt to delete an object.
-    const { userBuildings, deleteBuilding, players, deletePlayer } =
-      useMapStore.getState();
+    const { deleteBuilding, deletePlayer } = useMapStore.getState();
     const camera = useCameraStore.getState();
     const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera);
     const roundedX = Math.round(worldX);
     const roundedY = Math.round(worldY);
 
-    const buildingToDelete = userBuildings.find(
-      (b) =>
-        roundedX >= b.x &&
-        roundedX < b.x + b.w &&
-        roundedY >= b.y &&
-        roundedY < b.y + b.h,
-    );
+    const objectToDelete = getObjectAtCoords(roundedX, roundedY);
 
-    if (buildingToDelete) {
+    if (objectToDelete?.type === 'userBuilding') {
       if (window.confirm(`Delete this building?`)) {
-        deleteBuilding(buildingToDelete.id);
+        deleteBuilding(objectToDelete.data.id);
       }
-      return;
-    }
-
-    const playerToDelete = players.find(
-      (p) =>
-        roundedX >= p.x &&
-        roundedX < p.x + p.w &&
-        roundedY >= p.y &&
-        roundedY < p.y + p.h,
-    );
-
-    if (playerToDelete) {
-      if (window.confirm(`Delete player "${playerToDelete.name}"?`)) {
-        deletePlayer(playerToDelete.id);
+    } else if (objectToDelete?.type === 'player') {
+      if (window.confirm(`Delete player "${objectToDelete.data.name}"?`)) {
+        deletePlayer(objectToDelete.data.id);
       }
     }
   };
@@ -176,12 +188,13 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       const { exitPlacementMode } = useUiStore.getState();
+      const { clearSelection } = useSelectionStore.getState();
       exitPlacementMode();
+      clearSelection();
       canvas.style.cursor = 'grab';
     }
   };
 
-  // ... (mouse leave, wheel, and touch handlers are unchanged)
   const handleMouseLeave = () => {
     isPointerDown = false;
     canvas.style.cursor = 'grab';
@@ -203,7 +216,6 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       cameraBeforeZoom,
     );
     const [screenXAfter] = worldToScreen(worldX, worldY);
-    // Y-coordinate has inverted screen space, need to recalculate Y differently
     const screenYAfterFrom0 = (worldX + worldY) * (AppConfig.tileH / 2);
 
     const newCamX = focalPoint.x - screenXAfter * newScale;

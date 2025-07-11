@@ -1,5 +1,7 @@
 // src/types/map.types.ts
 
+import { AppConfig } from '../config/appConfig';
+
 export interface MapObject {
   x: number;
   y: number;
@@ -35,11 +37,19 @@ export interface Alliance {
   color: string;
 }
 
-export type BuildingType =
-  keyof (typeof import('../config/appConfig').AppConfig)['BUILDING_CATALOG'];
+export type BuildingType = keyof (typeof AppConfig)['BUILDING_CATALOG'];
 
 export interface UserBuilding extends MapObject {
   id: number;
   type: BuildingType;
   allianceId: number;
+}
+
+// --- NEW SHARED TYPE ---
+// This defines the structure of the JSON file for import/export.
+export interface PlanFile {
+  version: string;
+  alliances: Alliance[];
+  players: Player[];
+  userBuildings: UserBuilding[];
 }

@@ -3,6 +3,7 @@
 import { AppConfig } from '../config/appConfig';
 import { useCameraStore } from '../state/useCameraStore';
 import { useMapStore } from '../state/useMapStore';
+import { useSelectionStore } from '../state/useSelectionStore';
 import { useUiStore } from '../state/useUiStore';
 import { screenToWorld } from './coordinate-utils';
 import {
@@ -21,7 +22,6 @@ type DrawableObject = {
   color?: string;
 };
 
-// Utility to parse CSS color strings into normalized [r, g, b]
 function parseColor(colorString: string): [number, number, number] {
   if (colorString.startsWith('#')) {
     const r = parseInt(colorString.slice(1, 3), 16) / 255;
@@ -36,7 +36,7 @@ function parseColor(colorString: string): [number, number, number] {
       ) as [number, number, number];
     }
   }
-  return [0, 0, 0]; // Default to black on parse error
+  return [0, 0, 0];
 }
 
 export class WebGLRenderer {
@@ -53,7 +53,7 @@ export class WebGLRenderer {
   private isDrawingObjectLocation: WebGLUniformLocation | null;
   private objectAlphaLocation: WebGLUniformLocation | null;
   private objectBuffer: WebGLBuffer | null;
-  private territoryBuffer: WebGLBuffer | null; // Buffer specifically for territory
+  private territoryBuffer: WebGLBuffer | null;
   private mapPlaneBuffer: WebGLBuffer | null;
   private derivativesSupported = false;
   private isDrawingTerritoryLocation: WebGLUniformLocation | null;
@@ -141,6 +141,7 @@ export class WebGLRenderer {
       mouseWorldPosition,
       isValidPlacement,
     } = useUiStore.getState();
+    const { selection } = useSelectionStore.getState();
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0.06, 0.06, 0.06, 1.0);
@@ -178,6 +179,19 @@ export class WebGLRenderer {
     }
     for (const player of players) {
       this.drawObject(player, 1.0);
+    }
+
+    if (selection) {
+      switch (selection.type) {
+        case 'baseBuilding':
+        case 'userBuilding':
+        case 'player':
+          this.drawHighlight(selection.data);
+          break;
+        case 'tile':
+          this.drawHighlight({ ...selection.data, w: 1, h: 1 });
+          break;
+      }
     }
 
     const isDesktop = window.matchMedia('(min-width: 769px)').matches;
@@ -220,7 +234,6 @@ export class WebGLRenderer {
           ghostPosition = { x: Math.round(centerX), y: Math.round(centerY) };
         }
         if (coverage > 0) {
-          // FIX: Declare the 'radius' variable before using it.
           const radius = Math.floor(coverage / 2);
           this.drawObject(
             {
@@ -239,6 +252,48 @@ export class WebGLRenderer {
         );
       }
     }
+  }
+
+  private drawHighlight(obj: { x: number; y: number; w: number; h: number }) {
+    const gl = this.gl;
+    const { x, y, w, h } = obj;
+
+    gl.uniform1f(this.isDrawingObjectLocation, 1.0);
+    gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
+
+    const positions = [
+      x,
+      y,
+      x + w,
+      y,
+      x + w,
+      y,
+      x + w,
+      y + h,
+      x + w,
+      y + h,
+      x,
+      y + h,
+      x,
+      y + h,
+      x,
+      y,
+    ];
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.objectBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(positions),
+      gl.DYNAMIC_DRAW,
+    );
+
+    gl.enableVertexAttribArray(this.worldPosAttrLocation);
+    gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0);
+
+    const [r, g, b] = parseColor(AppConfig.selectionColor);
+    gl.uniform3fv(this.objectColorLocation, [r, g, b]);
+    gl.uniform1f(this.objectAlphaLocation, 1.0);
+    gl.drawArrays(gl.LINES, 0, positions.length / 2);
   }
 
   private drawTerritory(alliance: Alliance, tiles: Set<string>) {
