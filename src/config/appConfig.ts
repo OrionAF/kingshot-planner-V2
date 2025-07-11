@@ -2,13 +2,13 @@
 
 // Define a type for a single entry in our building catalog for type safety
 export interface BuildingDefinition {
-  name: string
-  w: number
-  h: number
-  coverage: number // Territory coverage radius
+  name: string;
+  w: number;
+  h: number;
+  coverage: number; // Territory coverage radius
   // FIX: Added 'territory' as a new, more precise placement rule.
-  rule: 'any' | 'claimed' | 'territory' | 'fertile' | 'plains' | 'badlands'
-  limit?: number // Optional limit per alliance
+  rule: 'any' | 'claimed' | 'territory' | 'fertile' | 'plains' | 'badlands';
+  limit?: number; // Optional limit per alliance
 }
 
 export const AppConfig = {
@@ -172,4 +172,4 @@ export const AppConfig = {
     gridThickness: 1, // A value of 1.0 is ~1 pixel. >1 is thicker, <1 is thinner.
     gridDarkness: 0.95, // 1.0 is invisible, 0.0 is black. 0.9 is a good default.
   },
-}
+};

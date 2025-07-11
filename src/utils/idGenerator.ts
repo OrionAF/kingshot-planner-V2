@@ -1,5 +1,5 @@
-let nextId = 1
+let nextId = 1;
 
 export function generateId(): number {
-  return nextId++
+  return nextId++;
 }

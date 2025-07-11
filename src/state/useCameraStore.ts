@@ -1,23 +1,23 @@
 // src/state/useCameraStore.ts
 
-import { create } from 'zustand'
-import { worldToScreen } from '../core/coordinate-utils'
-import { AppConfig } from '../config/appConfig'
+import { create } from 'zustand';
+import { worldToScreen } from '../core/coordinate-utils';
+import { AppConfig } from '../config/appConfig';
 
 export interface CameraState {
-  x: number
-  y: number
-  scale: number
+  x: number;
+  y: number;
+  scale: number;
 }
 
 interface CameraActions {
-  panBy: (dx: number, dy: number) => void
-  zoomTo: (newCameraState: Partial<CameraState>) => void
-  panTo: (worldX: number, worldY: number) => void // FIX: Add the new action
+  panBy: (dx: number, dy: number) => void;
+  zoomTo: (newCameraState: Partial<CameraState>) => void;
+  panTo: (worldX: number, worldY: number) => void; // FIX: Add the new action
 }
 
-const MIN_ZOOM = AppConfig.camera.minScale
-const MAX_ZOOM = AppConfig.camera.maxScale
+const MIN_ZOOM = AppConfig.camera.minScale;
+const MAX_ZOOM = AppConfig.camera.maxScale;
 
 export const useCameraStore = create<CameraState & CameraActions>((set) => ({
   // === Initial State ===
@@ -36,22 +36,22 @@ export const useCameraStore = create<CameraState & CameraActions>((set) => ({
     set((state) => {
       const clampedScale = Math.max(
         MIN_ZOOM,
-        Math.min(newCameraState.scale ?? state.scale, MAX_ZOOM)
-      )
+        Math.min(newCameraState.scale ?? state.scale, MAX_ZOOM),
+      );
       return {
         ...state,
         ...newCameraState,
         scale: clampedScale,
-      }
+      };
     }),
 
   // FIX: New panTo action to jump to a specific world coordinate
   panTo: (worldX, worldY) =>
     set((state) => {
-      const [targetScreenX, targetScreenY] = worldToScreen(worldX, worldY)
+      const [targetScreenX, targetScreenY] = worldToScreen(worldX, worldY);
       return {
         x: window.innerWidth / 2 - targetScreenX * state.scale,
         y: window.innerHeight / 2 - targetScreenY * state.scale,
-      }
+      };
     }),
-}))
+}));

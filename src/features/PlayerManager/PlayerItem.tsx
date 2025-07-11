@@ -1,23 +1,23 @@
 // src/features/PlayerManager/PlayerItem.tsx
 
-import { type Player } from '../../types/map.types'
-import styles from './PlayerItem.module.css' // Using this component's specific CSS
-import { useMapStore } from '../../state/useMapStore'
-import { useUiStore } from '../../state/useUiStore'
+import { type Player } from '../../types/map.types';
+import styles from './PlayerItem.module.css'; // Using this component's specific CSS
+import { useMapStore } from '../../state/useMapStore';
+import { useUiStore } from '../../state/useUiStore';
 
 interface PlayerItemProps {
-  player: Player
+  player: Player;
 }
 
 export function PlayerItem({ player }: PlayerItemProps) {
-  const { deletePlayer } = useMapStore()
-  const { startEditingPlayer } = useUiStore()
+  const { deletePlayer } = useMapStore();
+  const { startEditingPlayer } = useUiStore();
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete ${player.name}?`)) {
-      deletePlayer(player.id)
+      deletePlayer(player.id);
     }
-  }
+  };
 
   return (
     <div
@@ -45,5 +45,5 @@ export function PlayerItem({ player }: PlayerItemProps) {
         </button>
       </div>
     </div>
-  )
+  );
 }

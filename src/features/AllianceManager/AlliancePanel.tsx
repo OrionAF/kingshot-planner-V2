@@ -1,36 +1,36 @@
-import { useState } from 'react'
-import { Panel } from '../../components/Panel/Panel' // Our reusable panel
-import { useMapStore } from '../../state/useMapStore'
-import { useUiStore } from '../../state/useUiStore'
-import { AllianceItem } from './AllianceItem'
-import styles from './AlliancePanel.module.css'
+import { useState } from 'react';
+import { Panel } from '../../components/Panel/Panel'; // Our reusable panel
+import { useMapStore } from '../../state/useMapStore';
+import { useUiStore } from '../../state/useUiStore';
+import { AllianceItem } from './AllianceItem';
+import styles from './AlliancePanel.module.css';
 
 export function AlliancePanel() {
   // Get state and actions from our stores
-  const alliances = useMapStore((state) => state.alliances)
-  const createAlliance = useMapStore((state) => state.createAlliance)
-  const openPanel = useUiStore((state) => state.openPanel)
+  const alliances = useMapStore((state) => state.alliances);
+  const createAlliance = useMapStore((state) => state.createAlliance);
+  const openPanel = useUiStore((state) => state.openPanel);
 
   // Local state for the input fields
-  const [name, setName] = useState('')
-  const [tag, setTag] = useState('')
-  const [color, setColor] = useState('#d6662b')
+  const [name, setName] = useState('');
+  const [tag, setTag] = useState('');
+  const [color, setColor] = useState('#d6662b');
 
   const handleCreate = () => {
     if (!name.trim() || !tag.trim()) {
-      alert('Alliance Name and Tag cannot be empty.')
-      return
+      alert('Alliance Name and Tag cannot be empty.');
+      return;
     }
     // Call the action from our store
-    createAlliance({ name, tag, color })
+    createAlliance({ name, tag, color });
     // Clear the form fields
-    setName('')
-    setTag('')
-  }
+    setName('');
+    setTag('');
+  };
 
-  const isOpen = openPanel === 'alliance'
+  const isOpen = openPanel === 'alliance';
   // Combine base style with 'open' style if needed
-  const panelClassName = `${styles.sidebarPanel} ${isOpen ? styles.open : ''}`
+  const panelClassName = `${styles.sidebarPanel} ${isOpen ? styles.open : ''}`;
 
   return (
     <Panel className={panelClassName}>
@@ -73,5 +73,5 @@ export function AlliancePanel() {
         </button>
       </div>
     </Panel>
-  )
+  );
 }

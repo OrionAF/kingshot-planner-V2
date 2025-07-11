@@ -1,24 +1,24 @@
 // src/features/PlayerManager/PlayerPanel.tsx
-import { useState } from 'react'
-import { Panel } from '../../components/Panel/Panel'
-import { useMapStore } from '../../state/useMapStore'
-import { useUiStore } from '../../state/useUiStore'
-import { PlayerItem } from './PlayerItem'
-import styles from './PlayerPanel.module.css'
+import { useState } from 'react';
+import { Panel } from '../../components/Panel/Panel';
+import { useMapStore } from '../../state/useMapStore';
+import { useUiStore } from '../../state/useUiStore';
+import { PlayerItem } from './PlayerItem';
+import styles from './PlayerPanel.module.css';
 
 export function PlayerPanel() {
-  const players = useMapStore((state) => state.players)
-  const uiStore = useUiStore()
+  const players = useMapStore((state) => state.players);
+  const uiStore = useUiStore();
 
-  const [name, setName] = useState('')
-  const [power, setPower] = useState('')
-  const [rallyCap, setRallyCap] = useState('')
-  const [tcLevel, setTcLevel] = useState('')
-  const [notes, setNotes] = useState('')
-  const [color, setColor] = useState('#9400d3')
+  const [name, setName] = useState('');
+  const [power, setPower] = useState('');
+  const [rallyCap, setRallyCap] = useState('');
+  const [tcLevel, setTcLevel] = useState('');
+  const [notes, setNotes] = useState('');
+  const [color, setColor] = useState('#9400d3');
 
   const handleStartPlacement = () => {
-    if (!name.trim()) return alert('Player name cannot be empty.')
+    if (!name.trim()) return alert('Player name cannot be empty.');
     uiStore.startPlayerPlacement({
       name,
       power,
@@ -26,17 +26,17 @@ export function PlayerPanel() {
       tcLevel,
       notes,
       color,
-    })
-    uiStore.closeAllPanels()
-    setName('')
-    setPower('')
-    setRallyCap('')
-    setTcLevel('')
-    setNotes('')
-  }
+    });
+    uiStore.closeAllPanels();
+    setName('');
+    setPower('');
+    setRallyCap('');
+    setTcLevel('');
+    setNotes('');
+  };
 
-  const isOpen = uiStore.openPanel === 'player'
-  const panelClassName = `${styles.sidebarPanel} ${isOpen ? styles.open : ''}`
+  const isOpen = uiStore.openPanel === 'player';
+  const panelClassName = `${styles.sidebarPanel} ${isOpen ? styles.open : ''}`;
 
   return (
     <Panel className={panelClassName}>
@@ -112,5 +112,5 @@ export function PlayerPanel() {
         </button>
       </div>
     </Panel>
-  )
+  );
 }

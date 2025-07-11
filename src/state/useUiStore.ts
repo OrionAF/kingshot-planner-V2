@@ -1,15 +1,15 @@
 // src/state/useUiStore.ts
 
-import { create } from 'zustand'
+import { create } from 'zustand';
 import {
   type OmitIdAndCoords,
   type Player,
   type BuildingType,
-} from '../types/map.types'
-import { useMapStore } from './useMapStore'
-import { useCameraStore } from './useCameraStore'
-import { screenToWorld } from '../core/coordinate-utils'
-import { AppConfig } from '../config/appConfig'
+} from '../types/map.types';
+import { useMapStore } from './useMapStore';
+import { useCameraStore } from './useCameraStore';
+import { screenToWorld } from '../core/coordinate-utils';
+import { AppConfig } from '../config/appConfig';
 
 export type PanelId =
   | 'alliance'
@@ -23,35 +23,35 @@ export type PanelId =
   | 'settings'
   | 'management'
   | 'tools'
-  | null
+  | null;
 
 interface BuildModeState {
-  activeAllianceId: number | null
-  selectedBuildingType: BuildingType | null
+  activeAllianceId: number | null;
+  selectedBuildingType: BuildingType | null;
 }
 
 interface UiState {
-  openPanel: PanelId
-  isPlacingPlayer: boolean
-  playerToPlace: OmitIdAndCoords | null
-  mouseWorldPosition: { x: number; y: number } | null
-  isValidPlacement: boolean
-  editingPlayer: Player | null
-  buildMode: BuildModeState
+  openPanel: PanelId;
+  isPlacingPlayer: boolean;
+  playerToPlace: OmitIdAndCoords | null;
+  mouseWorldPosition: { x: number; y: number } | null;
+  isValidPlacement: boolean;
+  editingPlayer: Player | null;
+  buildMode: BuildModeState;
 }
 
 interface UiActions {
-  togglePanel: (panelId: PanelId) => void
-  switchPanel: (panelId: PanelId) => void
-  closeAllPanels: () => void
-  startPlayerPlacement: (playerData: OmitIdAndCoords) => void
-  endPlayerPlacement: () => void
-  setMouseWorldPosition: (pos: { x: number; y: number }) => void
-  setPlacementValidity: (isValid: boolean) => void
-  startEditingPlayer: (player: Player) => void
-  endEditingPlayer: () => void
-  setActiveAllianceId: (id: number | null) => void
-  setSelectedBuildingType: (type: BuildingType | null) => void
+  togglePanel: (panelId: PanelId) => void;
+  switchPanel: (panelId: PanelId) => void;
+  closeAllPanels: () => void;
+  startPlayerPlacement: (playerData: OmitIdAndCoords) => void;
+  endPlayerPlacement: () => void;
+  setMouseWorldPosition: (pos: { x: number; y: number }) => void;
+  setPlacementValidity: (isValid: boolean) => void;
+  startEditingPlayer: (player: Player) => void;
+  endEditingPlayer: () => void;
+  setActiveAllianceId: (id: number | null) => void;
+  setSelectedBuildingType: (type: BuildingType | null) => void;
 }
 
 export const useUiStore = create<UiState & UiActions>((set, get) => ({
@@ -74,30 +74,30 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
   closeAllPanels: () => set(() => ({ openPanel: null })),
 
   startPlayerPlacement: (playerData) => {
-    const isDesktop = window.matchMedia('(min-width: 769px)').matches
-    let initialValidity = true
+    const isDesktop = window.matchMedia('(min-width: 769px)').matches;
+    let initialValidity = true;
 
     if (!isDesktop) {
-      const camera = useCameraStore.getState()
-      const { checkPlacementValidity } = useMapStore.getState()
+      const camera = useCameraStore.getState();
+      const { checkPlacementValidity } = useMapStore.getState();
       const [worldX, worldY] = screenToWorld(
         window.innerWidth / 2,
         window.innerHeight / 2,
-        camera
-      )
+        camera,
+      );
       initialValidity = checkPlacementValidity(
         Math.round(worldX),
         Math.round(worldY),
         AppConfig.player.width,
-        AppConfig.player.height
-      )
+        AppConfig.player.height,
+      );
     }
 
     set(() => ({
       isPlacingPlayer: true,
       playerToPlace: playerData,
       isValidPlacement: initialValidity,
-    }))
+    }));
   },
   endPlayerPlacement: () =>
     set((state) => {
@@ -106,9 +106,9 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
           isPlacingPlayer: false,
           playerToPlace: null,
           buildMode: { ...state.buildMode, selectedBuildingType: null },
-        }
+        };
       }
-      return { isPlacingPlayer: false, playerToPlace: null }
+      return { isPlacingPlayer: false, playerToPlace: null };
     }),
 
   setMouseWorldPosition: (pos) => set(() => ({ mouseWorldPosition: pos })),
@@ -124,9 +124,9 @@ export const useUiStore = create<UiState & UiActions>((set, get) => ({
   setSelectedBuildingType: (type) =>
     set((state) => {
       const newType =
-        state.buildMode.selectedBuildingType === type ? null : type
+        state.buildMode.selectedBuildingType === type ? null : type;
       return {
         buildMode: { ...state.buildMode, selectedBuildingType: newType },
-      }
+      };
     }),
-}))
+}));

@@ -1,32 +1,32 @@
 // src/features/Map/MapCanvas.tsx
 
-import { useEffect, useRef } from 'react'
-import { useAnimationLoop } from '../../hooks/useAnimationLoop'
-import { createInputHandlers } from '../../hooks/useInputControls'
-import styles from './MapCanvas.module.css'
-import { WebGLRenderer } from '../../core/WebGLRenderer'
+import { useEffect, useRef } from 'react';
+import { useAnimationLoop } from '../../hooks/useAnimationLoop';
+import { createInputHandlers } from '../../hooks/useInputControls';
+import styles from './MapCanvas.module.css';
+import { WebGLRenderer } from '../../core/WebGLRenderer';
 
-type Renderer = WebGLRenderer
+type Renderer = WebGLRenderer;
 
 export function MapCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const rendererRef = useRef<Renderer | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rendererRef = useRef<Renderer | null>(null);
 
   useAnimationLoop(() => {
-    rendererRef.current?.renderFrame()
-  })
+    rendererRef.current?.renderFrame();
+  });
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const context = canvas.getContext('webgl', { antialias: true })
+    const context = canvas.getContext('webgl', { antialias: true });
     if (!context) {
-      console.error('This browser does not support WebGL.')
-      return
+      console.error('This browser does not support WebGL.');
+      return;
     }
 
-    rendererRef.current = new WebGLRenderer(context)
+    rendererRef.current = new WebGLRenderer(context);
 
     const {
       handleMouseDown,
@@ -39,43 +39,43 @@ export function MapCanvas() {
       handleTouchEnd,
       handleKeyDown,
       handleContextMenu,
-    } = createInputHandlers(canvas)
+    } = createInputHandlers(canvas);
 
-    canvas.addEventListener('mousedown', handleMouseDown)
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
-    canvas.addEventListener('mouseleave', handleMouseLeave)
-    canvas.addEventListener('wheel', handleWheel, { passive: false })
-    canvas.addEventListener('contextmenu', handleContextMenu)
-    window.addEventListener('keydown', handleKeyDown)
+    canvas.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mouseleave', handleMouseLeave);
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    canvas.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('keydown', handleKeyDown);
 
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: false })
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
-    canvas.addEventListener('touchend', handleTouchEnd)
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd);
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    resizeCanvas()
-    window.addEventListener('resize', resizeCanvas)
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
     return () => {
-      canvas.removeEventListener('mousedown', handleMouseDown)
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-      canvas.removeEventListener('mouseleave', handleMouseLeave)
-      canvas.removeEventListener('wheel', handleWheel)
-      canvas.removeEventListener('contextmenu', handleContextMenu)
-      window.removeEventListener('keydown', handleKeyDown)
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('mouseleave', handleMouseLeave);
+      canvas.removeEventListener('wheel', handleWheel);
+      canvas.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('keydown', handleKeyDown);
 
-      canvas.removeEventListener('touchstart', handleTouchStart)
-      canvas.removeEventListener('touchmove', handleTouchMove)
-      canvas.removeEventListener('touchend', handleTouchEnd)
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('touchend', handleTouchEnd);
 
-      window.removeEventListener('resize', resizeCanvas)
-    }
-  }, [])
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, []);
 
-  return <canvas ref={canvasRef} className={styles.canvas} id="map" />
+  return <canvas ref={canvasRef} className={styles.canvas} id="map" />;
 }

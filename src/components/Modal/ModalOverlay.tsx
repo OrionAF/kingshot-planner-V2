@@ -1,12 +1,12 @@
 // src/components/Modal/ModalOverlay.tsx
 
-import React from 'react'
-import { createPortal } from 'react-dom'
-import styles from './ModalOverlay.module.css'
+import React from 'react';
+import { createPortal } from 'react-dom';
+import styles from './ModalOverlay.module.css';
 
 interface ModalOverlayProps {
-  children: React.ReactNode
-  onClose?: () => void
+  children: React.ReactNode;
+  onClose?: () => void;
 }
 
 export function ModalOverlay({ children, onClose }: ModalOverlayProps) {
@@ -15,9 +15,9 @@ export function ModalOverlay({ children, onClose }: ModalOverlayProps) {
     // We check if the click target is the overlay itself, not its children.
     // This prevents the modal from closing when you click inside the panel.
     if (e.target === e.currentTarget && onClose) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   // Use createPortal to render the modal JSX directly into the document's body.
   // This ensures it renders on top of all other content.
@@ -28,6 +28,6 @@ export function ModalOverlay({ children, onClose }: ModalOverlayProps) {
     >
       {children}
     </div>,
-    document.body // The destination container for our portal
-  )
+    document.body, // The destination container for our portal
+  );
 }

@@ -1,30 +1,30 @@
 // src/features/Build/BuildPanel.tsx
-import { Panel } from '../../components/Panel/Panel'
-import { AppConfig } from '../../config/appConfig'
-import { useMapStore } from '../../state/useMapStore'
-import { useUiStore } from '../../state/useUiStore'
-import styles from './BuildPanel.module.css'
+import { Panel } from '../../components/Panel/Panel';
+import { AppConfig } from '../../config/appConfig';
+import { useMapStore } from '../../state/useMapStore';
+import { useUiStore } from '../../state/useUiStore';
+import styles from './BuildPanel.module.css';
 
 export function BuildPanel() {
-  const openPanel = useUiStore((state) => state.openPanel)
-  const alliances = useMapStore((state) => state.alliances)
+  const openPanel = useUiStore((state) => state.openPanel);
+  const alliances = useMapStore((state) => state.alliances);
   const { buildMode, setActiveAllianceId, setSelectedBuildingType } =
-    useUiStore()
+    useUiStore();
 
-  const buildingCatalog = AppConfig.BUILDING_CATALOG
+  const buildingCatalog = AppConfig.BUILDING_CATALOG;
 
   const handleAllianceSelect = (id: number) => {
-    setActiveAllianceId(buildMode.activeAllianceId === id ? null : id)
-  }
+    setActiveAllianceId(buildMode.activeAllianceId === id ? null : id);
+  };
 
   const handleBuildingSelect = (
-    type: keyof typeof AppConfig.BUILDING_CATALOG
+    type: keyof typeof AppConfig.BUILDING_CATALOG,
   ) => {
-    setSelectedBuildingType(type)
-  }
+    setSelectedBuildingType(type);
+  };
 
-  const isOpen = openPanel === 'build'
-  const panelClassName = `${styles.buildPanel} ${isOpen ? styles.open : ''}`
+  const isOpen = openPanel === 'build';
+  const panelClassName = `${styles.buildPanel} ${isOpen ? styles.open : ''}`;
 
   return (
     <Panel className={panelClassName}>
@@ -66,7 +66,7 @@ export function BuildPanel() {
                 }`}
                 onClick={() =>
                   handleBuildingSelect(
-                    type as keyof typeof AppConfig.BUILDING_CATALOG
+                    type as keyof typeof AppConfig.BUILDING_CATALOG,
                   )
                 }
               >
@@ -80,5 +80,5 @@ export function BuildPanel() {
         </div>
       )}
     </Panel>
-  )
+  );
 }

@@ -1,35 +1,35 @@
 // src/features/PlayerManager/EditPlayerModal.tsx
-import { useEffect, useState } from 'react'
-import { ModalOverlay } from '../../components/Modal/ModalOverlay'
-import { Panel } from '../../components/Panel/Panel'
-import { useUiStore } from '../../state/useUiStore'
-import { useMapStore } from '../../state/useMapStore'
-import styles from './PlayerPanel.module.css'
+import { useEffect, useState } from 'react';
+import { ModalOverlay } from '../../components/Modal/ModalOverlay';
+import { Panel } from '../../components/Panel/Panel';
+import { useUiStore } from '../../state/useUiStore';
+import { useMapStore } from '../../state/useMapStore';
+import styles from './PlayerPanel.module.css';
 
 export function EditPlayerModal() {
-  const { editingPlayer, endEditingPlayer } = useUiStore()
-  const { updatePlayer } = useMapStore()
+  const { editingPlayer, endEditingPlayer } = useUiStore();
+  const { updatePlayer } = useMapStore();
 
-  const [name, setName] = useState('')
-  const [power, setPower] = useState('')
-  const [rallyCap, setRallyCap] = useState('')
-  const [tcLevel, setTcLevel] = useState('')
-  const [notes, setNotes] = useState('')
-  const [color, setColor] = useState('#9400d3')
+  const [name, setName] = useState('');
+  const [power, setPower] = useState('');
+  const [rallyCap, setRallyCap] = useState('');
+  const [tcLevel, setTcLevel] = useState('');
+  const [notes, setNotes] = useState('');
+  const [color, setColor] = useState('#9400d3');
 
   useEffect(() => {
     if (editingPlayer) {
-      setName(editingPlayer.name)
-      setPower(editingPlayer.power)
-      setRallyCap(editingPlayer.rallyCap)
-      setTcLevel(editingPlayer.tcLevel)
-      setNotes(editingPlayer.notes)
-      setColor(editingPlayer.color)
+      setName(editingPlayer.name);
+      setPower(editingPlayer.power);
+      setRallyCap(editingPlayer.rallyCap);
+      setTcLevel(editingPlayer.tcLevel);
+      setNotes(editingPlayer.notes);
+      setColor(editingPlayer.color);
     }
-  }, [editingPlayer])
+  }, [editingPlayer]);
 
   const handleSaveChanges = () => {
-    if (!editingPlayer) return
+    if (!editingPlayer) return;
     updatePlayer(editingPlayer.id, {
       name,
       power,
@@ -37,11 +37,11 @@ export function EditPlayerModal() {
       tcLevel,
       notes,
       color,
-    })
-    endEditingPlayer()
-  }
+    });
+    endEditingPlayer();
+  };
 
-  if (!editingPlayer) return null
+  if (!editingPlayer) return null;
 
   return (
     <ModalOverlay onClose={endEditingPlayer}>
@@ -108,5 +108,5 @@ export function EditPlayerModal() {
         </div>
       </Panel>
     </ModalOverlay>
-  )
+  );
 }

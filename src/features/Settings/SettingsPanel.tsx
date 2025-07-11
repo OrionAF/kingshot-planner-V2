@@ -1,30 +1,30 @@
 // src/features/Settings/SettingsPanel.tsx
 
-import { useRef } from 'react'
-import { Panel } from '../../components/Panel/Panel'
-import { useMapStore } from '../../state/useMapStore'
-import { useUiStore } from '../../state/useUiStore'
+import { useRef } from 'react';
+import { Panel } from '../../components/Panel/Panel';
+import { useMapStore } from '../../state/useMapStore';
+import { useUiStore } from '../../state/useUiStore';
 import {
   type Alliance,
   type Player,
   type UserBuilding,
-} from '../../types/map.types'
-import styles from './SettingsPanel.module.css'
+} from '../../types/map.types';
+import styles from './SettingsPanel.module.css';
 
 interface PlanFile {
-  version: number
-  alliances: Alliance[]
-  players: Player[]
-  userBuildings: UserBuilding[]
+  version: number;
+  alliances: Alliance[];
+  players: Player[];
+  userBuildings: UserBuilding[];
 }
 
 export function SettingsPanel() {
-  const openPanel = useUiStore((state) => state.openPanel)
+  const openPanel = useUiStore((state) => state.openPanel);
   // FIX: Get userBuildings from the store for export
   const { alliances, players, userBuildings, importPlan } =
-    useMapStore.getState()
+    useMapStore.getState();
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
     const planData: PlanFile = {
@@ -32,37 +32,37 @@ export function SettingsPanel() {
       alliances,
       players,
       userBuildings,
-    }
-    const jsonString = JSON.stringify(planData, null, 2)
-    const blob = new Blob([jsonString], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `kingshot-plan-v1.1-${new Date().toISOString().slice(0, 10)}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
+    };
+    const jsonString = JSON.stringify(planData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kingshot-plan-v1.1-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const handleImportClick = () => {
-    fileInputRef.current?.click()
-  }
+    fileInputRef.current?.click();
+  };
 
   const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const result = event.target?.result
-        const data = JSON.parse(result as string) as PlanFile
+        const result = event.target?.result;
+        const data = JSON.parse(result as string) as PlanFile;
 
         if (data && data.version >= 1 && Array.isArray(data.alliances)) {
           if (
             window.confirm(
-              'This will overwrite your current plan. Are you sure?'
+              'This will overwrite your current plan. Are you sure?',
             )
           ) {
             const planToImport = {
@@ -70,26 +70,26 @@ export function SettingsPanel() {
               players: data.players ?? [],
               // FIX: Add userBuildings, defaulting to an empty array
               userBuildings: data.userBuildings ?? [],
-            }
-            importPlan(planToImport) // This now sends the correct object shape
-            alert('Plan imported successfully!')
+            };
+            importPlan(planToImport); // This now sends the correct object shape
+            alert('Plan imported successfully!');
           }
         } else {
-          throw new Error('Invalid or unsupported plan file format.')
+          throw new Error('Invalid or unsupported plan file format.');
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
         alert(
-          `Error importing plan: ${error instanceof Error ? error.message : 'Unknown error'}`
-        )
+          `Error importing plan: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
-    }
-    reader.readAsText(file)
-    e.target.value = ''
-  }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
-  const isOpen = openPanel === 'settings'
-  const panelClassName = `${styles.settingsPanel} ${isOpen ? styles.open : ''}`
+  const isOpen = openPanel === 'settings';
+  const panelClassName = `${styles.settingsPanel} ${isOpen ? styles.open : ''}`;
 
   return (
     <Panel className={panelClassName}>
@@ -110,5 +110,5 @@ export function SettingsPanel() {
         onChange={handleFileSelected}
       />
     </Panel>
-  )
+  );
 }

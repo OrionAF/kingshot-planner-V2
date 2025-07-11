@@ -1,15 +1,15 @@
-import { Panel } from '../../components/Panel/Panel'
-import { useUiStore } from '../../state/useUiStore'
-import styles from './ManagementPanel.module.css'
+import { Panel } from '../../components/Panel/Panel';
+import { useUiStore } from '../../state/useUiStore';
+import styles from './ManagementPanel.module.css';
 
 export function ManagementPanel() {
-  const { openPanel, switchPanel } = useUiStore()
-  const isOpen = openPanel === 'management'
+  const { openPanel, switchPanel } = useUiStore();
+  const isOpen = openPanel === 'management';
 
   const handleClick = (panelId: 'alliance' | 'build' | 'player') => {
     // Use the new, unambiguous switchPanel action
-    switchPanel(panelId)
-  }
+    switchPanel(panelId);
+  };
 
   return (
     <Panel className={`${styles.managementPanel} ${isOpen ? styles.open : ''}`}>
@@ -28,5 +28,5 @@ export function ManagementPanel() {
         </button>
       </div>
     </Panel>
-  )
+  );
 }

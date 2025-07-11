@@ -1,25 +1,25 @@
 // src/features/Toolbar/BottomToolbar.tsx
 
-import { useCameraStore } from '../../state/useCameraStore'
-import { useUiStore } from '../../state/useUiStore'
-import styles from './BottomToolbar.module.css'
+import { useCameraStore } from '../../state/useCameraStore';
+import { useUiStore } from '../../state/useUiStore';
+import styles from './BottomToolbar.module.css';
 
 export function BottomToolbar() {
-  const scale = useCameraStore((state) => state.scale)
-  const { togglePanel, openPanel } = useUiStore()
-  const zoomPct = Math.round(scale * 20)
+  const scale = useCameraStore((state) => state.scale);
+  const { togglePanel, openPanel } = useUiStore();
+  const zoomPct = Math.round(scale * 20);
 
   // New, robust logic for highlighting group buttons on mobile
   const isManagementActive =
     openPanel === 'management' ||
     openPanel === 'alliance' ||
-    openPanel === 'player'
+    openPanel === 'player';
   const isToolsActive =
     openPanel === 'tools' ||
     openPanel === 'nav' ||
     openPanel === 'overwatch' ||
     openPanel === 'zoomPresets' ||
-    openPanel === 'minimap'
+    openPanel === 'minimap';
 
   return (
     <div className={styles.bottomToolbar}>
@@ -141,5 +141,5 @@ export function BottomToolbar() {
         </button>
       </div>
     </div>
-  )
+  );
 }

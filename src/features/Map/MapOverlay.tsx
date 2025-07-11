@@ -1,18 +1,18 @@
 // src/features/Map/MapOverlay.tsx
 
-import { AppConfig } from '../../config/appConfig'
-import { useCameraStore } from '../../state/useCameraStore'
-import { useMapStore } from '../../state/useMapStore'
-import { useUiStore } from '../../state/useUiStore'
-import { screenToWorld } from '../../core/coordinate-utils'
-import styles from './MapOverlay.module.css'
+import { AppConfig } from '../../config/appConfig';
+import { useCameraStore } from '../../state/useCameraStore';
+import { useMapStore } from '../../state/useMapStore';
+import { useUiStore } from '../../state/useUiStore';
+import { screenToWorld } from '../../core/coordinate-utils';
+import styles from './MapOverlay.module.css';
 
 export function MapOverlay() {
   const cameraState = useCameraStore((state) => ({
     x: state.x,
     y: state.y,
     scale: state.scale,
-  }))
+  }));
   const {
     buildMode,
     isPlacingPlayer,
@@ -20,40 +20,41 @@ export function MapOverlay() {
     endPlayerPlacement,
     setSelectedBuildingType,
     isValidPlacement,
-  } = useUiStore()
-  const { placePlayer, placeBuilding } = useMapStore()
+  } = useUiStore();
+  const { placePlayer, placeBuilding } = useMapStore();
 
-  const isPlacingSomething = isPlacingPlayer || !!buildMode.selectedBuildingType
+  const isPlacingSomething =
+    isPlacingPlayer || !!buildMode.selectedBuildingType;
 
   const [worldX, worldY] = screenToWorld(
     window.innerWidth / 2,
     window.innerHeight / 2,
-    cameraState
-  )
+    cameraState,
+  );
 
   const handleConfirmPlacement = () => {
     if (isValidPlacement) {
-      const roundedX = Math.round(worldX)
-      const roundedY = Math.round(worldY)
+      const roundedX = Math.round(worldX);
+      const roundedY = Math.round(worldY);
 
       if (isPlacingPlayer && playerToPlace) {
-        placePlayer(playerToPlace, roundedX, roundedY)
+        placePlayer(playerToPlace, roundedX, roundedY);
       } else if (buildMode.selectedBuildingType && buildMode.activeAllianceId) {
         placeBuilding(
           buildMode.selectedBuildingType,
           roundedX,
           roundedY,
-          buildMode.activeAllianceId
-        )
+          buildMode.activeAllianceId,
+        );
       }
     }
-    handleCancelPlacement()
-  }
+    handleCancelPlacement();
+  };
 
   const handleCancelPlacement = () => {
-    endPlayerPlacement()
-    setSelectedBuildingType(null)
-  }
+    endPlayerPlacement();
+    setSelectedBuildingType(null);
+  };
 
   return (
     <div className={styles.overlayContainer}>
@@ -89,5 +90,5 @@ export function MapOverlay() {
         </>
       )}
     </div>
-  )
+  );
 }

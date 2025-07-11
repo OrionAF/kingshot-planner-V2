@@ -9,7 +9,7 @@ export const mapVertexShaderSource = /* glsl */ `
     gl_Position = vec4(screenPosition, 0.0, 1.0);
     v_worldPosition = a_worldPosition;
   }
-`
+`;
 
 // === Fragment Shader (Modified with Conditional Logic) ===
 export const mapFragmentShaderSource = /* glsl */ `
@@ -69,4 +69,4 @@ export const mapFragmentShaderSource = /* glsl */ `
 
     gl_FragColor = vec4(finalColor, 1.0);
   }
-`
+`;

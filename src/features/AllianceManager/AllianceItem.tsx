@@ -1,8 +1,8 @@
-import { type Alliance } from '../../types/map.types'
-import styles from './AllianceItem.module.css'
+import { type Alliance } from '../../types/map.types';
+import styles from './AllianceItem.module.css';
 
 interface AllianceItemProps {
-  alliance: Alliance
+  alliance: Alliance;
 }
 
 export function AllianceItem({ alliance }: AllianceItemProps) {
@@ -22,5 +22,5 @@ export function AllianceItem({ alliance }: AllianceItemProps) {
       </div>
       {/* We will add the expandable details section later */}
     </div>
-  )
+  );
 }
