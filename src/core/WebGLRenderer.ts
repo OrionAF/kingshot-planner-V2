@@ -1,17 +1,18 @@
 // src/core/WebGLRenderer.ts
 
 import { AppConfig } from '../config/appConfig';
+import { useAssetStore } from '../state/useAssetStore';
 import { useCameraStore } from '../state/useCameraStore';
 import { useMapStore } from '../state/useMapStore';
 import { useSelectionStore } from '../state/useSelectionStore';
 import { useUiStore } from '../state/useUiStore';
-import { screenToWorld } from './coordinate-utils';
+import type { Alliance, BaseBuilding } from '../types/map.types';
+import { screenToWorld, worldToScreen } from './coordinate-utils';
 import {
   mapFragmentShaderSource,
   mapVertexShaderSource,
 } from './webgl/map-shaders';
 import { createProgramFromSources } from './webgl/webgl-utils';
-import type { Alliance } from '../types/map.types';
 
 type Matrix3 = number[];
 type DrawableObject = {
@@ -43,6 +44,7 @@ export class WebGLRenderer {
   private gl: WebGLRenderingContext;
   private mapProgram: WebGLProgram;
   private worldPosAttrLocation: number;
+  private texCoordAttrLocation: number;
   private projectionUniformLocation: WebGLUniformLocation | null;
   private fertileColorLocation: WebGLUniformLocation | null;
   private plainsColorLocation: WebGLUniformLocation | null;
@@ -50,13 +52,17 @@ export class WebGLRenderer {
   private gridThicknessLocation: WebGLUniformLocation | null;
   private gridDarknessLocation: WebGLUniformLocation | null;
   private objectColorLocation: WebGLUniformLocation | null;
-  private isDrawingObjectLocation: WebGLUniformLocation | null;
   private objectAlphaLocation: WebGLUniformLocation | null;
+  private textureSamplerLocation: WebGLUniformLocation | null;
+  private isDrawingObjectLocation: WebGLUniformLocation | null;
+  private isDrawingTerritoryLocation: WebGLUniformLocation | null;
+  private isDrawingTextureLocation: WebGLUniformLocation | null;
   private objectBuffer: WebGLBuffer | null;
   private territoryBuffer: WebGLBuffer | null;
   private mapPlaneBuffer: WebGLBuffer | null;
+  private textureBuffer: WebGLBuffer | null;
+  private textures = new Map<string, WebGLTexture>();
   private derivativesSupported = false;
-  private isDrawingTerritoryLocation: WebGLUniformLocation | null;
 
   constructor(gl: WebGLRenderingContext) {
     this.gl = gl;
@@ -73,6 +79,10 @@ export class WebGLRenderer {
     this.worldPosAttrLocation = gl.getAttribLocation(
       this.mapProgram,
       'a_worldPosition',
+    );
+    this.texCoordAttrLocation = gl.getAttribLocation(
+      this.mapProgram,
+      'a_texCoord',
     );
     this.projectionUniformLocation = gl.getUniformLocation(
       this.mapProgram,
@@ -102,6 +112,14 @@ export class WebGLRenderer {
       this.mapProgram,
       'u_objectColor',
     );
+    this.objectAlphaLocation = gl.getUniformLocation(
+      this.mapProgram,
+      'u_objectAlpha',
+    );
+    this.textureSamplerLocation = gl.getUniformLocation(
+      this.mapProgram,
+      'u_textureSampler',
+    );
     this.isDrawingObjectLocation = gl.getUniformLocation(
       this.mapProgram,
       'u_isDrawingObject',
@@ -110,12 +128,13 @@ export class WebGLRenderer {
       this.mapProgram,
       'u_isDrawingTerritory',
     );
-    this.objectAlphaLocation = gl.getUniformLocation(
+    this.isDrawingTextureLocation = gl.getUniformLocation(
       this.mapProgram,
-      'u_objectAlpha',
+      'u_isDrawingTexture',
     );
     this.objectBuffer = gl.createBuffer();
     this.territoryBuffer = gl.createBuffer();
+    this.textureBuffer = gl.createBuffer();
     this.mapPlaneBuffer = this.createMapPlaneBuffer();
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -124,9 +143,10 @@ export class WebGLRenderer {
     }
   }
 
-  public renderFrame() {
+  public renderFrame(time = 0) {
     const gl = this.gl;
     const camera = useCameraStore.getState();
+    const { images } = useAssetStore.getState();
     const {
       baseBuildings,
       players,
@@ -142,13 +162,12 @@ export class WebGLRenderer {
       isValidPlacement,
     } = useUiStore.getState();
     const { selection } = useSelectionStore.getState();
-
+    if (images.size === 0) return;
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0.06, 0.06, 0.06, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.useProgram(this.mapProgram);
-
-    const projectionMatrix = this.calculateProjectionMatrix(
+    const worldProjectionMatrix = this.calculateWorldProjectionMatrix(
       camera.x,
       camera.y,
       camera.scale,
@@ -156,23 +175,22 @@ export class WebGLRenderer {
     gl.uniformMatrix3fv(
       this.projectionUniformLocation,
       false,
-      projectionMatrix,
+      worldProjectionMatrix,
     );
     gl.uniform1f(this.gridThicknessLocation, AppConfig.webgl.gridThickness);
     gl.uniform1f(this.gridDarknessLocation, AppConfig.webgl.gridDarkness);
-
     this.drawMapPlane();
-
     claimedTerritory.forEach((tiles, allianceId) => {
       const alliance = alliances.find((a) => a.id === allianceId);
       if (alliance && tiles.size > 0) {
         this.drawTerritory(alliance, tiles);
       }
     });
-
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
     for (const building of baseBuildings) {
-      this.drawObject(building);
+      if (!building.imgKey) {
+        this.drawObject(building);
+      }
     }
     for (const building of userBuildings) {
       this.drawObject(building);
@@ -180,7 +198,6 @@ export class WebGLRenderer {
     for (const player of players) {
       this.drawObject(player, 1.0);
     }
-
     if (selection) {
       switch (selection.type) {
         case 'baseBuilding':
@@ -193,12 +210,33 @@ export class WebGLRenderer {
           break;
       }
     }
-
+    const spriteProjectionMatrix = this.calculateSpriteProjectionMatrix();
+    gl.uniformMatrix3fv(
+      this.projectionUniformLocation,
+      false,
+      spriteProjectionMatrix,
+    );
+    for (const building of baseBuildings) {
+      const image = building.imgKey ? images.get(building.imgKey) : null;
+      if (image && building.anchorTile) {
+        this.drawImageAsSprite(camera, image, building);
+      }
+    }
+    gl.uniformMatrix3fv(
+      this.projectionUniformLocation,
+      false,
+      worldProjectionMatrix,
+    );
     const isDesktop = window.matchMedia('(min-width: 769px)').matches;
     const isPlacingSomething =
       isPlacingPlayer || !!buildMode.selectedBuildingType;
-
     if (isPlacingSomething) {
+      const flickerPeriod = AppConfig.interactions.GHOST_FLICKER_PERIOD_MS;
+      const sineValue =
+        (Math.sin((time / flickerPeriod) * (2 * Math.PI)) + 1) / 2;
+      const minAlpha = 0.3;
+      const maxAlpha = 0.8;
+      const flickerAlpha = minAlpha + (maxAlpha - minAlpha) * sineValue;
       let w = 0,
         h = 0,
         coverage = 0;
@@ -243,24 +281,117 @@ export class WebGLRenderer {
               h: coverage,
               color: ghostColor ?? ghostBaseColor,
             },
-            0.15,
+            flickerAlpha * 0.3,
           );
         }
         this.drawObject(
           { ...ghostPosition, w, h, color: ghostColor ?? ghostBaseColor },
-          0.6,
+          flickerAlpha,
         );
       }
     }
   }
 
+  private drawImageAsSprite(
+    camera: { x: number; y: number; scale: number },
+    image: HTMLImageElement,
+    building: BaseBuilding,
+  ) {
+    const gl = this.gl;
+    const {
+      anchorTile,
+      imgRndW = 1,
+      imgRndH = 1,
+      imgScl = 1,
+      imgSclFar = 1,
+    } = building;
+    if (!anchorTile) return;
+    const [screenAnchorX, screenAnchorY] = worldToScreen(
+      anchorTile.x,
+      anchorTile.y,
+    );
+    const transformedAnchorX = screenAnchorX * camera.scale + camera.x;
+    const transformedAnchorY = screenAnchorY * camera.scale + camera.y;
+    const zoomT = Math.max(
+      0,
+      Math.min(
+        1,
+        (camera.scale - AppConfig.camera.minScale) /
+          (AppConfig.camera.maxScale - AppConfig.camera.minScale),
+      ),
+    );
+    const dynamicScale = imgScl + (imgSclFar - imgScl) * (1 - zoomT);
+    const spritePixelW = imgRndW * AppConfig.tileW * dynamicScale;
+    const spritePixelH = imgRndH * AppConfig.tileH * dynamicScale;
+    const halfW = spritePixelW / 2;
+    const halfH = spritePixelH / 2;
+    const positions = [
+      transformedAnchorX - halfW,
+      transformedAnchorY - halfH,
+      transformedAnchorX + halfW,
+      transformedAnchorY - halfH,
+      transformedAnchorX - halfW,
+      transformedAnchorY + halfH,
+      transformedAnchorX - halfW,
+      transformedAnchorY + halfH,
+      transformedAnchorX + halfW,
+      transformedAnchorY - halfH,
+      transformedAnchorX + halfW,
+      transformedAnchorY + halfH,
+    ];
+    const texture = this.createAndCacheTexture(image.src, image);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.uniform1f(this.isDrawingTextureLocation, 1.0);
+    gl.uniform1f(this.isDrawingObjectLocation, 0.0);
+    gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.objectBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(positions),
+      gl.DYNAMIC_DRAW,
+    );
+    gl.enableVertexAttribArray(this.worldPosAttrLocation);
+    gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0,
+      ]),
+      gl.STATIC_DRAW,
+    );
+    gl.enableVertexAttribArray(this.texCoordAttrLocation);
+    gl.vertexAttribPointer(this.texCoordAttrLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform1i(this.textureSamplerLocation, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.uniform1f(this.isDrawingTextureLocation, 0.0);
+  }
+
+  private createAndCacheTexture(
+    key: string,
+    image: HTMLImageElement,
+  ): WebGLTexture | null {
+    if (this.textures.has(key)) {
+      return this.textures.get(key) ?? null;
+    }
+    const gl = this.gl;
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    if (texture) {
+      this.textures.set(key, texture);
+    }
+    return texture;
+  }
   private drawHighlight(obj: { x: number; y: number; w: number; h: number }) {
     const gl = this.gl;
     const { x, y, w, h } = obj;
-
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
     gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
-
     const positions = [
       x,
       y,
@@ -279,44 +410,35 @@ export class WebGLRenderer {
       x,
       y,
     ];
-
     gl.bindBuffer(gl.ARRAY_BUFFER, this.objectBuffer);
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array(positions),
       gl.DYNAMIC_DRAW,
     );
-
     gl.enableVertexAttribArray(this.worldPosAttrLocation);
     gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0);
-
     const [r, g, b] = parseColor(AppConfig.selectionColor);
     gl.uniform3fv(this.objectColorLocation, [r, g, b]);
     gl.uniform1f(this.objectAlphaLocation, 1.0);
     gl.drawArrays(gl.LINES, 0, positions.length / 2);
   }
-
   private drawTerritory(alliance: Alliance, tiles: Set<string>) {
     const gl = this.gl;
-
     gl.uniform1f(this.isDrawingObjectLocation, 0.0);
     gl.uniform1f(this.isDrawingTerritoryLocation, 1.0);
-
     const [r, g, b] = parseColor(alliance.color);
     gl.uniform3fv(this.objectColorLocation, [r, g, b]);
     gl.uniform1f(this.objectAlphaLocation, 0.25);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, this.territoryBuffer);
     gl.enableVertexAttribArray(this.worldPosAttrLocation);
     gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0);
-
     const positions: number[] = [];
     tiles.forEach((coordStr) => {
       const [x, y] = coordStr.split(',').map(Number);
       positions.push(x, y, x + 1, y, x, y + 1);
       positions.push(x, y + 1, x + 1, y, x + 1, y + 1);
     });
-
     if (positions.length > 0) {
       gl.bufferData(
         gl.ARRAY_BUFFER,
@@ -325,18 +447,14 @@ export class WebGLRenderer {
       );
       gl.drawArrays(gl.TRIANGLES, 0, positions.length / 2);
     }
-
     gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
   }
-
   private drawObject(obj: DrawableObject, alpha = 1.0) {
     const gl = this.gl;
     const { x, y, w, h, color } = obj;
     if (!color) return;
-
     gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
-
     const positions = [
       x,
       y,
@@ -396,8 +514,7 @@ export class WebGLRenderer {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
     return buffer;
   }
-
-  private calculateProjectionMatrix(
+  private calculateWorldProjectionMatrix(
     camX: number,
     camY: number,
     camScale: number,
@@ -406,13 +523,24 @@ export class WebGLRenderer {
     const { width, height } = this.gl.canvas;
     const clipX = 2.0 / width;
     const clipY = -2.0 / height;
+
+    // THE FIX: Negate the Y-components of the projection matrix to align
+    // with our "Y-UP" world-to-screen utility function.
     const a = (tileW / 2) * camScale * clipX;
-    const b = (tileH / 2) * camScale * clipY;
+    const b = -(tileH / 2) * camScale * clipY;
     const c = (-tileW / 2) * camScale * clipX;
-    const d = (tileH / 2) * camScale * clipY;
+    const d = -(tileH / 2) * camScale * clipY;
+
     const tx = camX * clipX - 1.0;
     const ty = camY * clipY + 1.0;
 
     return [a, b, 0, c, d, 0, tx, ty, 1];
+  }
+
+  private calculateSpriteProjectionMatrix(): Matrix3 {
+    const { width, height } = this.gl.canvas;
+    const clipX = 2.0 / width;
+    const clipY = -2.0 / height;
+    return [clipX, 0, 0, 0, clipY, 0, -1.0, 1.0, 1];
   }
 }

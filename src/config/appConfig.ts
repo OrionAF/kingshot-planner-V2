@@ -11,12 +11,12 @@ export interface BuildingDefinition {
 
 export const AppConfig = {
   CURRENT_VERSION: '0.0.1.0',
-  enableDevMode: false,
+  enableDevMode: true,
   N: 1200,
   tileW: 10,
   tileH: 10,
   strokeW: 0.3,
-  borderColor: '#000',
+  brdCol: '#000',
   textColor: '#fff',
   textColorAlt: 'rgba(0, 0, 0, 0.65)',
   maxPct: 250,
@@ -31,6 +31,11 @@ export const AppConfig = {
   player: {
     width: 2,
     height: 2,
+  },
+
+  // --- NEW CONFIG SECTION ---
+  interactions: {
+    GHOST_FLICKER_PERIOD_MS: 1000, // Time in milliseconds for one full pulse
   },
 
   BUILDING_CATALOG: {
@@ -56,14 +61,6 @@ export const AppConfig = {
       h: 3,
       coverage: 15,
       rule: 'plains',
-      limit: 1,
-    },
-    hq_fertile: {
-      name: 'Fertile Lands HQ',
-      w: 3,
-      h: 3,
-      coverage: 15,
-      rule: 'fertile',
       limit: 1,
     },
     pitfall: {
@@ -122,24 +119,24 @@ export const AppConfig = {
   },
   ALLIANCE_RSS_STYLES: {
     wood: {
-      displayName: 'Wood',
-      fillColor: 'rgba(139,69,19,1)',
-      borderColor: 'rgba(111,55,15,1)',
+      dpName: 'Wood',
+      fillCol: 'rgba(139,69,19,1)',
+      brdCol: 'rgba(111,55,15,1)',
     },
     food: {
-      displayName: 'Food',
-      fillColor: 'rgba(255,165,0,1)',
-      borderColor: 'rgba(204,132,0,1)',
+      dpName: 'Food',
+      fillCol: 'rgba(255,165,0,1)',
+      brdCol: 'rgba(204,132,0,1)',
     },
     stone: {
-      displayName: 'Stone',
-      fillColor: 'rgba(128,128,128,1)',
-      borderColor: 'rgba(102,102,102,1)',
+      dpName: 'Stone',
+      fillCol: 'rgba(128,128,128,1)',
+      brdCol: 'rgba(102,102,102,1)',
     },
     iron: {
-      displayName: 'Iron',
-      fillColor: 'rgba(192,192,192,1)',
-      borderColor: 'rgba(153,153,153,1)',
+      dpName: 'Iron',
+      fillCol: 'rgba(192,192,192,1)',
+      brdCol: 'rgba(153,153,153,1)',
     },
   },
   minimap: {
@@ -147,8 +144,8 @@ export const AppConfig = {
     height: 300,
     padding: 5,
     bgColor: 'rgba(40,40,40,0.8)',
-    viewportFillColor: 'rgba(255, 255, 255, 0.2)',
-    viewportBorderColor: 'rgba(255, 255, 255, 0.85)',
+    viewportfillCol: 'rgba(255, 255, 255, 0.2)',
+    viewportbrdCol: 'rgba(255, 255, 255, 0.85)',
     kingCastleColor: 'rgba(255,215,0,0.9)',
     fortressColor: 'rgba(178,34,34,1)',
     sanctuaryColor: 'rgba(65,105,225,1)',

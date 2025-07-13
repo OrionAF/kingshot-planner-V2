@@ -8,13 +8,22 @@ export interface MapObject {
   w: number;
   h: number;
   color: string;
-  borderColor?: string;
+  brdCol?: string;
 }
 
 export interface BaseBuilding extends MapObject {
   id: string;
-  displayName: string;
-  imageKey?: string;
+  // Use the new abbreviated property names from your JSON
+  dpName: string;
+  imgKey?: string;
+  imgScl?: number;
+  imgSclFar?: number;
+  imgRndW?: number;
+  imgRndH?: number;
+  anchorTile?: {
+    x: number;
+    y: number;
+  };
 }
 
 export interface OmitIdAndCoords {
@@ -45,8 +54,6 @@ export interface UserBuilding extends MapObject {
   allianceId: number;
 }
 
-// --- NEW SHARED TYPE ---
-// This defines the structure of the JSON file for import/export.
 export interface PlanFile {
   version: string;
   alliances: Alliance[];

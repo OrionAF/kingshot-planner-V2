@@ -19,9 +19,7 @@ export function NavPanel() {
   const [yInput, setYInput] = useState('600');
 
   const landmarks = baseBuildings.filter(
-    (b) =>
-      b.displayName.includes("King's Castle") ||
-      b.displayName.includes('Fortress'),
+    (b) => b.dpName.includes("King's Castle") || b.dpName.includes('Fortress'),
   );
 
   const handleGoTo = (x: number, y: number) => {
@@ -81,7 +79,7 @@ export function NavPanel() {
         <div className={`${styles.tabContent} ${styles.landmarkList}`}>
           {landmarks.map((b) => (
             <div key={b.id} className={styles.landmarkItem}>
-              <span>{b.displayName}</span>
+              <span>{b.dpName}</span>
               <button
                 className={styles.goButton}
                 onClick={() => handleGoTo(b.x, b.y)}

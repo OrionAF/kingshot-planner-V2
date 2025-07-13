@@ -12,8 +12,10 @@ export function MapCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<Renderer | null>(null);
 
-  useAnimationLoop(() => {
-    rendererRef.current?.renderFrame();
+  // CHANGE: The animation loop now passes the high-resolution timestamp
+  // from requestAnimationFrame into our renderFrame method.
+  useAnimationLoop((time) => {
+    rendererRef.current?.renderFrame(time);
   });
 
   useEffect(() => {

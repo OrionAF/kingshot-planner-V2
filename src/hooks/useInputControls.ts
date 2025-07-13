@@ -4,18 +4,16 @@ import { useCameraStore } from '../state/useCameraStore';
 import { screenToWorld, worldToScreen } from '../core/coordinate-utils';
 import { useUiStore } from '../state/useUiStore';
 import { useMapStore } from '../state/useMapStore';
-import { useSelectionStore, type Selection } from '../state/useSelectionStore';
+import { useSelectionStore } from '../state/useSelectionStore';
 import { AppConfig } from '../config/appConfig';
 import type { BaseBuilding, Player, UserBuilding } from '../types/map.types';
 
-// Define a more specific return type for hit detection results
 type HitDetectionResult =
   | { type: 'player'; data: Player }
   | { type: 'userBuilding'; data: UserBuilding }
   | { type: 'baseBuilding'; data: BaseBuilding }
   | null;
 
-// FIX: Add an explicit return type to the helper function.
 function getObjectAtCoords(x: number, y: number): HitDetectionResult {
   const { players, userBuildings, buildingMap } = useMapStore.getState();
 
@@ -210,16 +208,18 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
       Math.min(newScale, AppConfig.camera.maxScale),
     );
     const focalPoint = { x: e.clientX, y: e.clientY };
+
+    // THE FIX: Use the globally correct functions to find the world point under the mouse,
+    // then convert that back to its new screen position with the new scale.
     const [worldX, worldY] = screenToWorld(
       focalPoint.x,
       focalPoint.y,
       cameraBeforeZoom,
     );
-    const [screenXAfter] = worldToScreen(worldX, worldY);
-    const screenYAfterFrom0 = (worldX + worldY) * (AppConfig.tileH / 2);
+    const [screenXAfter, screenYAfter] = worldToScreen(worldX, worldY);
 
     const newCamX = focalPoint.x - screenXAfter * newScale;
-    const newCamY = focalPoint.y - screenYAfterFrom0 * newScale;
+    const newCamY = focalPoint.y - screenYAfter * newScale;
     zoomTo({ x: newCamX, y: newCamY, scale: newScale });
   };
 
@@ -287,15 +287,17 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           AppConfig.camera.minScale,
           Math.min(newScale, AppConfig.camera.maxScale),
         );
+
+        // THE FIX: Use the globally correct functions for pinch-to-zoom as well.
         const [worldX, worldY] = screenToWorld(
           focalPoint.x,
           focalPoint.y,
           cameraBeforeZoom,
         );
-        const [screenXAfter] = worldToScreen(worldX, worldY);
-        const screenYAfterFrom0 = (worldX + worldY) * (AppConfig.tileH / 2);
+        const [screenXAfter, screenYAfter] = worldToScreen(worldX, worldY);
+
         const newCamX = focalPoint.x - screenXAfter * newScale;
-        const newCamY = focalPoint.y - screenYAfterFrom0 * newScale;
+        const newCamY = focalPoint.y - screenYAfter * newScale;
         zoomTo({ x: newCamX, y: newCamY, scale: newScale });
 
         const { isPlacingPlayer, setPlacementValidity, buildMode } =

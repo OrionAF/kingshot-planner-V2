@@ -4,7 +4,7 @@ import { useSelectionStore } from '../state/useSelectionStore';
 import { AppConfig } from '../config/appConfig';
 import { useCameraStore } from '../state/useCameraStore';
 import { useMapStore } from '../state/useMapStore';
-import { type BaseBuilding } from '../types/map.types';
+import type { MapObject } from '../types/map.types';
 
 export class CanvasRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -66,19 +66,26 @@ export class CanvasRenderer {
       this.ctx.strokeStyle = AppConfig.selectionColor;
       this.ctx.lineWidth = 0.5;
 
-      if (selection.type === 'building') {
-        this.drawBuilding(selection.data, true);
-      } else if (selection.type === 'tile') {
-        const { x, y } = selection.data;
-        const [screenX, screenY] = this.worldToScreen(x, y);
-
-        this.ctx.beginPath();
-        this.ctx.moveTo(screenX, screenY - AppConfig.tileH / 2);
-        this.ctx.lineTo(screenX + AppConfig.tileW / 2, screenY);
-        this.ctx.lineTo(screenX, screenY + AppConfig.tileH / 2);
-        this.ctx.lineTo(screenX - AppConfig.tileW / 2, screenY);
-        this.ctx.closePath();
-        this.ctx.stroke();
+      // FIX: Use a switch statement to handle all valid selection types.
+      switch (selection.type) {
+        case 'baseBuilding':
+        case 'userBuilding':
+        case 'player':
+          this.drawBuilding(selection.data, true);
+          break;
+        case 'tile':
+          {
+            const { x, y } = selection.data;
+            const [screenX, screenY] = this.worldToScreen(x, y);
+            this.ctx.beginPath();
+            this.ctx.moveTo(screenX, screenY - AppConfig.tileH / 2);
+            this.ctx.lineTo(screenX + AppConfig.tileW / 2, screenY);
+            this.ctx.lineTo(screenX, screenY + AppConfig.tileH / 2);
+            this.ctx.lineTo(screenX - AppConfig.tileW / 2, screenY);
+            this.ctx.closePath();
+            this.ctx.stroke();
+          }
+          break;
       }
     }
   }
@@ -97,7 +104,7 @@ export class CanvasRenderer {
     this.ctx.fill();
   }
 
-  private drawBuilding(b: BaseBuilding, isHighlight = false) {
+  private drawBuilding(b: MapObject, isHighlight = false) {
     const { x: x0, y: y0, w, h } = b;
     const { tileW, tileH } = AppConfig;
 
@@ -133,7 +140,7 @@ export class CanvasRenderer {
       this.ctx.stroke();
     } else {
       this.ctx.fillStyle = b.color;
-      this.ctx.strokeStyle = b.borderColor ?? AppConfig.borderColor;
+      this.ctx.strokeStyle = b.brdCol ?? AppConfig.brdCol;
       this.ctx.lineWidth = 0.3;
       this.ctx.fill();
       this.ctx.stroke();

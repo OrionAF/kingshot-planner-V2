@@ -7,5 +7,13 @@
   "tabWidth": 2,
   "useTabs": false,
   "bracketSpacing": true,
-  "jsxSingleQuote": false
+  "jsxSingleQuote": false,
+  "overrides": [
+    {
+      "files": ["baseMap.json"],
+      "options": {
+        "printWidth": 99999999
+      }
+    }
+  ]
 }

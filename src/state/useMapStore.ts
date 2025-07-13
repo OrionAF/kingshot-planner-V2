@@ -112,30 +112,96 @@ function processBaseMapData(): {
   buildings: BaseBuilding[];
   map: Map<string, BaseBuilding>;
 } {
-  interface RawBuilding {
-    x: number;
-    y: number;
+  interface Prototype {
     w: number;
     h: number;
-    displayName: string;
-    fillColor: string;
-    borderColor?: string;
+    dpName?: string;
+    ruins?: number;
+    imgKey: string;
+    imgScl: number;
+    imgSclFar: number;
+    imgRndW: number;
+    imgRndH: number;
+    fillCol: string;
+    brdCol: string;
   }
+  interface RawBuildingInstance {
+    id: string;
+    prototype?: string;
+    dpName?: string;
+    x: number;
+    y: number;
+    w?: number;
+    h?: number;
+    imgKey?: string;
+    imgScl?: number;
+    imgSclFar?: number;
+    imgRndW?: number;
+    imgRndH?: number;
+    anchorTile?: { x: number; y: number };
+    fillCol?: string;
+    brdCol?: string;
+  }
+
+  const prototypes = (baseMapData as any).prototypes as Record<
+    string,
+    Prototype
+  >;
   const allBuildings: BaseBuilding[] = [];
   const buildingMap = new Map<string, BaseBuilding>();
-  for (const b of baseMapData.defaultBuildings as RawBuilding[]) {
-    const buildingWithId: BaseBuilding = {
-      ...(b as any),
-      id: `${b.x},${b.y}`,
-      color: b.fillColor,
+
+  for (const b of baseMapData.defaultBuildings as RawBuildingInstance[]) {
+    const prototypeData = b.prototype ? prototypes[b.prototype] : {};
+    const mergedData = { ...prototypeData, ...b };
+
+    const building: BaseBuilding = {
+      id: mergedData.id,
+      dpName: mergedData.dpName || 'Unnamed Building',
+      x: mergedData.x,
+      y: mergedData.y,
+      w: mergedData.w || 1,
+      h: mergedData.h || 1,
+      color: mergedData.fillCol || 'transparent',
+      brdCol: mergedData.brdCol,
+      imgKey: mergedData.imgKey,
+      imgScl: mergedData.imgScl,
+      imgSclFar: mergedData.imgSclFar,
+      imgRndW: mergedData.imgRndW,
+      imgRndH: mergedData.imgRndH,
+      anchorTile: mergedData.anchorTile,
     };
-    allBuildings.push(buildingWithId);
-    for (let dx = 0; dx < b.w; dx++) {
-      for (let dy = 0; dy < b.h; dy++) {
-        buildingMap.set(`${b.x + dx},${b.y + dy}`, buildingWithId);
+    allBuildings.push(building);
+
+    for (let dx = 0; dx < building.w; dx++) {
+      for (let dy = 0; dy < building.h; dy++) {
+        buildingMap.set(`${building.x + dx},${building.y + dy}`, building);
       }
     }
   }
+
+  for (const rss of baseMapData.allianceRssBuildings as any[]) {
+    const style =
+      AppConfig.ALLIANCE_RSS_STYLES[
+        rss.type as keyof typeof AppConfig.ALLIANCE_RSS_STYLES
+      ];
+    const building: BaseBuilding = {
+      id: `${rss.type}-${rss.x}-${rss.y}`,
+      dpName: style.dpName,
+      x: rss.x,
+      y: rss.y,
+      w: 2,
+      h: 2,
+      color: style.fillCol,
+      brdCol: style.brdCol,
+    };
+    allBuildings.push(building);
+    for (let dx = 0; dx < 2; dx++) {
+      for (let dy = 0; dy < 2; dy++) {
+        buildingMap.set(`${rss.x + dx},${rss.y + dy}`, building);
+      }
+    }
+  }
+
   return { buildings: allBuildings, map: buildingMap };
 }
 
@@ -151,7 +217,6 @@ export const useMapStore = create<MapState & MapActions>()(
       userBuildings: [],
       claimedTerritory: new Map(),
       globallyClaimedTiles: new Map(),
-
       recalculateTerritory: () => {
         const { userBuildings, alliances } = get();
         const newClaimedTerritory = new Map<number, Set<string>>();
@@ -219,9 +284,9 @@ export const useMapStore = create<MapState & MapActions>()(
         set((state) => ({ players: state.players.filter((p) => p.id !== id) })),
 
       placeBuilding: (type, x, y, allianceId) => {
-        const { alliances, recalculateTerritory } = get();
+        const { recalculateTerritory } = get();
         const definition = AppConfig.BUILDING_CATALOG[type];
-        const alliance = alliances.find((a) => a.id === allianceId);
+        const alliance = get().alliances.find((a) => a.id === allianceId);
         if (!definition || !alliance) return;
 
         const newBuilding: UserBuilding = {

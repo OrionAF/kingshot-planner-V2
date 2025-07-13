@@ -55,11 +55,22 @@
   align-items: center;
   justify-content: space-between;
 }
-.allianceItem:hover,
-.buildingItem:hover {
+
+/* Make buttons that are disabled appear so */
+.buildingItem:disabled {
+  color: #666;
+  background-color: rgba(0, 0, 0, 0.1);
+  cursor: not-allowed;
+}
+
+/* --- THE FIX --- */
+/* Only apply hover effects if the item is NOT disabled */
+.allianceItem:not(:disabled):hover,
+.buildingItem:not(:disabled):hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: #555;
 }
+
 .allianceItem.selected,
 .buildingItem.selected {
   background-color: #2a9fd6;
