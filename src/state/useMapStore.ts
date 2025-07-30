@@ -14,7 +14,7 @@ import baseMapData from '../assets/baseMap.json';
 import { AppConfig, type BuildingDefinition } from '../config/appConfig';
 import { generateId } from '../utils/idGenerator';
 
-function getBiomeForTile(x: number, y: number): string {
+export function getBiomeForTile(x: number, y: number): string {
   const { fertile, plains } = AppConfig.biomeRegions;
   if (x >= fertile.x1 && x <= fertile.x2 && y >= fertile.y1 && y <= fertile.y2)
     return 'fertile';

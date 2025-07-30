@@ -3,7 +3,7 @@
 import { useCameraStore } from '../state/useCameraStore';
 import { screenToWorld, worldToScreen } from '../core/coordinate-utils';
 import { useUiStore } from '../state/useUiStore';
-import { useMapStore } from '../state/useMapStore';
+import { useMapStore, getBiomeForTile } from '../state/useMapStore';
 import { useSelectionStore } from '../state/useSelectionStore';
 import { AppConfig } from '../config/appConfig';
 import type { BaseBuilding, Player, UserBuilding } from '../types/map.types';
@@ -144,6 +144,10 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
             setSelection(clickedObject);
           } else {
             setSelection({ type: 'tile', data: { x: roundedX, y: roundedY } });
+          }
+          if (AppConfig.enableDevMode) {
+            const biome = getBiomeForTile(roundedX, roundedY);
+            console.log(`Click at: ${roundedX}, ${roundedY} (Biome: ${biome})`);
           }
         }
       }

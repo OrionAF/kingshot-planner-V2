@@ -62,10 +62,10 @@ export const mapFragmentShaderSource = /* glsl */ `
     } else {
       // Draw the base map plane and grid
       vec3 mapColor;
-      vec2 fertile_min = vec2(480.0, 480.0);
-      vec2 fertile_max = vec2(719.0, 719.0);
-      vec2 plains_min = vec2(320.0, 320.0);
-      vec2 plains_max = vec2(879.0, 879.0);
+      vec2 fertile_min = vec2(450.0, 450.0);
+      vec2 fertile_max = vec2(750.0, 750.0);
+      vec2 plains_min = vec2(300.0, 300.0);
+      vec2 plains_max = vec2(900.0, 900.0);
 
       if (all(greaterThanEqual(v_worldPosition, fertile_min)) && all(lessThanEqual(v_worldPosition, fertile_max))) {
         mapColor = u_fertileColor;

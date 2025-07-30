@@ -113,8 +113,8 @@ export const AppConfig = {
     unoccupiable: 'rgb(30, 30, 30)',
   },
   biomeRegions: {
-    fertile: { x1: 480, y1: 480, x2: 719, y2: 719 },
-    plains: { x1: 320, y1: 320, x2: 879, y2: 879 },
+    fertile: { x1: 450, y1: 450, x2: 749, y2: 749 },
+    plains: { x1: 300, y1: 300, x2: 899, y2: 899 },
     badlands: { x1: 0, y1: 0, x2: 1199, y2: 1199 },
   },
   ALLIANCE_RSS_STYLES: {
