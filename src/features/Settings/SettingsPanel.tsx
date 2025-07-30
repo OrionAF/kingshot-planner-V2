@@ -10,9 +10,8 @@ import styles from './SettingsPanel.module.css';
 
 export function SettingsPanel() {
   const openPanel = useUiStore((state) => state.openPanel);
-  // Get a non-reactive reference to the store's state for exporting
-  const { alliances, players, userBuildings, importPlan } =
-    useMapStore.getState();
+  // Get a non-reactive reference to the importPlan action
+  const { importPlan } = useMapStore.getState();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
