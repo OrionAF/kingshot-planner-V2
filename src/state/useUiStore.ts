@@ -34,7 +34,8 @@ interface UiState {
   isPlacingPlayer: boolean;
   playerToPlace: OmitIdAndCoords | null;
   mouseWorldPosition: { x: number; y: number } | null;
-  isValidPlacement: boolean;
+  isValidPlacement: boolean; // retained for quick checks
+  lastPlacementResult?: import('../types/infrastructure.types').PlacementResult; // detailed info
   editingPlayer: Player | null;
   buildMode: BuildModeState;
 }
@@ -47,7 +48,9 @@ interface UiActions {
   endPlayerPlacement: () => void;
   exitPlacementMode: () => void;
   setMouseWorldPosition: (pos: { x: number; y: number }) => void;
-  setPlacementValidity: (isValid: boolean) => void;
+  setPlacementValidity: (
+    res: import('../types/infrastructure.types').PlacementResult,
+  ) => void;
   startEditingPlayer: (player: Player) => void;
   endEditingPlayer: () => void;
   setActiveAllianceId: (id: number | null) => void;
@@ -60,6 +63,7 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
   playerToPlace: null,
   mouseWorldPosition: null,
   isValidPlacement: true,
+  lastPlacementResult: { valid: true },
   editingPlayer: null,
   buildMode: {
     activeAllianceId: null,
@@ -75,7 +79,8 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
 
   startPlayerPlacement: (playerData) => {
     const isDesktop = window.matchMedia('(min-width: 769px)').matches;
-    let initialValidity = true;
+    let initialResult: import('../types/infrastructure.types').PlacementResult =
+      { valid: true };
 
     if (!isDesktop) {
       const camera = useCameraStore.getState();
@@ -86,7 +91,7 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
         camera,
       );
       // FIX: Correctly call the validity check for a player
-      initialValidity = checkPlacementValidity(
+      initialResult = checkPlacementValidity(
         Math.round(worldX),
         Math.round(worldY),
         'player',
@@ -96,7 +101,8 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
     set(() => ({
       isPlacingPlayer: true,
       playerToPlace: playerData,
-      isValidPlacement: initialValidity,
+      isValidPlacement: initialResult.valid,
+      lastPlacementResult: initialResult,
       buildMode: {
         activeAllianceId: null,
         selectedBuildingType: null,
@@ -121,7 +127,8 @@ export const useUiStore = create<UiState & UiActions>((set) => ({
   },
 
   setMouseWorldPosition: (pos) => set(() => ({ mouseWorldPosition: pos })),
-  setPlacementValidity: (isValid) => set(() => ({ isValidPlacement: isValid })),
+  setPlacementValidity: (res) =>
+    set(() => ({ isValidPlacement: res.valid, lastPlacementResult: res })),
   startEditingPlayer: (player) => set(() => ({ editingPlayer: player })),
   endEditingPlayer: () => set(() => ({ editingPlayer: null })),
 

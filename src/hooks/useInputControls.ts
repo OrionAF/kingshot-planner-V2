@@ -77,13 +77,13 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     if (isPlacingPlayer || buildMode.selectedBuildingType) {
       const { checkPlacementValidity } = useMapStore.getState();
       const type = isPlacingPlayer ? 'player' : buildMode.selectedBuildingType!;
-      const isValid = checkPlacementValidity(
+      const placementResult = checkPlacementValidity(
         roundedX,
         roundedY,
         type,
         buildMode.activeAllianceId,
       );
-      setPlacementValidity(isValid);
+      setPlacementValidity(placementResult);
     }
 
     if (!isPointerDown) return;
@@ -264,13 +264,13 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         const type = isPlacingPlayer
           ? 'player'
           : buildMode.selectedBuildingType!;
-        const isValid = checkPlacementValidity(
+        const placementResult = checkPlacementValidity(
           Math.round(worldX),
           Math.round(worldY),
           type,
           buildMode.activeAllianceId,
         );
-        setPlacementValidity(isValid);
+        setPlacementValidity(placementResult);
       }
     } else if (e.touches.length >= 2) {
       const touch1 = e.touches[0];
@@ -317,13 +317,13 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           const type = isPlacingPlayer
             ? 'player'
             : buildMode.selectedBuildingType!;
-          const isValid = checkPlacementValidity(
+          const placementResult = checkPlacementValidity(
             Math.round(centerX),
             Math.round(centerY),
             type,
             buildMode.activeAllianceId,
           );
-          setPlacementValidity(isValid);
+          setPlacementValidity(placementResult);
         }
       }
       lastPinchDist = newDist;

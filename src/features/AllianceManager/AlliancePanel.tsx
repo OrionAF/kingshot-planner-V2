@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Panel } from '../../components/Panel/Panel';
 import { useMapStore } from '../../state/useMapStore';
 import { useUiStore } from '../../state/useUiStore';
-import { AllianceItem } from './AllianceItem';
+import { AllianceListItem } from './AllianceListItem';
 import styles from './AlliancePanel.module.css';
 
 export function AlliancePanel() {
@@ -12,14 +12,15 @@ export function AlliancePanel() {
 
   const [name, setName] = useState('');
   const [tag, setTag] = useState('');
-  const [color, setColor] = useState('#d6662b');
+  // Color now auto-assigned; maintain no local color state
 
   const handleCreate = () => {
     if (!name.trim() || !tag.trim()) {
       alert('Alliance Name and Tag cannot be empty.');
       return;
     }
-    createAlliance({ name, tag, color });
+    // Provide a placeholder color (will be auto-adjusted in store)
+    createAlliance({ name, tag, color: '#000000' });
     setName('');
     setTag('');
   };
@@ -32,7 +33,11 @@ export function AlliancePanel() {
       <div className={styles.allianceListContainer}>
         <h4 className={styles.sectionTitle}>Alliances</h4>
         {alliances.map((alliance) => (
-          <AllianceItem key={alliance.id} alliance={alliance} />
+          <AllianceListItem
+            key={alliance.id}
+            alliance={alliance}
+            showTagRight
+          />
         ))}
       </div>
 
@@ -55,13 +60,15 @@ export function AlliancePanel() {
             onChange={(e) => setTag(e.target.value)}
             maxLength={3}
           />
-          <label htmlFor="allianceColor">Color:</label>
-          <input
-            id="allianceColor"
-            type="color"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-          />
+          <span
+            style={{
+              gridColumn: '1 / span 2',
+              fontSize: '0.8rem',
+              opacity: 0.8,
+            }}
+          >
+            Color is assigned automatically to avoid clashes.
+          </span>
         </div>
         <button className={styles.primaryButton} onClick={handleCreate}>
           Create Alliance

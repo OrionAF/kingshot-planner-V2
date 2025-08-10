@@ -83,3 +83,38 @@
     color: white;
   }
 }
+
+/* Placement feedback banner (always pointer-events:none) */
+.placementFeedback {
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 30, 30, 0.85);
+  color: #ffdddd;
+  border: 1px solid #dc3545;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  max-width: 240px;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+.placementInfo {
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 30, 30, 0.85);
+  color: #d7f5d7;
+  border: 1px solid #2f9e44;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  max-width: 240px;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}

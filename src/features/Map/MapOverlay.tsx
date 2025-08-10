@@ -16,8 +16,9 @@ export function MapOverlay() {
     buildMode,
     isPlacingPlayer,
     playerToPlace,
-    exitPlacementMode, // Use the corrected cancellation action
+    exitPlacementMode,
     isValidPlacement,
+    lastPlacementResult,
   } = useUiStore();
   const { placePlayer, placeBuilding } = useMapStore();
 
@@ -86,6 +87,18 @@ export function MapOverlay() {
               Confirm Placement
             </button>
           </div>
+          {!isValidPlacement && lastPlacementResult?.reasonCode && (
+            <div className={styles.placementFeedback}>
+              <strong>Blocked:</strong>{' '}
+              {lastPlacementResult.message || lastPlacementResult.reasonCode}
+            </div>
+          )}
+          {isValidPlacement &&
+            lastPlacementResult?.message?.includes('remaining') && (
+              <div className={styles.placementInfo}>
+                {lastPlacementResult.message}
+              </div>
+            )}
         </>
       )}
     </div>

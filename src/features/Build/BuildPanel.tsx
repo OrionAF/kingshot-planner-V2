@@ -4,6 +4,7 @@ import { AppConfig } from '../../config/appConfig';
 import { useMapStore } from '../../state/useMapStore';
 import { useUiStore } from '../../state/useUiStore';
 import styles from './BuildPanel.module.css';
+import { AllianceListItem } from '../AllianceManager/AllianceListItem';
 import { type BuildingType } from '../../types/map.types';
 import { useMemo } from 'react';
 
@@ -48,16 +49,13 @@ export function BuildPanel() {
         <div className={styles.allianceList}>
           {alliances.length > 0 ? (
             alliances.map((alliance) => (
-              <button
+              <AllianceListItem
                 key={alliance.id}
-                className={`${styles.allianceItem} ${
-                  activeAllianceId === alliance.id ? styles.selected : ''
-                }`}
-                onClick={() => setActiveAllianceId(alliance.id)}
-                style={{ borderLeft: `5px solid ${alliance.color}` }}
-              >
-                <span>{`[${alliance.tag}] ${alliance.name}`}</span>
-              </button>
+                alliance={alliance}
+                selected={activeAllianceId === alliance.id}
+                onSelect={(id) => setActiveAllianceId(id)}
+                showTagRight
+              />
             ))
           ) : (
             <div className={styles.placeholder}>Create an alliance first.</div>

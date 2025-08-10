@@ -1,12 +1,30 @@
 // src/config/appConfig.ts
 
 export interface BuildingDefinition {
+  /** Display name */
   name: string;
+  /** Footprint width (tiles) */
   w: number;
+  /** Footprint height (tiles) */
   h: number;
+  /** Square coverage size (tiles) used for territory influence */
   coverage: number;
+  /** Placement biome / rule constraint */
   rule: 'any' | 'claimed' | 'territory' | 'fertile' | 'plains' | 'badlands';
+  /** Maximum allowed per alliance (Infinity if omitted) */
   limit?: number;
+  /** High-level category used for filtering (Overwatch, minimap legend, etc.) */
+  category?:
+    | 'infrastructure'
+    | 'hq'
+    | 'trap'
+    | 'prestige'
+    | 'tower'
+    | 'statue'
+    | 'special'
+    | 'other';
+  /** Arbitrary tags ( biome, rarity, strategic, etc. ) */
+  tags?: string[];
 }
 
 export const AppConfig = {
@@ -46,6 +64,8 @@ export const AppConfig = {
       coverage: 7,
       rule: 'territory',
       limit: 9999,
+      category: 'tower',
+      tags: ['territory', 'influence'],
     },
     hq_badlands: {
       name: 'Badlands HQ',
@@ -54,6 +74,8 @@ export const AppConfig = {
       coverage: 15,
       rule: 'badlands',
       limit: 1,
+      category: 'hq',
+      tags: ['biome:badlands'],
     },
     hq_plains: {
       name: 'Plains HQ',
@@ -62,6 +84,8 @@ export const AppConfig = {
       coverage: 15,
       rule: 'plains',
       limit: 1,
+      category: 'hq',
+      tags: ['biome:plains'],
     },
     pitfall: {
       name: 'Pitfall Trap',
@@ -70,6 +94,8 @@ export const AppConfig = {
       coverage: 0,
       rule: 'claimed',
       limit: 1,
+      category: 'trap',
+      tags: ['defense'],
     },
     statue1: {
       name: 'Prestige Statue 1',
@@ -78,6 +104,8 @@ export const AppConfig = {
       coverage: 0,
       rule: 'claimed',
       limit: 1,
+      category: 'statue',
+      tags: ['prestige'],
     },
     statue2: {
       name: 'Prestige Statue 2',
@@ -86,6 +114,8 @@ export const AppConfig = {
       coverage: 0,
       rule: 'claimed',
       limit: 1,
+      category: 'statue',
+      tags: ['prestige'],
     },
     statue3: {
       name: 'Prestige Statue 3',
@@ -94,6 +124,8 @@ export const AppConfig = {
       coverage: 0,
       rule: 'claimed',
       limit: 1,
+      category: 'statue',
+      tags: ['prestige'],
     },
   } satisfies Record<string, BuildingDefinition>,
 
@@ -164,5 +196,54 @@ export const AppConfig = {
   webgl: {
     gridThickness: 1,
     gridDarkness: 0.95,
+  },
+  // Curated distinct alliance color palette (used for auto-assignment / fallback)
+  ALLIANCE_COLOR_PALETTE: [
+    '#e6194b', // vivid red
+    '#3cb44b', // bright green
+    '#0082c8', // bright blue
+    '#f58231', // vivid orange
+    '#911eb4', // vivid purple
+    '#46f0f0', // cyan
+    '#f032e6', // magenta
+    '#d2f53c', // bright lime
+    '#fabebe', // light pink
+    '#aa6e28', // brown
+    '#800000', // maroon
+    '#000080', // navy
+    '#ff7f50', // coral
+    '#ff4500', // orange-red
+    '#ff1493', // deep pink
+    '#ff69b4', // hot pink
+    '#ba55d3', // medium orchid
+    '#4b0082', // indigo
+    '#6a5acd', // slate blue
+    '#4169e1', // royal blue
+    '#1e90ff', // dodger blue
+    '#00bfff', // deep sky blue
+    '#00ced1', // dark turquoise
+    '#20b2aa', // light sea green
+    '#40e0d0', // turquoise
+    '#00ff7f', // spring green
+    '#7fff00', // chartreuse
+    '#adff2f', // green yellow
+    '#ffd700', // gold
+    '#ff8c00', // dark orange
+    '#ff6347', // tomato
+    '#dc143c', // crimson
+    '#b22222', // firebrick
+    '#8b0000', // dark red
+    '#9932cc', // dark orchid
+    '#8a2be2', // blue violet
+    '#9370db', // medium purple
+    '#ff00ff', // fuchsia
+    '#ffb6c1', // light pink
+    '#ffdab9', // peach puff
+    '#f0e68c', // khaki
+  ],
+  allianceColorConstraints: {
+    minColorDistance: 0.28, // Euclidean RGB distance (0-1) required vs existing & biomes
+    minLuminanceDiff: 0.12, // Minimum luminance separation vs biome fills
+    maxAttempts: 14, // Attempts to adjust before falling back to unused palette entry
   },
 };

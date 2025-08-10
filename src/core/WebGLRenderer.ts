@@ -21,6 +21,7 @@ type DrawableObject = {
   w: number;
   h: number;
   color?: string;
+  brdCol?: string; // optional border color
 };
 
 function parseColor(colorString: string): [number, number, number] {
@@ -63,6 +64,11 @@ export class WebGLRenderer {
   private textureBuffer: WebGLBuffer | null;
   private textures = new Map<string, WebGLTexture>();
   private derivativesSupported = false;
+  // Cache derived territory shades (fill + border) keyed by original alliance color string
+  private territoryColorCache = new Map<
+    string,
+    { fill: [number, number, number]; border: [number, number, number] }
+  >();
 
   constructor(gl: WebGLRenderingContext) {
     this.gl = gl;
@@ -153,6 +159,7 @@ export class WebGLRenderer {
       userBuildings,
       alliances,
       claimedTerritory,
+      globallyClaimedTiles,
     } = useMapStore.getState();
     const {
       isPlacingPlayer,
@@ -160,6 +167,7 @@ export class WebGLRenderer {
       buildMode,
       mouseWorldPosition,
       isValidPlacement,
+      lastPlacementResult,
     } = useUiStore.getState();
     const { selection } = useSelectionStore.getState();
     // Always render base map and non-textured primitives. Skip only the sprite pass when images are not ready
@@ -183,7 +191,7 @@ export class WebGLRenderer {
     claimedTerritory.forEach((tiles, allianceId) => {
       const alliance = alliances.find((a) => a.id === allianceId);
       if (alliance && tiles.size > 0) {
-        this.drawTerritory(alliance, tiles);
+        this.drawTerritory(alliance, tiles, globallyClaimedTiles);
       }
     });
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
@@ -251,17 +259,31 @@ export class WebGLRenderer {
       isPlacingPlayer || !!buildMode.selectedBuildingType;
     if (isPlacingSomething) {
       const flickerPeriod = AppConfig.interactions.GHOST_FLICKER_PERIOD_MS;
-      const sineValue =
-        (Math.sin((time / flickerPeriod) * (2 * Math.PI)) + 1) / 2;
-      const minAlpha = 0.3;
-      const maxAlpha = 0.8;
-      const flickerAlpha = minAlpha + (maxAlpha - minAlpha) * sineValue;
+      const tri = 1 - Math.abs(((time / flickerPeriod) % 2) - 1);
+      const eased = 0.5 - 0.5 * Math.cos(tri * Math.PI);
+      const minAlpha = 0.35;
+      const maxAlpha = 0.75;
+      const animatedAlpha = minAlpha + (maxAlpha - minAlpha) * eased;
       let w = 0,
         h = 0,
         coverage = 0;
       let ghostBaseColor = '#ffffff';
       let ghostPosition = { x: 0, y: 0 };
-      const ghostColor = isValidPlacement ? undefined : '#dc3545';
+      const failureCode = lastPlacementResult?.reasonCode;
+      const reasonColorMap: Record<string, string> = {
+        OUT_OF_BOUNDS: '#dc3545',
+        COLLIDES_BASE: '#dc3545',
+        COLLIDES_USER: '#dc3545',
+        COLLIDES_PLAYER: '#dc3545',
+        TERRITORY_REQUIRED: '#dc3545',
+        BIOME_MISMATCH: '#dc3545',
+        LIMIT_REACHED: '#dc3545',
+        TERRITORY_RULE_UNMET: '#dc3545',
+        FOREIGN_TERRITORY: '#dc3545',
+      };
+      const invalidColor =
+        (failureCode && reasonColorMap[failureCode]) || '#dc3545';
+      const ghostColor = isValidPlacement ? undefined : invalidColor;
       if (isPlacingPlayer && playerToPlace) {
         w = AppConfig.player.width;
         h = AppConfig.player.height;
@@ -290,6 +312,8 @@ export class WebGLRenderer {
           );
           ghostPosition = { x: Math.round(centerX), y: Math.round(centerY) };
         }
+        const bodyAlpha = isValidPlacement ? animatedAlpha : 0.6; // constant when invalid
+        const coverageAlpha = isValidPlacement ? animatedAlpha * 0.3 : 0.25;
         if (coverage > 0) {
           const radius = Math.floor(coverage / 2);
           this.drawObject(
@@ -300,13 +324,55 @@ export class WebGLRenderer {
               h: coverage,
               color: ghostColor ?? ghostBaseColor,
             },
-            flickerAlpha * 0.3,
+            coverageAlpha,
           );
         }
         this.drawObject(
           { ...ghostPosition, w, h, color: ghostColor ?? ghostBaseColor },
-          flickerAlpha,
+          bodyAlpha,
         );
+        if (!isValidPlacement && failureCode) {
+          const outlineAlpha = 0.65; // stable outline alpha to avoid perceived color cycling
+          const gl = this.gl;
+          gl.uniform1f(this.isDrawingObjectLocation, 1.0);
+          gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
+          const positions = [
+            ghostPosition.x,
+            ghostPosition.y,
+            ghostPosition.x + w,
+            ghostPosition.y,
+            ghostPosition.x + w,
+            ghostPosition.y,
+            ghostPosition.x + w,
+            ghostPosition.y + h,
+            ghostPosition.x + w,
+            ghostPosition.y + h,
+            ghostPosition.x,
+            ghostPosition.y + h,
+            ghostPosition.x,
+            ghostPosition.y + h,
+            ghostPosition.x,
+            ghostPosition.y,
+          ];
+          gl.bindBuffer(gl.ARRAY_BUFFER, this.objectBuffer);
+          gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array(positions),
+            gl.DYNAMIC_DRAW,
+          );
+          gl.enableVertexAttribArray(this.worldPosAttrLocation);
+          gl.vertexAttribPointer(
+            this.worldPosAttrLocation,
+            2,
+            gl.FLOAT,
+            false,
+            0,
+            0,
+          );
+          gl.uniform3fv(this.objectColorLocation, [1, 1, 1]);
+          gl.uniform1f(this.objectAlphaLocation, outlineAlpha);
+          gl.drawArrays(gl.LINES, 0, positions.length / 2);
+        }
       }
     }
   }
@@ -459,12 +525,17 @@ export class WebGLRenderer {
     gl.uniform1f(this.objectAlphaLocation, 1.0);
     gl.drawArrays(gl.LINES, 0, positions.length / 2);
   }
-  private drawTerritory(alliance: Alliance, tiles: Set<string>) {
+  private drawTerritory(
+    alliance: Alliance,
+    tiles: Set<string>,
+    globallyClaimedTiles: Map<string, number>,
+  ) {
     const gl = this.gl;
     gl.uniform1f(this.isDrawingObjectLocation, 0.0);
     gl.uniform1f(this.isDrawingTerritoryLocation, 1.0);
-    const [r, g, b] = parseColor(alliance.color);
-    gl.uniform3fv(this.objectColorLocation, [r, g, b]);
+    const shades = this.getTerritoryShades(alliance.color);
+    const [fr, fg, fb] = shades.fill;
+    gl.uniform3fv(this.objectColorLocation, [fr, fg, fb]); // fill shade
     gl.uniform1f(this.objectAlphaLocation, 0.25);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.territoryBuffer);
     gl.enableVertexAttribArray(this.worldPosAttrLocation);
@@ -495,11 +566,62 @@ export class WebGLRenderer {
       );
       gl.drawArrays(gl.TRIANGLES, 0, positions.length / 2);
     }
+    // Border pass (inside-only outline on outer perimeter against unclaimed tiles)
     gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
+    gl.uniform1f(this.isDrawingObjectLocation, 1.0);
+    const borderSegments: number[] = [];
+    const inset = 0.01; // Slight inset to stay inside territory but keep corners touching
+    tiles.forEach((coordStr) => {
+      const [x, y] = coordStr.split(',').map(Number);
+      const upKey = `${x},${y - 1}`;
+      const downKey = `${x},${y + 1}`;
+      const leftKey = `${x - 1},${y}`;
+      const rightKey = `${x + 1},${y}`;
+      const upOwner = globallyClaimedTiles.get(upKey);
+      const downOwner = globallyClaimedTiles.get(downKey);
+      const leftOwner = globallyClaimedTiles.get(leftKey);
+      const rightOwner = globallyClaimedTiles.get(rightKey);
+      // Draw when neighbor is absent OR belongs to different alliance.
+      if (upOwner !== alliance.id) {
+        borderSegments.push(x + 0, y + inset, x + 1, y + inset);
+      }
+      if (downOwner !== alliance.id) {
+        borderSegments.push(x + 0, y + 1 - inset, x + 1, y + 1 - inset);
+      }
+      if (leftOwner !== alliance.id) {
+        borderSegments.push(x + inset, y + 0, x + inset, y + 1);
+      }
+      if (rightOwner !== alliance.id) {
+        borderSegments.push(x + 1 - inset, y + 0, x + 1 - inset, y + 1);
+      }
+    });
+    if (borderSegments.length > 0) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.objectBuffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array(borderSegments),
+        gl.DYNAMIC_DRAW,
+      );
+      gl.enableVertexAttribArray(this.worldPosAttrLocation);
+      gl.vertexAttribPointer(
+        this.worldPosAttrLocation,
+        2,
+        gl.FLOAT,
+        false,
+        0,
+        0,
+      );
+      // Border: complementary light/dark adjustment for clearer edge
+      const [br, bg, bb] = shades.border;
+      const borderAlpha = 0.65;
+      gl.uniform3fv(this.objectColorLocation, [br, bg, bb]);
+      gl.uniform1f(this.objectAlphaLocation, borderAlpha);
+      gl.drawArrays(gl.LINES, 0, borderSegments.length / 2);
+    }
   }
   private drawObject(obj: DrawableObject, alpha = 1.0) {
     const gl = this.gl;
-    const { x, y, w, h, color } = obj;
+    const { x, y, w, h, color, brdCol } = obj;
     if (!color) return;
     gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
@@ -529,6 +651,46 @@ export class WebGLRenderer {
     gl.uniform3fv(this.objectColorLocation, [r, g, b]);
     gl.uniform1f(this.objectAlphaLocation, alpha);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+    // Optional border stroke if provided
+    if (brdCol) {
+      const [br, bg, bb] = parseColor(brdCol);
+      const linePos = [
+        x,
+        y,
+        x + w,
+        y,
+        x + w,
+        y,
+        x + w,
+        y + h,
+        x + w,
+        y + h,
+        x,
+        y + h,
+        x,
+        y + h,
+        x,
+        y,
+      ];
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.objectBuffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array(linePos),
+        gl.DYNAMIC_DRAW,
+      );
+      gl.enableVertexAttribArray(this.worldPosAttrLocation);
+      gl.vertexAttribPointer(
+        this.worldPosAttrLocation,
+        2,
+        gl.FLOAT,
+        false,
+        0,
+        0,
+      );
+      gl.uniform3fv(this.objectColorLocation, [br, bg, bb]);
+      gl.uniform1f(this.objectAlphaLocation, Math.min(1, alpha + 0.25));
+      gl.drawArrays(gl.LINES, 0, linePos.length / 2);
+    }
   }
 
   private drawMapPlane() {
@@ -590,5 +752,137 @@ export class WebGLRenderer {
     const clipX = 2.0 / width;
     const clipY = -2.0 / height;
     return [clipX, 0, 0, 0, clipY, 0, -1.0, 1.0, 1];
+  }
+
+  // --- Territory color shade derivation (hue-preserving) ---
+  private getTerritoryShades(color: string) {
+    const cached = this.territoryColorCache.get(color);
+    if (cached) return cached;
+    const baseRGB = parseColor(color);
+    const biomeRGBs = Object.values(AppConfig.biomeColors).map(parseColor);
+
+    const lum = (c: [number, number, number]) =>
+      0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    const dist = (a: [number, number, number], b: [number, number, number]) =>
+      Math.sqrt(
+        (a[0] - b[0]) * (a[0] - b[0]) +
+          (a[1] - b[1]) * (a[1] - b[1]) +
+          (a[2] - b[2]) * (a[2] - b[2]),
+      );
+
+    const [h, s0, l0] = this.rgbToHsl(baseRGB);
+    const baseLum = lum(baseRGB);
+    let s = s0;
+    let l = l0;
+
+    // Ensure minimum saturation so colors (esp. yellows) don't wash into plains
+    if (s < 0.25) s = 0.25;
+
+    // Special handling for yellowish hues to distinguish from plains (approx 45-70 deg)
+    if (h >= 45 && h <= 70) {
+      if (l > 0.6) l = 0.55; // pull slightly darker
+      if (s < 0.5) s = 0.5; // enrich saturation
+    }
+
+    // Measure closeness to any biome color
+    let minLumDiff = Infinity;
+    let minDistance = Infinity;
+    for (const b of biomeRGBs) {
+      minLumDiff = Math.min(minLumDiff, Math.abs(baseLum - lum(b)));
+      minDistance = Math.min(minDistance, dist(baseRGB, b));
+    }
+
+    const LUM_THRESHOLD = 0.12;
+    const DIST_THRESHOLD = 0.28;
+    if (minLumDiff < LUM_THRESHOLD || minDistance < DIST_THRESHOLD) {
+      // Adjust lightness while preserving hue
+      if (baseLum > 0.5) {
+        l *= 0.65; // darken
+      } else {
+        l = l + (1 - l) * 0.4; // lighten
+      }
+      // Slight saturation boost to avoid blending
+      s = Math.min(1, s * 1.1);
+    }
+
+    // Build fill shade
+    const fillRGB = this.hslToRgb([h, s, l]);
+
+    // Derive border shade: push lightness in opposite direction for clear edge
+    let borderL = l;
+    if (l >= 0.5) {
+      borderL = Math.max(0, l - 0.18);
+    } else {
+      borderL = Math.min(1, l + 0.18);
+    }
+    let borderS = Math.min(1, s * 1.05);
+    const borderRGB = this.hslToRgb([h, borderS, borderL]);
+
+    const shades = { fill: fillRGB, border: borderRGB } as const;
+    this.territoryColorCache.set(color, shades);
+    return shades;
+  }
+
+  private rgbToHsl([r, g, b]: [number, number, number]): [
+    number,
+    number,
+    number,
+  ] {
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    const l = (max + min) / 2;
+    const d = max - min;
+    let s = 0;
+    if (d !== 0) {
+      s = d / (1 - Math.abs(2 * l - 1));
+      switch (max) {
+        case r:
+          h = ((g - b) / d) % 6;
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        default:
+          h = (r - g) / d + 4;
+      }
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    return [h, s, l];
+  }
+
+  private hslToRgb([h, s, l]: [number, number, number]): [
+    number,
+    number,
+    number,
+  ] {
+    const C = (1 - Math.abs(2 * l - 1)) * s;
+    const Hp = h / 60;
+    const X = C * (1 - Math.abs((Hp % 2) - 1));
+    let r1 = 0,
+      g1 = 0,
+      b1 = 0;
+    if (Hp >= 0 && Hp < 1) {
+      r1 = C;
+      g1 = X;
+    } else if (Hp >= 1 && Hp < 2) {
+      r1 = X;
+      g1 = C;
+    } else if (Hp >= 2 && Hp < 3) {
+      g1 = C;
+      b1 = X;
+    } else if (Hp >= 3 && Hp < 4) {
+      g1 = X;
+      b1 = C;
+    } else if (Hp >= 4 && Hp < 5) {
+      r1 = X;
+      b1 = C;
+    } else if (Hp >= 5 && Hp < 6) {
+      r1 = C;
+      b1 = X;
+    }
+    const m = l - C / 2;
+    return [r1 + m, g1 + m, b1 + m];
   }
 }
