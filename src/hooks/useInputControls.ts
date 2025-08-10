@@ -145,7 +145,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           } else {
             setSelection({ type: 'tile', data: { x: roundedX, y: roundedY } });
           }
-          if (AppConfig.enableDevMode) {
+          if (import.meta.env.DEV && AppConfig.enableDevMode) {
             const biome = getBiomeForTile(roundedX, roundedY);
             console.log(`Click at: ${roundedX}, ${roundedY} (Biome: ${biome})`);
           }

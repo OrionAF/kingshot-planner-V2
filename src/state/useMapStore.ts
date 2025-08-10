@@ -12,7 +12,7 @@ import {
 } from '../types/map.types';
 import baseMapData from '../assets/baseMap.json';
 import { AppConfig, type BuildingDefinition } from '../config/appConfig';
-import { generateId } from '../utils/idGenerator';
+import { generateId, seedIdCounter } from '../utils/idGenerator';
 
 export function getBiomeForTile(x: number, y: number): string {
   const { fertile, plains } = AppConfig.biomeRegions;
@@ -405,8 +405,21 @@ export const useMapStore = create<MapState & MapActions>()(
       onRehydrateStorage: () => {
         return (state) => {
           if (state) {
-            console.log('Plan loaded from browser storage.');
+            if (import.meta.env.DEV) {
+              console.log('Plan loaded from browser storage.');
+            }
             state.recalculateTerritory();
+            // Seed ID counter to avoid collisions after reload
+            const maxPlayerId = state.players.reduce(
+              (max, p) => Math.max(max, p.id),
+              0,
+            );
+            const maxBuildingId = state.userBuildings.reduce(
+              (max, b) => Math.max(max, b.id),
+              0,
+            );
+            const next = Math.max(maxPlayerId, maxBuildingId) + 1;
+            seedIdCounter(next);
           }
         };
       },

@@ -12,16 +12,19 @@ import { SettingsPanel } from './features/Settings/SettingsPanel';
 import { PlayerPanel } from './features/PlayerManager/PlayerPanel';
 import { EditPlayerModal } from './features/PlayerManager/EditPlayerModal';
 import { BuildPanel } from './features/Build/BuildPanel';
-import { useAssetStore } from './state/useAssetStore'; // <-- 1. Import the asset store
+import { useAssetStore } from './state/useAssetStore';
 
 function App() {
-  // 2. Trigger asset loading on application startup
+  // Trigger asset loading on startup
+  const { isLoading, error } = useAssetStore();
   useEffect(() => {
     useAssetStore.getState().loadAssets();
   }, []);
 
   return (
     <main>
+      {isLoading && <div className="loading-overlay">Loading assets…</div>}
+      {error && <div className="error-overlay">{error}</div>}
       <MapCanvas />
       <MapOverlay />
       {/* --- ALL UI PANELS --- */}

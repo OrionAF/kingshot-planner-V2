@@ -23,7 +23,7 @@ export const AppConfig = {
   selectionColor: '#ff0',
   pingColor: '#fff',
   pingDuration: 500,
-  baseScale: 5,
+  baseScale: 0.4,
   camera: {
     minScale: 0.05,
     maxScale: 20,

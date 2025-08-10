@@ -20,6 +20,8 @@ export function ModalOverlay({ children, onClose }: ModalOverlayProps) {
     <div
       className={`${styles.overlay} ${styles.visible}`}
       onClick={handleOverlayClick}
+      role="dialog"
+      aria-modal="true"
     >
       {children}
     </div>,

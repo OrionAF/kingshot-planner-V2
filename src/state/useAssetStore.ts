@@ -19,15 +19,28 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
   });
 };
 
-// Define the assets to be loaded
+// Define the assets to be loaded (use Vite URL imports for reliability in dev/build)
 const IMAGE_ASSETS = {
-  'armory&arsenal': '/src/assets/images/armory&arsenal.png',
-  fortress: '/src/assets/images/fortress.png',
-  'frontier&drill': '/src/assets/images/frontier&drill.png',
-  'harvest&forager': '/src/assets/images/harvest&forager.png',
-  kings_castle: '/src/assets/images/kings_castle.png',
-  sanctuary: '/src/assets/images/sanctuary.png',
-  'scholar&builder': '/src/assets/images/scholar&builder.png',
+  'armory&arsenal': new URL(
+    '../assets/images/armory&arsenal.png',
+    import.meta.url,
+  ).href,
+  fortress: new URL('../assets/images/fortress.png', import.meta.url).href,
+  'frontier&drill': new URL(
+    '../assets/images/frontier&drill.png',
+    import.meta.url,
+  ).href,
+  'harvest&forager': new URL(
+    '../assets/images/harvest&forager.png',
+    import.meta.url,
+  ).href,
+  kings_castle: new URL('../assets/images/kings_castle.png', import.meta.url)
+    .href,
+  sanctuary: new URL('../assets/images/sanctuary.png', import.meta.url).href,
+  'scholar&builder': new URL(
+    '../assets/images/scholar&builder.png',
+    import.meta.url,
+  ).href,
 };
 
 export const useAssetStore = create<AssetState>((set) => ({
@@ -50,7 +63,9 @@ export const useAssetStore = create<AssetState>((set) => ({
       const imageMap = new Map(loadedImages);
 
       set({ images: imageMap, isLoading: false });
-      console.log('All image assets loaded successfully.');
+      if (import.meta.env.DEV) {
+        console.log('All image assets loaded successfully.');
+      }
     } catch (e) {
       console.error('Failed to load image assets:', e);
       set({ isLoading: false, error: 'Could not load required image assets.' });

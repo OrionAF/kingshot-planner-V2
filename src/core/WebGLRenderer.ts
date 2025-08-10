@@ -162,7 +162,7 @@ export class WebGLRenderer {
       isValidPlacement,
     } = useUiStore.getState();
     const { selection } = useSelectionStore.getState();
-    if (images.size === 0) return;
+    // Always render base map and non-textured primitives. Skip only the sprite pass when images are not ready
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0.06, 0.06, 0.06, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -187,16 +187,32 @@ export class WebGLRenderer {
       }
     });
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
+    // Viewport culling: compute visible world bounds using ALL 4 screen corners
+    const [tlx, tly] = screenToWorld(0, 0, camera);
+    const [trx, try_] = screenToWorld(gl.canvas.width, 0, camera);
+    const [blx, bly] = screenToWorld(0, gl.canvas.height, camera);
+    const [brx, bry] = screenToWorld(gl.canvas.width, gl.canvas.height, camera);
+    const pad = 2; // tile margin to avoid edge popping
+    const minX = Math.floor(Math.min(tlx, trx, blx, brx)) - pad;
+    const maxX = Math.ceil(Math.max(tlx, trx, blx, brx)) + pad;
+    const minY = Math.floor(Math.min(tly, try_, bly, bry)) - pad;
+    const maxY = Math.ceil(Math.max(tly, try_, bly, bry)) + pad;
+    const inView = (o: { x: number; y: number; w: number; h: number }) =>
+      !(
+        o.x > maxX ||
+        o.x + o.w - 1 < minX ||
+        o.y > maxY ||
+        o.y + o.h - 1 < minY
+      );
+
     for (const building of baseBuildings) {
-      if (!building.imgKey) {
-        this.drawObject(building);
-      }
+      if (inView(building)) this.drawObject(building);
     }
     for (const building of userBuildings) {
-      this.drawObject(building);
+      if (inView(building)) this.drawObject(building);
     }
     for (const player of players) {
-      this.drawObject(player, 1.0);
+      if (inView(player)) this.drawObject(player, 1.0);
     }
     if (selection) {
       switch (selection.type) {
@@ -210,23 +226,26 @@ export class WebGLRenderer {
           break;
       }
     }
-    const spriteProjectionMatrix = this.calculateSpriteProjectionMatrix();
-    gl.uniformMatrix3fv(
-      this.projectionUniformLocation,
-      false,
-      spriteProjectionMatrix,
-    );
-    for (const building of baseBuildings) {
-      const image = building.imgKey ? images.get(building.imgKey) : null;
-      if (image && building.anchorTile) {
-        this.drawImageAsSprite(camera, image, building);
+    if (images.size > 0) {
+      const spriteProjectionMatrix = this.calculateSpriteProjectionMatrix();
+      gl.uniformMatrix3fv(
+        this.projectionUniformLocation,
+        false,
+        spriteProjectionMatrix,
+      );
+      for (const building of baseBuildings) {
+        if (!inView(building)) continue;
+        const image = building.imgKey ? images.get(building.imgKey) : null;
+        if (image && building.anchorTile) {
+          this.drawImageAsSprite(camera, image, building);
+        }
       }
+      gl.uniformMatrix3fv(
+        this.projectionUniformLocation,
+        false,
+        worldProjectionMatrix,
+      );
     }
-    gl.uniformMatrix3fv(
-      this.projectionUniformLocation,
-      false,
-      worldProjectionMatrix,
-    );
     const isDesktop = window.matchMedia('(min-width: 769px)').matches;
     const isPlacingSomething =
       isPlacingPlayer || !!buildMode.selectedBuildingType;
@@ -292,6 +311,18 @@ export class WebGLRenderer {
     }
   }
 
+  public dispose() {
+    const gl = this.gl;
+    if (this.objectBuffer) gl.deleteBuffer(this.objectBuffer);
+    if (this.territoryBuffer) gl.deleteBuffer(this.territoryBuffer);
+    if (this.textureBuffer) gl.deleteBuffer(this.textureBuffer);
+    if (this.mapPlaneBuffer) gl.deleteBuffer(this.mapPlaneBuffer);
+    this.textures.forEach((tex) => gl.deleteTexture(tex));
+    this.textures.clear();
+    // Programs are typically deleted on context loss; guard for safety
+    if (this.mapProgram) gl.deleteProgram(this.mapProgram);
+  }
+
   private drawImageAsSprite(
     camera: { x: number; y: number; scale: number },
     image: HTMLImageElement,
@@ -312,17 +343,22 @@ export class WebGLRenderer {
     );
     const transformedAnchorX = screenAnchorX * camera.scale + camera.x;
     const transformedAnchorY = screenAnchorY * camera.scale + camera.y;
-    const zoomT = Math.max(
-      0,
-      Math.min(
-        1,
-        (camera.scale - AppConfig.camera.minScale) /
-          (AppConfig.camera.maxScale - AppConfig.camera.minScale),
-      ),
+    // Hold sprite scale at imgScl until a threshold (default: AppConfig.baseScale),
+    // then increase towards imgSclFar as we zoom out below that threshold.
+    const holdUntilScale = AppConfig.baseScale; // e.g., 100% zoom if percent = scale*20
+    const startScale = AppConfig.camera.minScale;
+    const clampedScale = Math.max(
+      startScale,
+      Math.min(camera.scale, holdUntilScale),
     );
-    const dynamicScale = imgScl + (imgSclFar - imgScl) * (1 - zoomT);
-    const spritePixelW = imgRndW * AppConfig.tileW * dynamicScale;
-    const spritePixelH = imgRndH * AppConfig.tileH * dynamicScale;
+    const t = (clampedScale - startScale) / (holdUntilScale - startScale); // 0 at min, 1 at hold
+    const dynamicScaleUnclamped = imgSclFar + (imgScl - imgSclFar) * t;
+    const dynamicScale = Math.max(imgScl, dynamicScaleUnclamped);
+    // Make sprites scale with camera zoom so they stay proportional to tiles
+    const spritePixelW =
+      imgRndW * AppConfig.tileW * dynamicScale * camera.scale;
+    const spritePixelH =
+      imgRndH * AppConfig.tileH * dynamicScale * camera.scale;
     const halfW = spritePixelW / 2;
     const halfH = spritePixelH / 2;
     const positions = [
@@ -434,8 +470,20 @@ export class WebGLRenderer {
     gl.enableVertexAttribArray(this.worldPosAttrLocation);
     gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0);
     const positions: number[] = [];
+    // Viewport culling for territory tiles
+    const camera = useCameraStore.getState();
+    const [tlx, tly] = screenToWorld(0, 0, camera);
+    const [trx, try_] = screenToWorld(gl.canvas.width, 0, camera);
+    const [blx, bly] = screenToWorld(0, gl.canvas.height, camera);
+    const [brx, bry] = screenToWorld(gl.canvas.width, gl.canvas.height, camera);
+    const pad = 2;
+    const minX = Math.floor(Math.min(tlx, trx, blx, brx)) - pad;
+    const maxX = Math.ceil(Math.max(tlx, trx, blx, brx)) + pad;
+    const minY = Math.floor(Math.min(tly, try_, bly, bry)) - pad;
+    const maxY = Math.ceil(Math.max(tly, try_, bly, bry)) + pad;
     tiles.forEach((coordStr) => {
       const [x, y] = coordStr.split(',').map(Number);
+      if (x > maxX || x + 1 < minX || y > maxY || y + 1 < minY) return;
       positions.push(x, y, x + 1, y, x, y + 1);
       positions.push(x, y + 1, x + 1, y, x + 1, y + 1);
     });

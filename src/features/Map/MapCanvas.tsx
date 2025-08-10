@@ -56,8 +56,12 @@ export function MapCanvas() {
     canvas.addEventListener('touchend', handleTouchEnd);
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      context.viewport(0, 0, canvas.width, canvas.height);
     };
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
@@ -76,6 +80,9 @@ export function MapCanvas() {
       canvas.removeEventListener('touchend', handleTouchEnd);
 
       window.removeEventListener('resize', resizeCanvas);
+      // Clean up renderer GPU resources
+      rendererRef.current?.dispose();
+      rendererRef.current = null;
     };
   }, []);
 

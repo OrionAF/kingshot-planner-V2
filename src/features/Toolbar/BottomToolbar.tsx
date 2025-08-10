@@ -1,11 +1,13 @@
 // src/features/Toolbar/BottomToolbar.tsx
 
 import { useCameraStore } from '../../state/useCameraStore';
+import { AppConfig } from '../../config/appConfig';
 import { useUiStore } from '../../state/useUiStore';
 import styles from './BottomToolbar.module.css';
 
 export function BottomToolbar() {
   const scale = useCameraStore((state) => state.scale);
+  const { zoomTo } = useCameraStore();
   const { togglePanel, openPanel } = useUiStore();
   const zoomPct = Math.round(scale * 20);
 
@@ -83,15 +85,29 @@ export function BottomToolbar() {
         <button
           className={`${styles.toolbarButton} ${styles.desktopOnly}`}
           title="Zoom Out"
+          aria-label="Zoom Out"
+          onClick={() => {
+            const s = Math.max(scale * 0.9, AppConfig.camera.minScale);
+            zoomTo({ scale: s });
+          }}
         >
           -
         </button>
-        <div className={styles.zoomLevel} title="Tap to set zoom">
+        <div
+          className={styles.zoomLevel}
+          title="Tap to set zoom"
+          aria-live="polite"
+        >
           Zoom: {zoomPct}%
         </div>
         <button
           className={`${styles.toolbarButton} ${styles.desktopOnly}`}
           title="Zoom In"
+          aria-label="Zoom In"
+          onClick={() => {
+            const s = Math.min(scale * 1.1, AppConfig.camera.maxScale);
+            zoomTo({ scale: s });
+          }}
         >
           +
         </button>
