@@ -638,11 +638,14 @@ export class WebGLRenderer {
       );
       gl.drawArrays(gl.TRIANGLES, 0, positions.length / 2);
     }
-    // Border pass (inside-only outline on outer perimeter against unclaimed tiles)
+    // Border pass (quad strips for outer perimeter and inter-alliance edges)
     gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
-    const borderSegments: number[] = [];
-    const inset = 0.015; // Slight inset to stay inside territory but keep corners touching
+    const borderCfg = AppConfig.territory.border;
+    const quadPositions: number[] = [];
+    const inset = borderCfg.insetPrimary;
+    const thickness = borderCfg.thickness;
+    const avoidDouble = borderCfg.avoidDoubleDraw;
     tiles.forEach((coordStr) => {
       const [x, y] = coordStr.split(',').map(Number);
       const upKey = `${x},${y - 1}`;
@@ -653,25 +656,97 @@ export class WebGLRenderer {
       const downOwner = globallyClaimedTiles.get(downKey);
       const leftOwner = globallyClaimedTiles.get(leftKey);
       const rightOwner = globallyClaimedTiles.get(rightKey);
-      // Draw when neighbor is absent OR belongs to different alliance.
-      if (upOwner !== alliance.id) {
-        borderSegments.push(x + 0, y + inset, x + 1, y + inset);
+
+      // Helper to decide if we draw shared edge (avoid duplicates to prevent color dominance)
+      const shouldDraw = (neighborOwner: number | undefined | null) => {
+        if (neighborOwner === alliance.id) return false; // internal edge
+        if (neighborOwner == null) return true; // boundary of unclaimed
+        if (!avoidDouble) return true;
+        return alliance.id < (neighborOwner as number); // deterministic tie-breaker
+      };
+
+      // Top edge quad (horizontal band)
+      if (shouldDraw(upOwner)) {
+        const y1 = y + inset;
+        const y2 = Math.min(y + 1, y1 + thickness);
+        quadPositions.push(
+          x,
+          y1,
+          x + 1,
+          y1,
+          x,
+          y2,
+          x,
+          y2,
+          x + 1,
+          y1,
+          x + 1,
+          y2,
+        );
       }
-      if (downOwner !== alliance.id) {
-        borderSegments.push(x + 0, y + 1 - inset, x + 1, y + 1 - inset);
+      // Bottom edge
+      if (shouldDraw(downOwner)) {
+        const y2 = y + 1 - inset;
+        const y1 = Math.max(y, y2 - thickness);
+        quadPositions.push(
+          x,
+          y1,
+          x + 1,
+          y1,
+          x,
+          y2,
+          x,
+          y2,
+          x + 1,
+          y1,
+          x + 1,
+          y2,
+        );
       }
-      if (leftOwner !== alliance.id) {
-        borderSegments.push(x + inset, y + 0, x + inset, y + 1);
+      // Left edge (vertical band)
+      if (shouldDraw(leftOwner)) {
+        const x1 = x + inset;
+        const x2 = Math.min(x + 1, x1 + thickness);
+        quadPositions.push(
+          x1,
+          y,
+          x2,
+          y,
+          x1,
+          y + 1,
+          x1,
+          y + 1,
+          x2,
+          y,
+          x2,
+          y + 1,
+        );
       }
-      if (rightOwner !== alliance.id) {
-        borderSegments.push(x + 1 - inset, y + 0, x + 1 - inset, y + 1);
+      // Right edge
+      if (shouldDraw(rightOwner)) {
+        const x2 = x + 1 - inset;
+        const x1 = Math.max(x, x2 - thickness);
+        quadPositions.push(
+          x1,
+          y,
+          x2,
+          y,
+          x1,
+          y + 1,
+          x1,
+          y + 1,
+          x2,
+          y,
+          x2,
+          y + 1,
+        );
       }
     });
-    if (borderSegments.length > 0) {
+    if (quadPositions.length > 0) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.objectBuffer);
       gl.bufferData(
         gl.ARRAY_BUFFER,
-        new Float32Array(borderSegments),
+        new Float32Array(quadPositions),
         gl.DYNAMIC_DRAW,
       );
       gl.enableVertexAttribArray(this.worldPosAttrLocation);
@@ -683,12 +758,11 @@ export class WebGLRenderer {
         0,
         0,
       );
-      // Border: complementary light/dark adjustment for clearer edge
       const [br, bg, bb] = shades.border;
-      const borderAlpha = 0.65;
+      const borderAlpha = 0.85; // single pass alpha
       gl.uniform3fv(this.objectColorLocation, [br, bg, bb]);
       gl.uniform1f(this.objectAlphaLocation, borderAlpha);
-      gl.drawArrays(gl.LINES, 0, borderSegments.length / 2);
+      gl.drawArrays(gl.TRIANGLES, 0, quadPositions.length / 2);
     }
   }
   private drawObject(obj: DrawableObject, alpha = 1.0) {

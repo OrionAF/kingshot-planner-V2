@@ -197,6 +197,13 @@ export const AppConfig = {
     gridThickness: 1,
     gridDarkness: 0.95,
   },
+  territory: {
+    border: {
+      insetPrimary: 0,
+      thickness: 0.03, // thickness in tile units for quad borders
+      avoidDoubleDraw: false, // when true only lower-id alliance draws shared edge
+    },
+  },
   // Curated distinct alliance color palette (used for auto-assignment / fallback)
   ALLIANCE_COLOR_PALETTE: [
     '#d6685c',
