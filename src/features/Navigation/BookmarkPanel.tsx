@@ -53,8 +53,12 @@ export function BookmarkPanel() {
     }
   }, [isOpen]);
 
-  const sorted = bookmarks
-    .slice()
+  // Sort within pinned/unpinned groups by order
+  const pinned = bookmarks
+    .filter((b) => b.pinned)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const unpinned = bookmarks
+    .filter((b) => !b.pinned)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   // Track globally which bookmark is being dragged
@@ -105,9 +109,9 @@ export function BookmarkPanel() {
               onClick={() => {
                 if (!selectedCoords) return;
                 const raw = prompt('Label for bookmark?', selectedDefaultLabel);
-                const label = (
-                  raw === null ? selectedDefaultLabel : raw
-                ).trim();
+                if (raw === null) return; // user cancelled
+                const label = raw.trim();
+                if (!label) return; // ignore empty
                 addBookmark(
                   Math.round(selectedCoords.x),
                   Math.round(selectedCoords.y),
@@ -134,26 +138,48 @@ export function BookmarkPanel() {
         {bookmarks.length === 0 && (
           <div style={{ opacity: 0.6, fontSize: 12 }}>No bookmarks.</div>
         )}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-            maxHeight: 400,
-            overflowY: 'auto',
-          }}
-        >
-          {sorted.map((b) => (
-            <BookmarkRow
-              key={b.id}
-              b={b}
-              rename={renameBookmark}
-              reorder={reorder}
-              draggingId={draggingId}
-              setDraggingId={setDraggingId}
-            />
-          ))}
-        </div>
+        {bookmarks.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+              maxHeight: 400,
+              overflowY: 'auto',
+            }}
+          >
+            {pinned.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <SectionHeader label="Pinned" />
+                {pinned.map((b) => (
+                  <BookmarkRow
+                    key={b.id}
+                    b={b}
+                    rename={renameBookmark}
+                    reorder={reorder}
+                    draggingId={draggingId}
+                    setDraggingId={setDraggingId}
+                  />
+                ))}
+              </div>
+            )}
+            {unpinned.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {pinned.length > 0 && <SectionHeader label="Others" subtle />}
+                {unpinned.map((b) => (
+                  <BookmarkRow
+                    key={b.id}
+                    b={b}
+                    rename={renameBookmark}
+                    reorder={reorder}
+                    draggingId={draggingId}
+                    setDraggingId={setDraggingId}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </Panel>
     </div>
   );
@@ -316,6 +342,24 @@ function BookmarkRow({ b, rename, reorder, draggingId, setDraggingId }: any) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SectionHeader({ label, subtle }: { label: string; subtle?: boolean }) {
+  return (
+    <div
+      style={{
+        fontSize: 11,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        fontWeight: 600,
+        color: subtle ? '#9aa3ab' : '#cfd6dd',
+        opacity: subtle ? 0.8 : 1,
+        padding: '0 2px',
+      }}
+    >
+      {label}
     </div>
   );
 }

@@ -107,7 +107,7 @@ export const useCameraStore = create<CameraState & CameraActions>()((set) => ({
       const next = { x: state.x + dx, y: state.y + dy };
       const merged = { ...state, ...next };
       scheduleSave(merged);
-      return next;
+      return merged;
     }),
 
   zoomTo: (newCameraState) =>
@@ -134,7 +134,7 @@ export const useCameraStore = create<CameraState & CameraActions>()((set) => ({
       };
       const merged = { ...state, ...next };
       scheduleSave(merged);
-      return next;
+      return merged;
     }),
   focusOn: (worldX, worldY, opts) => {
     if (opts?.scale != null) {
