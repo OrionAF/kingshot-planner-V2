@@ -15,6 +15,8 @@ export interface BaseBuilding extends MapObject {
   id: string;
   // Use the new abbreviated property names from your JSON
   dpName: string;
+  /** Prototype key or derived base id (e.g., 'fortress', 'sanctuary', 'lv1_builder', 'kings_castle') */
+  proto?: string;
   imgKey?: string;
   imgScl?: number;
   imgSclFar?: number;

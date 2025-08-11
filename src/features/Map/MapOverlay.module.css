@@ -118,3 +118,46 @@
   pointer-events: none;
   backdrop-filter: blur(4px);
 }
+
+/* Hover/focus info banner */
+.hoverInfo {
+  position: absolute;
+  bottom: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(24, 28, 32, 0.9);
+  color: #f7fbff;
+  border: 1px solid #4d5860;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  max-width: 320px;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(3px);
+}
+
+/* Restored richer error bar with accent and icon */
+.placementReason {
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    rgba(28, 32, 36, 0.95),
+    rgba(22, 26, 30, 0.95)
+  );
+  color: #ffd7d7;
+  border: 1px solid rgba(220, 53, 69, 0.8);
+  border-left-width: 6px; /* accent bar, color set inline */
+  padding: 8px 12px 9px;
+  border-radius: 8px;
+  font-size: 12px;
+  max-width: 360px;
+  text-align: left;
+  pointer-events: none;
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}

@@ -32,3 +32,21 @@ export function worldToScreen(x: number, y: number): [number, number] {
   const screenY = -((x + y) * (AppConfig.tileH / 2));
   return [screenX, screenY];
 }
+
+// Snap continuous world coordinates to discrete tile indices.
+// Uses floor (with tiny epsilon) to avoid off-by-one selection near tile borders.
+export function snapWorldToTile(
+  worldX: number,
+  worldY: number,
+): [number, number] {
+  const eps = 1e-6;
+  let tx = Math.floor(worldX + eps);
+  let ty = Math.floor(worldY + eps);
+  // Clamp to world bounds
+  const maxIdx = AppConfig.N - 1;
+  if (tx < 0) tx = 0;
+  else if (tx > maxIdx) tx = maxIdx;
+  if (ty < 0) ty = 0;
+  else if (ty > maxIdx) ty = maxIdx;
+  return [tx, ty];
+}

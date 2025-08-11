@@ -3,12 +3,14 @@
 import { useCameraStore } from '../../state/useCameraStore';
 import { AppConfig } from '../../config/appConfig';
 import { useUiStore } from '../../state/useUiStore';
+import { screenToWorld, worldToScreen } from '../../core/coordinate-utils';
 import styles from './BottomToolbar.module.css';
 
 export function BottomToolbar() {
   const scale = useCameraStore((state) => state.scale);
   const { zoomTo } = useCameraStore();
-  const { togglePanel, openPanel } = useUiStore();
+  const { togglePanel, openPanel, toggleMinimapVisibility, minimapVisible } =
+    useUiStore();
   const zoomPct = Math.round(scale * 20);
 
   const isManagementActive =
@@ -96,8 +98,23 @@ export function BottomToolbar() {
           title="Zoom Out"
           aria-label="Zoom Out"
           onClick={() => {
-            const s = Math.max(scale * 0.9, AppConfig.camera.minScale);
-            zoomTo({ scale: s });
+            const camBefore = useCameraStore.getState();
+            const targetScale = Math.max(
+              camBefore.scale * 0.9,
+              AppConfig.camera.minScale,
+            );
+            if (targetScale === camBefore.scale) return; // no-op
+            const focalScreenX = window.innerWidth / 2;
+            const focalScreenY = window.innerHeight / 2;
+            const [worldX, worldY] = screenToWorld(
+              focalScreenX,
+              focalScreenY,
+              camBefore,
+            );
+            const [screenXAfter, screenYAfter] = worldToScreen(worldX, worldY);
+            const newCamX = focalScreenX - screenXAfter * targetScale;
+            const newCamY = focalScreenY - screenYAfter * targetScale;
+            zoomTo({ x: newCamX, y: newCamY, scale: targetScale });
           }}
         >
           -
@@ -114,8 +131,23 @@ export function BottomToolbar() {
           title="Zoom In"
           aria-label="Zoom In"
           onClick={() => {
-            const s = Math.min(scale * 1.1, AppConfig.camera.maxScale);
-            zoomTo({ scale: s });
+            const camBefore = useCameraStore.getState();
+            const targetScale = Math.min(
+              camBefore.scale * 1.1,
+              AppConfig.camera.maxScale,
+            );
+            if (targetScale === camBefore.scale) return; // no-op
+            const focalScreenX = window.innerWidth / 2;
+            const focalScreenY = window.innerHeight / 2;
+            const [worldX, worldY] = screenToWorld(
+              focalScreenX,
+              focalScreenY,
+              camBefore,
+            );
+            const [screenXAfter, screenYAfter] = worldToScreen(worldX, worldY);
+            const newCamX = focalScreenX - screenXAfter * targetScale;
+            const newCamY = focalScreenY - screenYAfter * targetScale;
+            zoomTo({ x: newCamX, y: newCamY, scale: targetScale });
           }}
         >
           +
@@ -138,9 +170,9 @@ export function BottomToolbar() {
           🎯
         </button>
         <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'minimap' ? styles.active : ''}`}
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${minimapVisible ? styles.active : ''}`}
           title="Toggle Minimap"
-          onClick={() => togglePanel('minimap')}
+          onClick={() => toggleMinimapVisibility()}
         >
           🗺️
         </button>

@@ -3,9 +3,13 @@
 import { AppConfig } from '../../config/appConfig';
 import { getPlacementReasonColor } from '../../constants/placementColors';
 import { useCameraStore } from '../../state/useCameraStore';
-import { useMapStore } from '../../state/useMapStore';
+import { useMapStore, getBiomeForTile } from '../../state/useMapStore';
 import { useUiStore } from '../../state/useUiStore';
-import { screenToWorld, worldToScreen } from '../../core/coordinate-utils';
+import {
+  screenToWorld,
+  worldToScreen,
+  snapWorldToTile,
+} from '../../core/coordinate-utils';
 import { useEffect } from 'react';
 import styles from './MapOverlay.module.css';
 import { useBookmarkStore } from '../../state/useBookmarkStore';
@@ -21,7 +25,16 @@ export function MapOverlay() {
     isValidPlacement,
     lastPlacementResult,
   } = useUiStore();
-  const { placePlayer, placeBuilding } = useMapStore();
+  const mousePos = useUiStore((s) => s.mouseWorldPosition);
+  const {
+    placePlayer,
+    placeBuilding,
+    players,
+    userBuildings,
+    buildingMap,
+    alliances,
+    globallyClaimedTiles,
+  } = useMapStore();
 
   const isPlacingSomething =
     isPlacingPlayer || !!buildMode.selectedBuildingType;
@@ -34,8 +47,7 @@ export function MapOverlay() {
 
   const handleConfirmPlacement = () => {
     if (isValidPlacement) {
-      const roundedX = Math.round(worldX);
-      const roundedY = Math.round(worldY);
+      const [roundedX, roundedY] = snapWorldToTile(worldX, worldY);
       if (isPlacingPlayer && playerToPlace) {
         placePlayer(playerToPlace, roundedX, roundedY);
       } else if (buildMode.selectedBuildingType && buildMode.activeAllianceId) {
@@ -151,7 +163,9 @@ export function MapOverlay() {
             <div
               className={styles.placementReason}
               style={{
-                color: getPlacementReasonColor(lastPlacementResult.reasonCode),
+                borderLeftColor: getPlacementReasonColor(
+                  lastPlacementResult.reasonCode,
+                ),
               }}
             >
               {lastPlacementResult.reasonCode || 'Invalid'}
@@ -174,6 +188,76 @@ export function MapOverlay() {
           </div>
         </div>
       )}
+
+      {!isPlacingSomething &&
+        mousePos &&
+        (() => {
+          const { x: hx, y: hy } = mousePos;
+          // hit detection (players -> userBuildings -> base building)
+          const player = players.find(
+            (p) => hx >= p.x && hx < p.x + p.w && hy >= p.y && hy < p.y + p.h,
+          );
+          const ubuild = !player
+            ? userBuildings.find(
+                (b) =>
+                  hx >= b.x && hx < b.x + b.w && hy >= b.y && hy < b.y + b.h,
+              )
+            : null;
+          const bbuild =
+            !player && !ubuild ? buildingMap.get(`${hx},${hy}`) : null;
+
+          const biome = getBiomeForTile(hx, hy);
+          const claimAid = globallyClaimedTiles.get(`${hx},${hy}`);
+          const claimAlliance = claimAid
+            ? alliances.find((a) => a.id === claimAid)
+            : undefined;
+
+          const cap = (s: string) =>
+            s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+          let title = `Tile ${hx},${hy}`;
+          const parts: string[] = [];
+          if (player) {
+            title = `Player: ${player.name}`;
+            parts.push(`${player.w}x${player.h}`);
+            parts.push(`${player.x},${player.y}`);
+          } else if (ubuild) {
+            const def = AppConfig.BUILDING_CATALOG[ubuild.type];
+            const an = alliances.find((a) => a.id === ubuild.allianceId);
+            const aLabel = an
+              ? an.tag || an.name
+              : `Alliance ${ubuild.allianceId}`;
+            title = `${def?.name ?? ubuild.type} — ${aLabel}`;
+            parts.push(`${ubuild.w}x${ubuild.h}`);
+            parts.push(`${ubuild.x},${ubuild.y}`);
+          } else if (bbuild) {
+            title = `${bbuild.dpName}`;
+            parts.push(`${bbuild.w}x${bbuild.h}`);
+            parts.push(`${bbuild.x},${bbuild.y}`);
+          }
+
+          const claimLine = claimAlliance
+            ? `Claimed by ${claimAlliance.tag || claimAlliance.name}`
+            : 'Unclaimed';
+
+          parts.push(cap(biome));
+
+          // Claim appears for resource base buildings and empty tiles only
+          let showClaim = false;
+          if (bbuild) {
+            const rssSet = new Set(['wood', 'food', 'stone', 'iron']);
+            showClaim = !!(bbuild.proto && rssSet.has(bbuild.proto));
+          } else if (!ubuild && !player) {
+            showClaim = true; // empty tile
+          }
+          if (showClaim) parts.push(claimLine);
+
+          return (
+            <div className={styles.hoverInfo}>
+              <div style={{ fontWeight: 700 }}>{title}</div>
+              <div>{parts.join(' - ')}</div>
+            </div>
+          );
+        })()}
     </div>
   );
 }

@@ -226,6 +226,7 @@ function processBaseMapData(): {
       h: mergedData.h || 1,
       color: mergedData.fillCol || 'transparent',
       brdCol: mergedData.brdCol,
+      proto: b.prototype || (mergedData.id?.split('_')[0] ?? 'unknown'),
       imgKey: mergedData.imgKey,
       imgScl: mergedData.imgScl,
       imgSclFar: mergedData.imgSclFar,
@@ -256,6 +257,7 @@ function processBaseMapData(): {
       h: 2,
       color: style.fillCol,
       brdCol: style.brdCol,
+      proto: rss.type,
     };
     allBuildings.push(building);
     for (let dx = 0; dx < 2; dx++) {

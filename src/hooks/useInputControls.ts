@@ -1,7 +1,11 @@
 // src/hooks/useInputControls.ts
 
 import { useCameraStore } from '../state/useCameraStore';
-import { screenToWorld, worldToScreen } from '../core/coordinate-utils';
+import {
+  screenToWorld,
+  worldToScreen,
+  snapWorldToTile,
+} from '../core/coordinate-utils';
 import { useUiStore } from '../state/useUiStore';
 import { useMapStore, getBiomeForTile } from '../state/useMapStore';
 import { useSelectionStore } from '../state/useSelectionStore';
@@ -93,15 +97,14 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     }
 
     const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera);
-    const roundedX = Math.round(worldX);
-    const roundedY = Math.round(worldY);
-    setMouseWorldPosition({ x: roundedX, y: roundedY });
+    const [tileX, tileY] = snapWorldToTile(worldX, worldY);
+    setMouseWorldPosition({ x: tileX, y: tileY });
 
     if (isPlacingPlayer || buildMode.selectedBuildingType) {
       const type = isPlacingPlayer ? 'player' : buildMode.selectedBuildingType!;
       queuedPlacement = {
-        x: roundedX,
-        y: roundedY,
+        x: tileX,
+        y: tileY,
         type,
         allianceId: buildMode.activeAllianceId,
       };
@@ -150,8 +153,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
         const { setSelection } = useSelectionStore.getState();
 
         const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera);
-        const roundedX = Math.round(worldX);
-        const roundedY = Math.round(worldY);
+        const [tileX, tileY] = snapWorldToTile(worldX, worldY);
 
         const {
           isPlacingPlayer,
@@ -164,7 +166,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
 
         if (isPlacingPlayer && playerToPlace) {
           if (isValidPlacement) {
-            mapStore.placePlayer(playerToPlace, roundedX, roundedY);
+            mapStore.placePlayer(playerToPlace, tileX, tileY);
             endPlayerPlacement();
           }
         } else if (
@@ -174,8 +176,8 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           if (isValidPlacement) {
             mapStore.placeBuilding(
               buildMode.selectedBuildingType,
-              roundedX,
-              roundedY,
+              tileX,
+              tileY,
               buildMode.activeAllianceId,
             );
             if (buildMode.selectedBuildingType !== 'alliance_tower') {
@@ -183,15 +185,15 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
             }
           }
         } else {
-          const clickedObject = getObjectAtCoords(roundedX, roundedY);
+          const clickedObject = getObjectAtCoords(tileX, tileY);
           if (clickedObject) {
             setSelection(clickedObject);
           } else {
-            setSelection({ type: 'tile', data: { x: roundedX, y: roundedY } });
+            setSelection({ type: 'tile', data: { x: tileX, y: tileY } });
           }
           if (import.meta.env.DEV && AppConfig.enableDevMode) {
-            const biome = getBiomeForTile(roundedX, roundedY);
-            console.log(`Click at: ${roundedX}, ${roundedY} (Biome: ${biome})`);
+            const biome = getBiomeForTile(tileX, tileY);
+            console.log(`Click at: ${tileX}, ${tileY} (Biome: ${biome})`);
           }
         }
       }
@@ -215,10 +217,9 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     const { deleteBuilding, deletePlayer } = useMapStore.getState();
     const camera = useCameraStore.getState();
     const [worldX, worldY] = screenToWorld(e.clientX, e.clientY, camera);
-    const roundedX = Math.round(worldX);
-    const roundedY = Math.round(worldY);
+    const [tileX, tileY] = snapWorldToTile(worldX, worldY);
 
-    const objectToDelete = getObjectAtCoords(roundedX, roundedY);
+    const objectToDelete = getObjectAtCoords(tileX, tileY);
 
     if (objectToDelete?.type === 'userBuilding') {
       if (window.confirm(`Delete this building?`)) {
@@ -309,8 +310,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
           ? 'player'
           : buildMode.selectedBuildingType!;
         const placementResult = checkPlacementValidity(
-          Math.round(worldX),
-          Math.round(worldY),
+          ...snapWorldToTile(worldX, worldY),
           type,
           buildMode.activeAllianceId,
         );
@@ -362,8 +362,7 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
             ? 'player'
             : buildMode.selectedBuildingType!;
           const placementResult = checkPlacementValidity(
-            Math.round(centerX),
-            Math.round(centerY),
+            ...snapWorldToTile(centerX, centerY),
             type,
             buildMode.activeAllianceId,
           );

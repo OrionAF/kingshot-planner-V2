@@ -189,9 +189,55 @@ export const AppConfig = {
     armoryOutpostColor: 'rgba(0, 128, 128, 1)',
     drillCampOutpostColor: 'rgba(135, 206, 235, 1)',
     frontierLodgeOutpostColor: 'rgba(128, 128, 0, 1)',
-    zoomFactorMin: 1.2,
-    zoomFactorMax: 15.0,
-    mainMapZoomThresholdForMinimapZoom: 0.03,
+    // Target world coverage at main map's MAX zoom.
+    // Accepts either:
+    // - a fraction in [0,1], e.g. 0.25 for 25%
+    // - a percentage in (1,100], e.g. 25 for 25%
+    // When fractionMode === 'area', the value represents area coverage; it is converted to linear via sqrt.
+    // When the main map is fully zoomed out, minimap shows 100% of world. Interpolates per easing.
+    maxWorldFractionAtMaxZoom: 0.25,
+    // Interpretation of maxWorldFractionAtMaxZoom: 'linear' (width/height fraction) or 'area' (surface coverage)
+    fractionMode: 'linear' as 'linear' | 'area',
+    // Target logical width (in css px) the minimap content is designed for before scaling to panel.
+    logicalTargetWidth: 240,
+    // Supersample factor for biome raster (higher = sharper, more cost).
+    supersample: 2,
+    // Drag-follow easing factor (0..1) when panning main map via minimap drag.
+    followPanFactor: 0.4,
+    // Wheel zoom step multipliers applied to main map when wheel over minimap.
+    wheelZoomStepIn: 1.05,
+    wheelZoomStepOut: 0.95,
+    // Easing configuration for minimap world fraction interpolation.
+    easing: {
+      // Supported: 'linear', 'easeOutQuad', 'easeInOutCubic', 'log', 'power'
+      mode: 'easeOutQuad' as
+        | 'linear'
+        | 'easeOutQuad'
+        | 'easeInOutCubic'
+        | 'log'
+        | 'power',
+      // For 'log' mode: larger base exaggerates low-end detail.
+      logBase: 5,
+      // For 'power' mode: exponent >1 biases toward low zoom detail.
+      exponent: 1.5,
+    },
+    // Drag activation thresholds to prevent accidental pans while just moving cursor.
+    drag: {
+      startDistancePx: 8, // movement required before drag engages
+      startDelayMs: 40, // minimum hold time before drag can engage
+      clickMaxDistancePx: 6, // still considered click if under this total movement
+    },
+    layout: {
+      // mode: 'auto' => (mapW, mapH) = (round(screenW/autoDivisor), round(screenH/autoDivisor))
+      // mode: 'fixed' => uses logicalTargetWidth with height derived from world aspect
+      mode: 'auto' as 'auto' | 'fixed',
+      autoDivisor: 5.5,
+      // Internal pixel density multiplier (1 = CSS pixels, 2 = render at 2x then downscale for sharpness)
+      pixelDensity:
+        typeof window !== 'undefined' && window.devicePixelRatio
+          ? Math.min(2, window.devicePixelRatio)
+          : 1,
+    },
   },
   webgl: {
     gridThickness: 1,
