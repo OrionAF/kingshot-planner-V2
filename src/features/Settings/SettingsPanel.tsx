@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { Panel } from '../../components/Panel/Panel';
 import { AppConfig } from '../../config/appConfig';
 import { useMapStore } from '../../state/useMapStore';
+import { useBookmarkStore } from '../../state/useBookmarkStore';
 import { useUiStore } from '../../state/useUiStore';
 import { type PlanFile } from '../../types/map.types'; // <-- Import the shared type
 import styles from './SettingsPanel.module.css';
@@ -71,11 +72,13 @@ export function SettingsPanel() {
   const handleExport = () => {
     // We get the latest state directly here to ensure the export is always fresh
     const latestState = useMapStore.getState();
+    const bmState = useBookmarkStore.getState();
     const planData: PlanFile = {
       version: AppConfig.CURRENT_VERSION, // Use dynamic version
       alliances: latestState.alliances,
       players: latestState.players,
       userBuildings: latestState.userBuildings,
+      bookmarks: bmState.bookmarks,
     };
     const jsonString = JSON.stringify(planData, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
@@ -121,6 +124,20 @@ export function SettingsPanel() {
               userBuildings: data.userBuildings ?? [],
             };
             importPlan(planToImport);
+            if (Array.isArray(data.bookmarks)) {
+              // hydrate bookmarks slice (replace existing)
+              const bmStore = useBookmarkStore.getState();
+              bmStore.clearAll();
+              for (const bm of data.bookmarks) {
+                // preserve id/order if present
+                bmStore.addBookmark(bm.x, bm.y, bm.label || '');
+                const justAdded =
+                  bmStore.bookmarks[bmStore.bookmarks.length - 1];
+                justAdded.pinned = !!bm.pinned;
+                justAdded.order = bm.order;
+                justAdded.createdAt = bm.createdAt || Date.now();
+              }
+            }
             alert('Plan imported successfully!');
           }
         } else {

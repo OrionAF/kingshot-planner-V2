@@ -11,6 +11,7 @@ interface BookmarkActions {
   togglePinned: (id: string) => void;
   renameBookmark: (id: string, label: string) => void;
   clearAll: () => void;
+  reorder: (id: string, beforeId: string | null) => void; // beforeId null => move to end
 }
 
 export const useBookmarkStore = create<BookmarkState & BookmarkActions>(
@@ -18,6 +19,8 @@ export const useBookmarkStore = create<BookmarkState & BookmarkActions>(
     bookmarks: [],
     addBookmark: (x, y, label) =>
       set((s) => {
+        const nextOrder =
+          (s.bookmarks.reduce((m, b) => Math.max(m, b.order ?? 0), 0) || 0) + 1;
         const bm: Bookmark = {
           id: 'bm_' + generateId('bookmark'),
           x,
@@ -25,6 +28,7 @@ export const useBookmarkStore = create<BookmarkState & BookmarkActions>(
           label,
           pinned: false,
           createdAt: Date.now(),
+          order: nextOrder,
         };
         const bookmarks = [...s.bookmarks, bm];
         queueMicrotask(() =>
@@ -66,6 +70,25 @@ export const useBookmarkStore = create<BookmarkState & BookmarkActions>(
           globalEventBus.emit('bookmarks:changed', undefined),
         );
         return { bookmarks: [] };
+      }),
+    reorder: (id, beforeId) =>
+      set((s) => {
+        const list = [...s.bookmarks];
+        const idx = list.findIndex((b) => b.id === id);
+        if (idx === -1) return s;
+        const [item] = list.splice(idx, 1);
+        let insertIndex =
+          beforeId === null
+            ? list.length
+            : list.findIndex((b) => b.id === beforeId);
+        if (insertIndex === -1) insertIndex = list.length;
+        list.splice(insertIndex, 0, item);
+        // reassign contiguous order values
+        list.forEach((b, i) => (b.order = i + 1));
+        queueMicrotask(() =>
+          globalEventBus.emit('bookmarks:changed', undefined),
+        );
+        return { bookmarks: list };
       }),
   }),
 );

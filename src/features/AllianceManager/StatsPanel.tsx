@@ -5,12 +5,14 @@ import {
   getTerritoryDensity,
   getAllianceCategoryCounts,
 } from '../../state/selectors/alliances';
+import { useMapStore } from '../../state/useMapStore';
 import styles from './AlliancePanel.module.css';
 
 export function StatsPanel() {
   const openPanel = useUiStore((s) => s.openPanel);
   // Selector function reads store internally (cached) so just call.
   const stats = getAllianceStats();
+  const alliances = useMapStore((s) => s.alliances); // reactive so tag changes update
   const densities = getTerritoryDensity();
   const categories = getAllianceCategoryCounts();
   const byIdDensity = new Map(densities.map((d) => [d.allianceId, d]));
@@ -25,12 +27,15 @@ export function StatsPanel() {
       );
       const density = dens ? dens.density : 0;
       const territory = dens ? dens.tiles : s.territoryTileCount;
+      const alliance = alliances.find((a) => a.id === s.allianceId);
+      const tag = alliance?.tag || s.allianceId.toString();
       return {
         ...s,
         totalBuildings,
         density,
         territory,
         cats: cats?.categories || {},
+        tag,
       };
     })
     .sort((a, b) => b.territory - a.territory);
@@ -75,7 +80,7 @@ export function StatsPanel() {
                 }}
               >
                 <span>
-                  <strong>#{m.allianceId}</strong>{' '}
+                  <strong>{m.tag}</strong>{' '}
                   <span style={{ opacity: 0.7 }}>T:{m.territory}</span>{' '}
                   <span style={{ opacity: 0.7 }}>B:{m.totalBuildings}</span>
                 </span>

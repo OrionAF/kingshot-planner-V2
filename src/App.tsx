@@ -7,6 +7,7 @@ import { MapOverlay } from './features/Map/MapOverlay';
 import { AlliancePanel } from './features/AllianceManager/AlliancePanel';
 import { StatsPanel } from './features/AllianceManager/StatsPanel';
 import { NavPanel } from './features/Navigation/NavPanel';
+import { BookmarkPanel } from './features/Navigation/BookmarkPanel';
 import { ManagementPanel } from './features/GroupedPanels/ManagementPanel';
 import { ToolsPanel } from './features/GroupedPanels/ToolsPanel';
 import { SettingsPanel } from './features/Settings/SettingsPanel';
@@ -97,6 +98,7 @@ function App() {
       <AlliancePanel />
       <StatsPanel />
       <NavPanel />
+      <BookmarkPanel />
       <SettingsPanel />
       <PlayerPanel />
       <BuildPanel />

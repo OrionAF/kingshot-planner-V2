@@ -7,6 +7,7 @@ export interface Bookmark {
   label: string;
   pinned: boolean;
   createdAt: number;
+  order?: number; // relative ordering (optional for backward compatibility)
 }
 
 export interface OverwatchSettings {

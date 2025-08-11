@@ -58,8 +58,9 @@ export function BottomToolbar() {
           👤
         </button>
         <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
-          title="Pinned Landmarks"
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'bookmarks' ? styles.active : ''}`}
+          title="Bookmarks"
+          onClick={() => togglePanel('bookmarks')}
         >
           📌
         </button>
@@ -80,8 +81,9 @@ export function BottomToolbar() {
           🧰
         </button>
         <button
-          className={`${styles.toolbarButton} ${styles.mobileOnly}`}
-          title="Pinned Landmarks"
+          className={`${styles.toolbarButton} ${styles.mobileOnly} ${openPanel === 'bookmarks' ? styles.active : ''}`}
+          title="Bookmarks"
+          onClick={() => togglePanel('bookmarks')}
         >
           📌
         </button>

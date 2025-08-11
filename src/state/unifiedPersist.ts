@@ -102,6 +102,10 @@ export function loadUnifiedPersist(): void {
       players: migrated.map.players,
       userBuildings: migrated.map.userBuildings,
     });
+    // hydrate bookmarks (replace existing)
+    try {
+      useBookmarkStore.setState({ bookmarks: migrated.bookmarks || [] });
+    } catch {}
     const meta = useMetaStore.getState();
     const incomingVersion = migrated.meta.lastSeenVersion || null;
     if (!meta.lastSeenVersion || meta.lastSeenVersion !== incomingVersion) {

@@ -14,6 +14,7 @@ interface CameraActions {
   panBy: (dx: number, dy: number) => void;
   zoomTo: (newCameraState: Partial<CameraState>) => void;
   panTo: (worldX: number, worldY: number) => void; // FIX: Add the new action
+  focusOn: (worldX: number, worldY: number, opts?: { scale?: number }) => void;
 }
 
 const MIN_ZOOM = AppConfig.camera.minScale;
@@ -135,6 +136,12 @@ export const useCameraStore = create<CameraState & CameraActions>()((set) => ({
       scheduleSave(merged);
       return next;
     }),
+  focusOn: (worldX, worldY, opts) => {
+    if (opts?.scale != null) {
+      useCameraStore.getState().zoomTo({ scale: opts.scale });
+    }
+    useCameraStore.getState().panTo(worldX, worldY);
+  },
 }));
 
 // Camera state now persisted manually with a debounced writer to reduce jank risk.
