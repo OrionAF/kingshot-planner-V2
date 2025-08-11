@@ -3,6 +3,7 @@ import { useUiStore } from '../../state/useUiStore';
 import { useBookmarkStore } from '../../state/useBookmarkStore';
 import { useCameraStore } from '../../state/useCameraStore';
 import { useSelectionStore } from '../../state/useSelectionStore';
+import { useMapStore } from '../../state/useMapStore';
 import { useEffect, useState } from 'react';
 
 export function BookmarkPanel() {
@@ -10,8 +11,31 @@ export function BookmarkPanel() {
   const { bookmarks, addBookmark, renameBookmark, reorder } =
     useBookmarkStore();
   const selection = useSelectionStore((s) => s.selection);
-  const selectedTile =
-    selection && selection.type === 'tile' ? selection.data : null;
+  // Derive selected target (tile OR building OR player)
+  let selectedCoords: { x: number; y: number } | null = null;
+  let selectedDefaultLabel = '';
+  if (selection) {
+    if (selection.type === 'tile') {
+      selectedCoords = selection.data;
+      selectedDefaultLabel = `${selection.data.x},${selection.data.y}`;
+    } else if (selection.type === 'userBuilding') {
+      selectedCoords = { x: selection.data.x, y: selection.data.y };
+      // Include alliance tag if available
+      const { alliances } = useMapStore.getState();
+      const alliance = alliances.find(
+        (a) => a.id === selection.data.allianceId,
+      );
+      selectedDefaultLabel = alliance
+        ? `${alliance.tag}_${selection.data.type}`
+        : selection.data.type;
+    } else if (selection.type === 'baseBuilding') {
+      selectedCoords = { x: selection.data.x, y: selection.data.y };
+      selectedDefaultLabel = selection.data.dpName || 'Base';
+    } else if (selection.type === 'player') {
+      selectedCoords = { x: selection.data.x, y: selection.data.y };
+      selectedDefaultLabel = selection.data.name || 'Player';
+    }
+  }
   const isOpen = openPanel === 'bookmarks';
 
   // anchor above toolbar button
@@ -32,6 +56,9 @@ export function BookmarkPanel() {
   const sorted = bookmarks
     .slice()
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  // Track globally which bookmark is being dragged
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   return (
     <div
@@ -70,18 +97,21 @@ export function BookmarkPanel() {
             <button
               style={miniBtn}
               title={
-                selectedTile
-                  ? `Add bookmark at selected tile (${selectedTile.x},${selectedTile.y})`
-                  : 'Select a tile to add a bookmark'
+                selectedCoords
+                  ? `Add bookmark at (${selectedCoords.x},${selectedCoords.y})`
+                  : 'Select a tile / building / player to add a bookmark'
               }
-              disabled={!selectedTile}
+              disabled={!selectedCoords}
               onClick={() => {
-                if (!selectedTile) return;
-                const label = prompt('Label for bookmark?', '') || '';
+                if (!selectedCoords) return;
+                const raw = prompt('Label for bookmark?', selectedDefaultLabel);
+                const label = (
+                  raw === null ? selectedDefaultLabel : raw
+                ).trim();
                 addBookmark(
-                  Math.round(selectedTile.x),
-                  Math.round(selectedTile.y),
-                  label.trim(),
+                  Math.round(selectedCoords.x),
+                  Math.round(selectedCoords.y),
+                  label,
                 );
               }}
             >
@@ -91,14 +121,15 @@ export function BookmarkPanel() {
         </div>
         <div
           style={{
-            fontSize: 11,
+            fontSize: 12,
             lineHeight: 1.3,
-            opacity: 0.7,
-            marginBottom: 8,
-            color: '#c2c8d0',
+            opacity: 0.85,
+            marginBottom: 10,
+            color: '#e1e6eb',
           }}
         >
-          Select a tile then add. Drag to reorder. Double‑click label to rename.
+          Select a tile, building, or player; then add. Drag rows to reorder.
+          Double‑click label to rename.
         </div>
         {bookmarks.length === 0 && (
           <div style={{ opacity: 0.6, fontSize: 12 }}>No bookmarks.</div>
@@ -107,8 +138,8 @@ export function BookmarkPanel() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 8,
-            maxHeight: 360,
+            gap: 10,
+            maxHeight: 400,
             overflowY: 'auto',
           }}
         >
@@ -118,6 +149,8 @@ export function BookmarkPanel() {
               b={b}
               rename={renameBookmark}
               reorder={reorder}
+              draggingId={draggingId}
+              setDraggingId={setDraggingId}
             />
           ))}
         </div>
@@ -127,21 +160,23 @@ export function BookmarkPanel() {
 }
 
 const miniBtn: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid #333',
-  padding: '2px 6px',
-  fontSize: 10,
+  background: 'linear-gradient(#394249,#31393f)',
+  border: '1px solid #4d5860',
+  padding: '3px 8px',
+  fontSize: 11,
   cursor: 'pointer',
-  borderRadius: 3,
+  borderRadius: 4,
+  color: '#f5f9fc',
+  fontWeight: 500,
 };
 
-function BookmarkRow({ b, rename, reorder }: any) {
+function BookmarkRow({ b, rename, reorder, draggingId, setDraggingId }: any) {
   const { togglePinned, removeBookmark } = useBookmarkStore.getState();
   const focusOn = useCameraStore.getState().focusOn;
   const camera = useCameraStore.getState();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(b.label || '');
-  const [dragging, setDragging] = useState(false);
+  const dragging = draggingId === b.id;
   const [dragOver, setDragOver] = useState(false);
 
   return (
@@ -149,42 +184,34 @@ function BookmarkRow({ b, rename, reorder }: any) {
       draggable
       onDragStart={(e) => {
         e.dataTransfer.effectAllowed = 'move';
-        setDragging(true);
+        e.dataTransfer.setData('text/plain', b.id);
+        setDraggingId(b.id);
       }}
       onDragEnter={(e) => {
         e.preventDefault();
-        if (!dragging) setDragOver(true);
+        if (draggingId !== b.id) setDragOver(true);
       }}
-      onDragLeave={() => setDragOver(false)}
+      onDragLeave={(e) => {
+        if (e.currentTarget === e.target) setDragOver(false);
+      }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
+        const sourceId = draggingId || e.dataTransfer.getData('text/plain');
+        if (sourceId && sourceId !== b.id) reorder(sourceId, b.id);
         setDragOver(false);
-        setDragging(false);
-        // id of dragged item is stored via dataTransfer OR fallback to global selection (here simplify: use label in data)
-        const draggedId = e.dataTransfer.getData('text/plain');
-        if (draggedId && draggedId !== b.id) reorder(draggedId, b.id);
+        setDraggingId(null);
       }}
-      onDragEnd={(e) => {
-        const draggedId = e.dataTransfer.getData('text/plain');
-        if (draggedId && draggedId !== b.id && !dragOver)
-          reorder(draggedId, null);
-        setDragging(false);
+      onDragEnd={() => {
         setDragOver(false);
-      }}
-      onMouseDown={(e) => {
-        const handler = (ds: Event) => {
-          const de = ds as DragEvent;
-          de.dataTransfer?.setData('text/plain', b.id);
-        };
-        e.currentTarget.addEventListener('dragstart', handler, { once: true });
+        setDraggingId(null);
       }}
       style={{
         background: dragOver
-          ? 'rgba(255,255,255,0.15)'
-          : 'rgba(255,255,255,0.06)',
-        padding: '6px 8px',
-        borderRadius: 6,
+          ? 'rgba(255,255,255,0.18)'
+          : 'rgba(255,255,255,0.08)',
+        padding: '8px 10px',
+        borderRadius: 8,
         display: 'flex',
         flexDirection: 'column',
         gap: 4,
@@ -193,7 +220,7 @@ function BookmarkRow({ b, rename, reorder }: any) {
           : '1px solid rgba(255,255,255,0.08)',
         opacity: dragging ? 0.5 : 1,
         cursor: 'grab',
-        fontSize: 13,
+        fontSize: 14,
       }}
     >
       <div
@@ -235,13 +262,25 @@ function BookmarkRow({ b, rename, reorder }: any) {
             <span
               onDoubleClick={() => setEditing(true)}
               onClick={() => focusOn(b.x, b.y, { scale: camera.scale })}
-              style={{ cursor: 'pointer', fontWeight: 500, color: '#eef2f5' }}
+              style={{
+                cursor: 'pointer',
+                fontWeight: 600,
+                color: '#f4f8fb',
+                letterSpacing: 0.3,
+              }}
               title={`Go to (${b.x},${b.y}) (double‑click to rename)`}
             >
               {b.label || `${b.x},${b.y}`}
             </span>
           )}
-          <span style={{ fontSize: 10, opacity: 0.55, color: '#b4bcc4' }}>
+          <span
+            style={{
+              fontSize: 12,
+              opacity: 0.75,
+              color: '#d0d8de',
+              fontFamily: 'monospace',
+            }}
+          >
             @ {b.x},{b.y}
           </span>
         </div>
@@ -261,7 +300,12 @@ function BookmarkRow({ b, rename, reorder }: any) {
             {b.pinned ? '★' : '☆'}
           </button>
           <button
-            style={{ ...miniBtn, color: '#ff9d9d' }}
+            style={{
+              ...miniBtn,
+              color: '#ffd3d3',
+              background: 'linear-gradient(#603030,#4b1f1f)',
+              border: '1px solid #7a4242',
+            }}
             title="Delete bookmark"
             onClick={() => {
               if (!confirm('Delete bookmark?')) return;

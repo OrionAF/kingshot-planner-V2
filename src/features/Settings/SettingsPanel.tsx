@@ -7,6 +7,7 @@ import { useMapStore } from '../../state/useMapStore';
 import { useBookmarkStore } from '../../state/useBookmarkStore';
 import { useUiStore } from '../../state/useUiStore';
 import { type PlanFile } from '../../types/map.types'; // <-- Import the shared type
+import { disableUnifiedPersistence } from '../../state/unifiedPersist';
 import styles from './SettingsPanel.module.css';
 
 export function SettingsPanel() {
@@ -14,52 +15,64 @@ export function SettingsPanel() {
   // Get a non-reactive reference to the importPlan action
   const { importPlan } = useMapStore.getState();
   const clearPlan = () => {
-    // Multi-step confirmations (triple)
-    if (
-      !window.confirm(
-        'Step 1: This will ERASE all alliances & buildings. Continue?',
-      )
-    )
-      return;
-    if (!window.confirm('Step 2: This cannot be undone. Proceed?')) return;
-    if (!window.confirm('Step 3: There is NO undo. Still proceed?')) return;
-    const final = prompt(
-      'FINAL STEP: Type CLEAR PLAN to confirm deletion:',
+    const summary = [
+      'CLEAR BUILD PLAN SUMMARY:',
       '',
-    );
-    if (final !== 'CLEAR PLAN') {
-      alert('Phrase mismatch. Aborted.');
-      return;
-    }
+      'This action will REMOVE:',
+      '  • Alliances',
+      '  • Players',
+      '  • User buildings (your placed structures)',
+      '',
+      'This action will KEEP:',
+      '  • Bookmarks',
+      '  • Camera position & zoom',
+      '  • UI panel state',
+      '  • Overwatch / navigation settings',
+      '  • Meta flags (patch notes, version)',
+      '',
+      'There is NO undo.',
+    ].join('\n');
+    if (!window.confirm(summary + '\n\nProceed?')) return;
+    const final = prompt('Type CLEAR PLAN to confirm:', '');
+    if (final !== 'CLEAR PLAN') return alert('Phrase mismatch. Aborted.');
     const mapStore = useMapStore.getState();
-    // Wipe relevant arrays
     mapStore.hydrateMap({ alliances: [], players: [], userBuildings: [] });
     alert('Build plan cleared.');
   };
 
   const clearStorage = () => {
-    // Quadruple confirmation for full localStorage purge
-    if (
-      !window.confirm(
-        'Step 1: This will clear ALL saved planner data in this browser. Continue?',
-      )
-    )
-      return;
-    if (
-      !window.confirm(
-        'Step 2: This also removes camera settings & bookmarks. Proceed?',
-      )
-    )
-      return;
-    if (!window.confirm('Step 3: There is NO undo. Still proceed?')) return;
-    const phrase = prompt('FINAL STEP: Type ERASE STORAGE to confirm:', '');
-    if (phrase !== 'ERASE STORAGE') {
-      alert('Phrase mismatch. Aborted.');
-      return;
-    }
+    const summary = [
+      'CLEAR BROWSER STORAGE SUMMARY:',
+      '',
+      'This action will REMOVE:',
+      '  • Bookmarks',
+      '  • Camera position & zoom (reset to defaults on reload)',
+      '  • UI open panel state',
+      '  • Overwatch / navigation settings',
+      '  • Meta flags (patch notes viewed status, version seen)',
+      '',
+      'This action will KEEP:',
+      '  • Alliances',
+      '  • Players',
+      '  • User buildings',
+      '',
+      'There is NO undo.',
+    ].join('\n');
+    if (!window.confirm(summary + '\n\nProceed?')) return;
+    const phrase = prompt('Type ERASE STORAGE to confirm:', '');
+    if (phrase !== 'ERASE STORAGE') return alert('Phrase mismatch. Aborted.');
     try {
+      disableUnifiedPersistence();
+      const mapState = useMapStore.getState();
+      const planSnapshot = {
+        alliances: mapState.alliances.map((a) => ({ ...a })),
+        players: mapState.players.map((p) => ({ ...p })),
+        userBuildings: mapState.userBuildings.map((b) => ({ ...b })),
+      };
+      useBookmarkStore.getState().clearAll();
       localStorage.clear();
-      alert('Local storage cleared. Reloading...');
+      useMapStore.getState().hydrateMap(planSnapshot);
+      alert('Browser storage cleared (build plan retained). Reloading...');
       window.location.reload();
     } catch (e) {
       console.error(e);
@@ -72,13 +85,11 @@ export function SettingsPanel() {
   const handleExport = () => {
     // We get the latest state directly here to ensure the export is always fresh
     const latestState = useMapStore.getState();
-    const bmState = useBookmarkStore.getState();
     const planData: PlanFile = {
       version: AppConfig.CURRENT_VERSION, // Use dynamic version
       alliances: latestState.alliances,
       players: latestState.players,
       userBuildings: latestState.userBuildings,
-      bookmarks: bmState.bookmarks,
     };
     const jsonString = JSON.stringify(planData, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
@@ -124,20 +135,7 @@ export function SettingsPanel() {
               userBuildings: data.userBuildings ?? [],
             };
             importPlan(planToImport);
-            if (Array.isArray(data.bookmarks)) {
-              // hydrate bookmarks slice (replace existing)
-              const bmStore = useBookmarkStore.getState();
-              bmStore.clearAll();
-              for (const bm of data.bookmarks) {
-                // preserve id/order if present
-                bmStore.addBookmark(bm.x, bm.y, bm.label || '');
-                const justAdded =
-                  bmStore.bookmarks[bmStore.bookmarks.length - 1];
-                justAdded.pinned = !!bm.pinned;
-                justAdded.order = bm.order;
-                justAdded.createdAt = bm.createdAt || Date.now();
-              }
-            }
+            // Ignore legacy bookmarks if present (backward compatibility)
             alert('Plan imported successfully!');
           }
         } else {

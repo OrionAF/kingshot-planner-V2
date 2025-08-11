@@ -124,11 +124,14 @@ export function loadUnifiedPersist(): void {
 }
 
 let saveQueued = false;
+let disabled = false; // allow temporary disable (e.g., during full storage purge)
 function scheduleSave() {
+  if (disabled) return; // skip if disabled
   if (saveQueued) return;
   saveQueued = true;
   queueMicrotask(() => {
     saveQueued = false;
+    if (disabled) return;
     if (typeof window === 'undefined') return;
     const cam = useCameraStore.getState();
     const ui = useUiStore.getState();
@@ -172,4 +175,9 @@ export function initUnifiedPersistence() {
     unsubOw();
     unsubMeta();
   };
+}
+
+// Allow other modules to temporarily disable unified persistence writes
+export function disableUnifiedPersistence() {
+  disabled = true;
 }

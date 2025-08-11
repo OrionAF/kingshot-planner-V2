@@ -59,5 +59,4 @@ export interface PlanFile {
   alliances: Alliance[];
   players: Player[];
   userBuildings: UserBuilding[];
-  bookmarks?: import('./infrastructure.types').Bookmark[]; // optional for backward compat
 }

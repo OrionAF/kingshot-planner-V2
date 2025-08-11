@@ -73,17 +73,19 @@ export const useBookmarkStore = create<BookmarkState & BookmarkActions>(
       }),
     reorder: (id, beforeId) =>
       set((s) => {
-        const list = [...s.bookmarks];
-        const idx = list.findIndex((b) => b.id === id);
-        if (idx === -1) return s;
-        const [item] = list.splice(idx, 1);
-        let insertIndex =
-          beforeId === null
-            ? list.length
-            : list.findIndex((b) => b.id === beforeId);
-        if (insertIndex === -1) insertIndex = list.length;
-        list.splice(insertIndex, 0, item);
-        // reassign contiguous order values
+        if (id === beforeId) return s;
+        const list = s.bookmarks.map((b) => ({ ...b })); // shallow clone
+        const fromIndex = list.findIndex((b) => b.id === id);
+        if (fromIndex === -1) return s;
+        const [moved] = list.splice(fromIndex, 1);
+        let toIndex: number;
+        if (beforeId === null) {
+          toIndex = list.length;
+        } else {
+          toIndex = list.findIndex((b) => b.id === beforeId);
+          if (toIndex === -1) toIndex = list.length;
+        }
+        list.splice(toIndex, 0, moved);
         list.forEach((b, i) => (b.order = i + 1));
         queueMicrotask(() =>
           globalEventBus.emit('bookmarks:changed', undefined),
