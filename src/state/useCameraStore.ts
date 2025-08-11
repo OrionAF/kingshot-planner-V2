@@ -101,13 +101,60 @@ function scheduleSave(state: CameraState) {
 
 export const useCameraStore = create<CameraState & CameraActions>()((set) => ({
   ...loadInitialCamera(),
+  // Helper: clamp camera so projected map bounding box roughly covers viewport (AABB approximation over diamond)
+  _clamp(next: CameraState) {
+    const N = AppConfig.N;
+    // Project corners (0,0) (N,0) (0,N) (N,N)
+    const corners: [number, number][] = [
+      worldToScreen(0, 0),
+      worldToScreen(N, 0),
+      worldToScreen(0, N),
+      worldToScreen(N, N),
+    ];
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
+    for (const [cx, cy] of corners) {
+      const sx = cx * next.scale + next.x;
+      const sy = cy * next.scale + next.y;
+      if (sx < minX) minX = sx;
+      if (sx > maxX) maxX = sx;
+      if (sy < minY) minY = sy;
+      if (sy > maxY) maxY = sy;
+    }
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 0;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
+    // If map smaller than viewport in a dimension, center it
+    if (maxX - minX < vw) {
+      const mid = (minX + maxX) / 2;
+      next.x += vw / 2 - mid;
+      minX = next.x + (minX - (next.x - (vw / 2 - mid))); // recompute not strictly needed
+      maxX = next.x + (maxX - (next.x - (vw / 2 - mid)));
+    } else {
+      if (minX > 0) next.x -= minX; // shift left
+      if (maxX < vw) next.x += vw - maxX; // shift right
+    }
+    if (maxY - minY < vh) {
+      const mid = (minY + maxY) / 2;
+      next.y += vh / 2 - mid;
+    } else {
+      if (minY > 0) next.y -= minY;
+      if (maxY < vh) next.y += vh - maxY;
+    }
+    return next;
+  },
 
   panBy: (dx, dy) =>
     set((state) => {
-      const next = { x: state.x + dx, y: state.y + dy };
-      const merged = { ...state, ...next };
-      scheduleSave(merged);
-      return merged;
+      const next = {
+        ...state,
+        x: state.x + dx,
+        y: state.y + dy,
+      } as CameraState;
+      const clamped = (useCameraStore.getState() as any)._clamp(next);
+      scheduleSave(clamped);
+      return clamped;
     }),
 
   zoomTo: (newCameraState) =>
@@ -116,25 +163,31 @@ export const useCameraStore = create<CameraState & CameraActions>()((set) => ({
         MIN_ZOOM,
         Math.min(newCameraState.scale ?? state.scale, MAX_ZOOM),
       );
-      const merged = { ...state, ...newCameraState, scale: clampedScale };
-      scheduleSave(merged);
-      return merged;
+      const next = {
+        ...state,
+        ...newCameraState,
+        scale: clampedScale,
+      } as CameraState;
+      const clamped = (useCameraStore.getState() as any)._clamp(next);
+      scheduleSave(clamped);
+      return clamped;
     }),
 
   panTo: (worldX, worldY) =>
     set((state) => {
       const [targetScreenX, targetScreenY] = worldToScreen(worldX, worldY);
       const next = {
+        ...state,
         x:
           (typeof window !== 'undefined' ? window.innerWidth : 0) / 2 -
           targetScreenX * state.scale,
         y:
           (typeof window !== 'undefined' ? window.innerHeight : 0) / 2 -
           targetScreenY * state.scale,
-      };
-      const merged = { ...state, ...next };
-      scheduleSave(merged);
-      return merged;
+      } as CameraState;
+      const clamped = (useCameraStore.getState() as any)._clamp(next);
+      scheduleSave(clamped);
+      return clamped;
     }),
   focusOn: (worldX, worldY, opts) => {
     if (opts?.scale != null) {

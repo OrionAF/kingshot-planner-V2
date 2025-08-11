@@ -138,8 +138,9 @@ export function BottomToolbar() {
           🎯
         </button>
         <button
-          className={`${styles.toolbarButton} ${styles.desktopOnly}`}
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'minimap' ? styles.active : ''}`}
           title="Toggle Minimap"
+          onClick={() => togglePanel('minimap')}
         >
           🗺️
         </button>
