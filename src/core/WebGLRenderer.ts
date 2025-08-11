@@ -1,6 +1,6 @@
 // src/core/WebGLRenderer.ts
 
-import { AppConfig } from '../config/appConfig';
+import { AppConfig, Config } from '../config/appConfig';
 import { useAssetStore } from '../state/useAssetStore';
 import { useCameraStore } from '../state/useCameraStore';
 import { useMapStore } from '../state/useMapStore';
@@ -197,8 +197,14 @@ export class WebGLRenderer {
       false,
       worldProjectionMatrix,
     );
-    gl.uniform1f(this.gridThicknessLocation, AppConfig.webgl.gridThickness);
-    gl.uniform1f(this.gridDarknessLocation, AppConfig.webgl.gridDarkness);
+    gl.uniform1f(
+      this.gridThicknessLocation,
+      Config.rendering.webgl.gridThickness,
+    );
+    gl.uniform1f(
+      this.gridDarknessLocation,
+      Config.rendering.webgl.gridDarkness,
+    );
     this.drawMapPlane();
     // Invoke external registered layers (e.g., overlays/dev) between base map and built-in passes
     layerManager.draw(time);
@@ -329,7 +335,7 @@ export class WebGLRenderer {
     if (isPlacingSomething) {
       let ghostStart = 0;
       if (perfEnabled) ghostStart = performance.now();
-      const flickerPeriod = AppConfig.interactions.GHOST_FLICKER_PERIOD_MS;
+      const flickerPeriod = Config.interaction.ghost.GHOST_FLICKER_PERIOD_MS;
       const tri = 1 - Math.abs(((time / flickerPeriod) % 2) - 1);
       const eased = 0.5 - 0.5 * Math.cos(tri * Math.PI);
       const minAlpha = 0.35;
@@ -495,7 +501,7 @@ export class WebGLRenderer {
     const transformedAnchorY = screenAnchorY * camera.scale + camera.y;
     // Hold sprite scale at imgScl until a threshold (default: AppConfig.baseScale),
     // then increase towards imgSclFar as we zoom out below that threshold.
-    const holdUntilScale = AppConfig.baseScale; // e.g., 100% zoom if percent = scale*20
+    const holdUntilScale = Config.interaction.baseScale; // e.g., 100% zoom if percent = scale*20
     const startScale = AppConfig.camera.minScale;
     const clampedScale = Math.max(
       startScale,
@@ -604,7 +610,7 @@ export class WebGLRenderer {
     );
     gl.enableVertexAttribArray(this.worldPosAttrLocation);
     gl.vertexAttribPointer(this.worldPosAttrLocation, 2, gl.FLOAT, false, 0, 0);
-    const [r, g, b] = parseColor(AppConfig.selectionColor);
+    const [r, g, b] = parseColor(Config.ui.colors.selection);
     gl.uniform3fv(this.objectColorLocation, [r, g, b]);
     gl.uniform1f(this.objectAlphaLocation, 1.0);
     gl.drawArrays(gl.LINES, 0, positions.length / 2);
@@ -860,15 +866,15 @@ export class WebGLRenderer {
     gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
     gl.uniform3fv(
       this.fertileColorLocation,
-      parseColor(AppConfig.biomeColors.fertile),
+      parseColor(Config.rendering.biomes.colors.fertile),
     );
     gl.uniform3fv(
       this.plainsColorLocation,
-      parseColor(AppConfig.biomeColors.plains),
+      parseColor(Config.rendering.biomes.colors.plains),
     );
     gl.uniform3fv(
       this.badlandsColorLocation,
-      parseColor(AppConfig.biomeColors.badlands),
+      parseColor(Config.rendering.biomes.colors.badlands),
     );
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
