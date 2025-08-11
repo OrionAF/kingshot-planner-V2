@@ -48,3 +48,20 @@
 .button:hover {
   background-color: #5f6368;
 }
+
+.dangerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.danger {
+  background-color: #642f2f;
+  border-color: #703a3a;
+  color: #ffbdbd;
+}
+.danger:hover {
+  background-color: #7a3434;
+  color: #ffe2e2;
+}

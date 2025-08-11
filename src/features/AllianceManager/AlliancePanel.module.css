@@ -38,6 +38,66 @@
   min-height: 0; /* allow flexbox to constrain height */
 }
 
+.allianceRow {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid #333;
+  border-radius: 3px;
+  padding: 0;
+  position: relative;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+.allianceRow:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: #555;
+}
+
+.actions {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.actionBtn {
+  background: transparent;
+  border: none;
+  color: #cfcfcf;
+  padding: 0 10px;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 100%;
+  border-left: 1px solid #333;
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+.actionBtn:first-child {
+  /* not used currently but safety */
+  border-left: 1px solid #333;
+}
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+.actionBtn.danger {
+  color: #ff7d7d;
+}
+.actionBtn.danger:hover {
+  background: rgba(255, 80, 80, 0.12);
+  color: #ff9d9d;
+  border-color: #664040;
+}
+
 .sectionTitle {
   margin: 0 0 6px 0;
   font-size: 12px;

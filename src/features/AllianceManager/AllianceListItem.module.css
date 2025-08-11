@@ -29,6 +29,20 @@
   color: #fff;
   font-weight: 600;
 }
+.embedded {
+  /* Strip own background/border so parent row supplies full-width background */
+  background: transparent;
+  border: none;
+  padding: 5px 8px 5px 12px; /* keep spacing */
+  border-radius: 0; /* parent row handles rounding */
+}
+.embedded:hover {
+  background: transparent; /* parent row hover handles */
+  border: none;
+}
+.embedded .colorBar {
+  border-radius: 0; /* parent row rounding */
+}
 .colorBar {
   position: absolute;
   left: 0;

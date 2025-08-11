@@ -19,7 +19,7 @@ export const useBookmarkStore = create<BookmarkState & BookmarkActions>(
     addBookmark: (x, y, label) =>
       set((s) => {
         const bm: Bookmark = {
-          id: 'bm_' + generateId(),
+          id: 'bm_' + generateId('bookmark'),
           x,
           y,
           label,

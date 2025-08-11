@@ -7,6 +7,9 @@ import styles from './AlliancePanel.module.css';
 
 export function AlliancePanel() {
   const alliances = useMapStore((state) => state.alliances);
+  const updateAlliance = useMapStore((s) => s.updateAlliance);
+  const deleteAlliance = useMapStore((s) => s.deleteAlliance);
+  const reassignAllianceColor = useMapStore((s) => s.reassignAllianceColor);
   const createAlliance = useMapStore((state) => state.createAlliance);
   const openPanel = useUiStore((state) => state.openPanel);
 
@@ -34,11 +37,60 @@ export function AlliancePanel() {
         <h4 className={styles.sectionTitle}>Alliances</h4>
         <div className={styles.allianceList}>
           {alliances.map((alliance) => (
-            <AllianceListItem
-              key={alliance.id}
-              alliance={alliance}
-              showTagRight={false}
-            />
+            <div key={alliance.id} className={styles.allianceRow}>
+              <AllianceListItem
+                alliance={alliance}
+                showTagRight={false}
+                embedded
+              />
+              <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={styles.actionBtn}
+                  title="Edit name/tag"
+                  onClick={() => {
+                    const newName = prompt('New name', alliance.name)?.trim();
+                    if (!newName || newName === alliance.name) return;
+                    const newTag = prompt('New tag', alliance.tag)?.trim();
+                    if (!newTag || newTag === alliance.tag) return;
+                    updateAlliance(alliance.id, { name: newName, tag: newTag });
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  className={styles.actionBtn}
+                  title="Reassign color"
+                  onClick={() => reassignAllianceColor(alliance.id)}
+                >
+                  Color
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${styles.danger}`}
+                  title="Delete alliance"
+                  onClick={() => {
+                    if (!confirm('Step 1: Delete alliance and its buildings?'))
+                      return;
+                    if (!confirm('Step 2: This cannot be undone. Proceed?'))
+                      return;
+                    const finalType = prompt(
+                      'FINAL STEP: Type the alliance TAG (exact) to confirm deletion:',
+                      '',
+                    )?.trim();
+                    if (finalType !== alliance.tag) {
+                      alert('Tag mismatch. Deletion cancelled.');
+                      return;
+                    }
+                    deleteAlliance(alliance.id);
+                    // Territory recalculation handled in store after deletion (ensure ordering of first-claim remains by insertion order of surviving buildings)
+                  }}
+                >
+                  Del
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -79,3 +131,4 @@ export function AlliancePanel() {
     </Panel>
   );
 }
+// (Removed inline miniBtnStyle; using CSS module classes instead.)

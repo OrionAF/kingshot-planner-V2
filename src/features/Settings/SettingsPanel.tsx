@@ -12,6 +12,59 @@ export function SettingsPanel() {
   const openPanel = useUiStore((state) => state.openPanel);
   // Get a non-reactive reference to the importPlan action
   const { importPlan } = useMapStore.getState();
+  const clearPlan = () => {
+    // Multi-step confirmations (triple)
+    if (
+      !window.confirm(
+        'Step 1: This will ERASE all alliances & buildings. Continue?',
+      )
+    )
+      return;
+    if (!window.confirm('Step 2: This cannot be undone. Proceed?')) return;
+    if (!window.confirm('Step 3: There is NO undo. Still proceed?')) return;
+    const final = prompt(
+      'FINAL STEP: Type CLEAR PLAN to confirm deletion:',
+      '',
+    );
+    if (final !== 'CLEAR PLAN') {
+      alert('Phrase mismatch. Aborted.');
+      return;
+    }
+    const mapStore = useMapStore.getState();
+    // Wipe relevant arrays
+    mapStore.hydrateMap({ alliances: [], players: [], userBuildings: [] });
+    alert('Build plan cleared.');
+  };
+
+  const clearStorage = () => {
+    // Quadruple confirmation for full localStorage purge
+    if (
+      !window.confirm(
+        'Step 1: This will clear ALL saved planner data in this browser. Continue?',
+      )
+    )
+      return;
+    if (
+      !window.confirm(
+        'Step 2: This also removes camera settings & bookmarks. Proceed?',
+      )
+    )
+      return;
+    if (!window.confirm('Step 3: There is NO undo. Still proceed?')) return;
+    const phrase = prompt('FINAL STEP: Type ERASE STORAGE to confirm:', '');
+    if (phrase !== 'ERASE STORAGE') {
+      alert('Phrase mismatch. Aborted.');
+      return;
+    }
+    try {
+      localStorage.clear();
+      alert('Local storage cleared. Reloading...');
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to clear storage (see console).');
+    }
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -98,6 +151,23 @@ export function SettingsPanel() {
         </button>
         <button className={styles.button} onClick={handleExport}>
           Export
+        </button>
+      </div>
+      <h4 className={styles.sectionTitle} style={{ marginTop: 18 }}>
+        Danger Zone
+      </h4>
+      <div className={styles.dangerGroup}>
+        <button
+          className={`${styles.button} ${styles.danger}`}
+          onClick={clearPlan}
+        >
+          Clear Build Plan
+        </button>
+        <button
+          className={`${styles.button} ${styles.danger}`}
+          onClick={clearStorage}
+        >
+          Clear Browser Storage
         </button>
       </div>
       <input

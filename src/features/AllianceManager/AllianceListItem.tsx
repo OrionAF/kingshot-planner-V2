@@ -6,6 +6,7 @@ interface Props {
   selected?: boolean;
   onSelect?: (id: number) => void;
   showTagRight?: boolean; // if true render tag on right side instead of merged prefix
+  embedded?: boolean; // when true, render without its own background/border (parent row supplies it)
 }
 
 export function AllianceListItem({
@@ -13,11 +14,14 @@ export function AllianceListItem({
   selected,
   onSelect,
   showTagRight,
+  embedded,
 }: Props) {
   return (
     <button
       type="button"
-      className={`${styles.itemButton} ${selected ? styles.selected : ''}`}
+      className={`${styles.itemButton} ${selected ? styles.selected : ''} ${
+        embedded ? styles.embedded : ''
+      }`}
       onClick={() => onSelect?.(alliance.id)}
       title={alliance.name}
     >

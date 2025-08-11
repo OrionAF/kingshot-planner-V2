@@ -13,7 +13,7 @@ import baseMapData from '../assets/baseMap.json';
 import { AppConfig, type BuildingDefinition } from '../config/appConfig';
 import { globalEventBus } from '../types/infrastructure.types';
 import type { PlacementResult } from '../types/infrastructure.types';
-import { generateId, seedIdCounter } from '../utils/idGenerator';
+import { generateId, seedIdCounters } from '../utils/idGenerator';
 
 // (Legacy slice persistence removed in favor of unified persistence scaffold)
 
@@ -130,6 +130,11 @@ interface MapState {
    * Map<allianceId, Record<BuildingType, count>>
    */
   buildingCounts: Map<number, Record<BuildingType, number>>;
+  /**
+   * Monotonically increasing version to bust placement validator memo cache when
+   * underlying spatial ownership data changes (alliances, buildings, territory recalcs).
+   */
+  validationEpoch: number;
 }
 
 interface MapActions {
@@ -274,6 +279,8 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
   claimedTerritory: new Map(),
   globallyClaimedTiles: new Map(),
   buildingCounts: new Map(),
+  // Incremented whenever territory / ownership data changes to invalidate placement validation cache
+  validationEpoch: 0,
   // Helper to get or init a counts record
   _initCountsRecord(allianceId: number) {
     const { buildingCounts } = get();
@@ -315,23 +322,24 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
         }
       }
     }
-    set({
+    set((prev) => ({
       claimedTerritory: newClaimedTerritory,
       globallyClaimedTiles: newGloballyClaimedTiles,
-    });
+      validationEpoch: prev.validationEpoch + 1,
+    }));
     globalEventBus.emit('territory:recalculated', undefined);
   },
   createAlliance: (newAllianceData) =>
     set((state) => {
-      // Basic uniqueness checks (case-insensitive)
-      const nameLower = newAllianceData.name.trim().toLowerCase();
-      const tagLower = newAllianceData.tag.trim().toLowerCase();
-      if (state.alliances.some((a) => a.name.toLowerCase() === nameLower)) {
-        console.warn('Alliance name already exists');
+      // Basic uniqueness checks (now case-sensitive)
+      const nameTrimmed = newAllianceData.name.trim();
+      const tagTrimmed = newAllianceData.tag.trim();
+      if (state.alliances.some((a) => a.name === nameTrimmed)) {
+        console.warn('Alliance name already exists (case-sensitive match)');
         return {} as any;
       }
-      if (state.alliances.some((a) => a.tag.toLowerCase() === tagLower)) {
-        console.warn('Alliance tag already exists');
+      if (state.alliances.some((a) => a.tag === tagTrimmed)) {
+        console.warn('Alliance tag already exists (case-sensitive match)');
         return {} as any;
       }
       // Color collision mitigation: ensure new alliance color is distinct from existing allies and biome palette
@@ -460,7 +468,7 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
       }
       const finalHex = rgb01ToHex(finalRgb);
       const newAlliance = {
-        id: generateId(),
+        id: generateId('alliance'),
         ...newAllianceData,
         color: finalHex,
       };
@@ -480,30 +488,38 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
         if (data.color !== undefined) next.color = data.color; // trust validated color upstream
         return next;
       });
-      // Re-run uniqueness validation (ignore self)
+      // Re-run uniqueness validation (case-sensitive, ignore self)
+      const original = state.alliances.find((a) => a.id === id);
+      const updated = alliances.find((a) => a.id === id);
+      let userBuildings = state.userBuildings;
       const seenNames = new Map<string, number>();
       const seenTags = new Map<string, number>();
       for (const a of alliances) {
-        const nl = a.name.toLowerCase();
-        const tl = a.tag.toLowerCase();
-        if (seenNames.has(nl) && seenNames.get(nl) !== a.id) {
+        const nameKey = a.name; // exact case
+        const tagKey = a.tag; // exact case
+        if (seenNames.has(nameKey) && seenNames.get(nameKey) !== a.id) {
           console.warn(
             'Duplicate alliance name after update; reverting change',
           );
           return {} as any;
         }
-        if (seenTags.has(tl) && seenTags.get(tl) !== a.id) {
+        if (seenTags.has(tagKey) && seenTags.get(tagKey) !== a.id) {
           console.warn('Duplicate alliance tag after update; reverting change');
           return {} as any;
         }
-        seenNames.set(nl, a.id);
-        seenTags.set(tl, a.id);
+        seenNames.set(nameKey, a.id);
+        seenTags.set(tagKey, a.id);
       }
       queueMicrotask(() => globalEventBus.emit('alliances:changed', undefined));
-      return { alliances };
+      if (original && updated && original.color !== updated.color) {
+        userBuildings = state.userBuildings.map((b) =>
+          b.allianceId === id ? { ...b, color: updated.color } : b,
+        );
+      }
+      return { alliances, userBuildings };
     }),
 
-  deleteAlliance: (id) =>
+  deleteAlliance: (id) => {
     set((state) => {
       if (!state.alliances.some((a) => a.id === id)) return {} as any;
       const alliances = state.alliances.filter((a) => a.id !== id);
@@ -520,10 +536,12 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
         }
         rec[b.type] = (rec[b.type] || 0) + 1;
       }
-      // Rebuild territory maps
       queueMicrotask(() => globalEventBus.emit('alliances:changed', undefined));
       return { alliances, userBuildings, buildingCounts };
-    }),
+    });
+    // Recalculate territory AFTER state update so removed alliance tiles are purged
+    get().recalculateTerritory();
+  },
 
   reassignAllianceColor: (id) =>
     set((state) => {
@@ -547,15 +565,19 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
           break;
         }
       }
+      // Update user building colors for this alliance
+      const userBuildings = state.userBuildings.map((b) =>
+        b.allianceId === id ? { ...b, color: target.color } : b,
+      );
       queueMicrotask(() => globalEventBus.emit('alliances:changed', undefined));
-      return { alliances: [...state.alliances] };
+      return { alliances: [...state.alliances], userBuildings };
     }),
 
   placePlayer: (data, x, y) =>
     set((state) => {
       const newPlayer: Player = {
         ...data,
-        id: generateId(),
+        id: generateId('player'),
         x,
         y,
         w: AppConfig.player.width,
@@ -590,7 +612,7 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
     }
 
     const newBuilding: UserBuilding = {
-      id: generateId(),
+      id: generateId('building'),
       type,
       x,
       y,
@@ -684,11 +706,16 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
       };
     });
     get().recalculateTerritory();
-    // Seed ID counter to avoid collisions after hydration
-    const { players, userBuildings } = get();
+    // Seed ID counters to avoid collisions after hydration
+    const { players, userBuildings, alliances } = get();
     const maxPlayerId = players.reduce((m, p) => Math.max(m, p.id), 0);
     const maxBuildingId = userBuildings.reduce((m, b) => Math.max(m, b.id), 0);
-    seedIdCounter(Math.max(maxPlayerId, maxBuildingId) + 1);
+    const maxAllianceId = alliances.reduce((m, a) => Math.max(m, a.id), 0);
+    seedIdCounters({
+      player: maxPlayerId + 1,
+      building: maxBuildingId + 1,
+      alliance: maxAllianceId + 1,
+    });
     globalEventBus.emit('alliances:changed', undefined);
   },
 
@@ -697,7 +724,8 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
     let lastKey: string | null = null;
     let lastResult: PlacementResult | null = null;
     return (x, y, type, allianceId = null) => {
-      const key = `${x}|${y}|${type}|${allianceId ?? -1}`;
+      const { validationEpoch } = get();
+      const key = `${validationEpoch}|${x}|${y}|${type}|${allianceId ?? -1}`;
       if (key === lastKey && lastResult) return lastResult;
 
       const {
