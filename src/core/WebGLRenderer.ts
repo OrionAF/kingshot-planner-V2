@@ -10,6 +10,7 @@ import { usePerfStore } from '../state/usePerfStore';
 import { useOverwatchStore } from '../state/useOverwatchStore';
 import type { Alliance, BaseBuilding } from '../types/map.types';
 import { layerManager } from './layers';
+import { getPlacementReasonColor } from '../constants/placementColors';
 import { screenToWorld, worldToScreen } from './coordinate-utils';
 import {
   mapFragmentShaderSource,
@@ -347,19 +348,9 @@ export class WebGLRenderer {
       let ghostBaseColor = '#ffffff';
       let ghostPosition = { x: 0, y: 0 };
       const failureCode = lastPlacementResult?.reasonCode;
-      const reasonColorMap: Record<string, string> = {
-        OUT_OF_BOUNDS: '#dc3545',
-        COLLIDES_BASE: '#dc3545',
-        COLLIDES_USER: '#dc3545',
-        COLLIDES_PLAYER: '#dc3545',
-        TERRITORY_REQUIRED: '#dc3545',
-        BIOME_MISMATCH: '#dc3545',
-        LIMIT_REACHED: '#dc3545',
-        TERRITORY_RULE_UNMET: '#dc3545',
-        FOREIGN_TERRITORY: '#dc3545',
-      };
-      const invalidColor =
-        (failureCode && reasonColorMap[failureCode]) || '#dc3545';
+      const invalidColor = failureCode
+        ? getPlacementReasonColor(failureCode)
+        : '#dc3545';
       const ghostColor = isValidPlacement ? undefined : invalidColor;
       if (isPlacingPlayer && playerToPlace) {
         w = AppConfig.player.width;

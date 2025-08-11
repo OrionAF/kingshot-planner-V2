@@ -34,6 +34,13 @@ export function BottomToolbar() {
         >
           🏰
         </button>
+        <button
+          className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'stats' ? styles.active : ''}`}
+          title="Alliance Stats"
+          onClick={() => togglePanel('stats')}
+        >
+          📊
+        </button>
 
         <button
           className={`${styles.toolbarButton} ${styles.desktopOnly} ${openPanel === 'build' ? styles.active : ''}`}

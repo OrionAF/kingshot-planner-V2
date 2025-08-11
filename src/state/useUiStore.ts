@@ -21,6 +21,7 @@ export type PanelId =
   | 'minimap'
   | 'settings'
   | 'management'
+  | 'stats'
   | 'tools'
   | null;
 

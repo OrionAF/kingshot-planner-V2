@@ -1,6 +1,7 @@
 // src/features/Map/MapOverlay.tsx
 
 import { AppConfig } from '../../config/appConfig';
+import { getPlacementReasonColor } from '../../constants/placementColors';
 import { useCameraStore } from '../../state/useCameraStore';
 import { useMapStore } from '../../state/useMapStore';
 import { useUiStore } from '../../state/useUiStore';
@@ -88,7 +89,15 @@ export function MapOverlay() {
             </button>
           </div>
           {!isValidPlacement && lastPlacementResult?.reasonCode && (
-            <div className={styles.placementFeedback}>
+            <div
+              className={styles.placementFeedback}
+              style={{
+                borderColor: getPlacementReasonColor(
+                  lastPlacementResult.reasonCode,
+                ),
+                color: getPlacementReasonColor(lastPlacementResult.reasonCode),
+              }}
+            >
               <strong>Blocked:</strong>{' '}
               {lastPlacementResult.message || lastPlacementResult.reasonCode}
             </div>

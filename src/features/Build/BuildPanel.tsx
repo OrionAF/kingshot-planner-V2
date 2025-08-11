@@ -78,7 +78,9 @@ export function BuildPanel() {
             const currentCount =
               buildingCounts[`${activeAllianceId}-${type}`] || 0;
             const limit = def.limit ?? Infinity;
-            const isAtLimit = currentCount >= limit;
+            const remaining =
+              limit === Infinity ? Infinity : Math.max(0, limit - currentCount);
+            const isAtLimit = remaining === 0;
             const isDisabled = !activeAllianceId || isAtLimit;
             let title = '';
             if (!activeAllianceId) title = 'Please select an alliance first.';
@@ -96,7 +98,9 @@ export function BuildPanel() {
               >
                 <span>{def.name}</span>
                 <span style={{ fontSize: '11px', opacity: 0.7 }}>
-                  ({currentCount} / {limit === Infinity ? '∞' : limit})
+                  {limit === Infinity
+                    ? `${currentCount}`
+                    : `${currentCount}/${limit} (${remaining} left)`}
                 </span>
               </button>
             );

@@ -134,6 +134,9 @@ interface MapState {
 
 interface MapActions {
   createAlliance: (newAllianceData: Omit<Alliance, 'id'>) => void;
+  updateAlliance: (id: number, data: Partial<Omit<Alliance, 'id'>>) => void;
+  deleteAlliance: (id: number) => void;
+  reassignAllianceColor: (id: number) => void;
   placePlayer: (data: OmitIdAndCoords, x: number, y: number) => void;
   updatePlayer: (id: number, updatedData: Partial<OmitIdAndCoords>) => void;
   deletePlayer: (id: number) => void;
@@ -320,6 +323,17 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
   },
   createAlliance: (newAllianceData) =>
     set((state) => {
+      // Basic uniqueness checks (case-insensitive)
+      const nameLower = newAllianceData.name.trim().toLowerCase();
+      const tagLower = newAllianceData.tag.trim().toLowerCase();
+      if (state.alliances.some((a) => a.name.toLowerCase() === nameLower)) {
+        console.warn('Alliance name already exists');
+        return {} as any;
+      }
+      if (state.alliances.some((a) => a.tag.toLowerCase() === tagLower)) {
+        console.warn('Alliance tag already exists');
+        return {} as any;
+      }
       // Color collision mitigation: ensure new alliance color is distinct from existing allies and biome palette
       const biomeColors = Object.values(AppConfig.biomeColors).map((c) =>
         parseColorToRgb01(c),
@@ -456,6 +470,87 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
       return updated;
     }),
 
+  updateAlliance: (id, data) =>
+    set((state) => {
+      const alliances = state.alliances.map((a) => {
+        if (a.id !== id) return a;
+        const next = { ...a };
+        if (data.name !== undefined) next.name = data.name;
+        if (data.tag !== undefined) next.tag = data.tag;
+        if (data.color !== undefined) next.color = data.color; // trust validated color upstream
+        return next;
+      });
+      // Re-run uniqueness validation (ignore self)
+      const seenNames = new Map<string, number>();
+      const seenTags = new Map<string, number>();
+      for (const a of alliances) {
+        const nl = a.name.toLowerCase();
+        const tl = a.tag.toLowerCase();
+        if (seenNames.has(nl) && seenNames.get(nl) !== a.id) {
+          console.warn(
+            'Duplicate alliance name after update; reverting change',
+          );
+          return {} as any;
+        }
+        if (seenTags.has(tl) && seenTags.get(tl) !== a.id) {
+          console.warn('Duplicate alliance tag after update; reverting change');
+          return {} as any;
+        }
+        seenNames.set(nl, a.id);
+        seenTags.set(tl, a.id);
+      }
+      queueMicrotask(() => globalEventBus.emit('alliances:changed', undefined));
+      return { alliances };
+    }),
+
+  deleteAlliance: (id) =>
+    set((state) => {
+      if (!state.alliances.some((a) => a.id === id)) return {} as any;
+      const alliances = state.alliances.filter((a) => a.id !== id);
+      // Remove buildings & players belonging to alliance
+      const userBuildings = state.userBuildings.filter(
+        (b) => b.allianceId !== id,
+      );
+      const buildingCounts = new Map<number, Record<BuildingType, number>>();
+      for (const b of userBuildings) {
+        let rec = buildingCounts.get(b.allianceId);
+        if (!rec) {
+          rec = {} as Record<BuildingType, number>;
+          buildingCounts.set(b.allianceId, rec);
+        }
+        rec[b.type] = (rec[b.type] || 0) + 1;
+      }
+      // Rebuild territory maps
+      queueMicrotask(() => globalEventBus.emit('alliances:changed', undefined));
+      return { alliances, userBuildings, buildingCounts };
+    }),
+
+  reassignAllianceColor: (id) =>
+    set((state) => {
+      const target = state.alliances.find((a) => a.id === id);
+      if (!target) return {} as any;
+      const used = new Set(
+        state.alliances
+          .filter((a) => a.id !== id)
+          .map((a) => normalizeHex(a.color)),
+      );
+      const palette = AppConfig.ALLIANCE_COLOR_PALETTE;
+      const currentIndex = palette.findIndex(
+        (p) => normalizeHex(p) === normalizeHex(target.color),
+      );
+      // Cycle to next unused palette color
+      for (let i = 1; i <= palette.length; i++) {
+        const idx = (currentIndex + i) % palette.length;
+        const cand = palette[idx];
+        if (!used.has(normalizeHex(cand))) {
+          target.color = cand;
+          break;
+        }
+      }
+      queueMicrotask(() => globalEventBus.emit('alliances:changed', undefined));
+      return { alliances: [...state.alliances] };
+    }),
+
   placePlayer: (data, x, y) =>
     set((state) => {
       const newPlayer: Player = {
@@ -484,6 +579,15 @@ export const useMapStore = create<MapState & MapActions>()((set, get) => ({
     const definition = AppConfig.BUILDING_CATALOG[type];
     const alliance = get().alliances.find((a) => a.id === allianceId);
     if (!definition || !alliance) return;
+    // Enforce limit proactively (def.limit) if set
+    if (typeof definition.limit === 'number') {
+      const { buildingCounts } = get();
+      const current = buildingCounts.get(allianceId)?.[type] || 0;
+      if (current >= definition.limit) {
+        console.warn('Building limit reached; placement aborted');
+        return;
+      }
+    }
 
     const newBuilding: UserBuilding = {
       id: generateId(),

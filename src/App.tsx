@@ -5,6 +5,7 @@ import { BottomToolbar } from './features/Toolbar/BottomToolbar';
 import { MapCanvas } from './features/Map/MapCanvas';
 import { MapOverlay } from './features/Map/MapOverlay';
 import { AlliancePanel } from './features/AllianceManager/AlliancePanel';
+import { StatsPanel } from './features/AllianceManager/StatsPanel';
 import { NavPanel } from './features/Navigation/NavPanel';
 import { ManagementPanel } from './features/GroupedPanels/ManagementPanel';
 import { ToolsPanel } from './features/GroupedPanels/ToolsPanel';
@@ -94,6 +95,7 @@ function App() {
       <MapOverlay />
       {/* --- ALL UI PANELS --- */}
       <AlliancePanel />
+      <StatsPanel />
       <NavPanel />
       <SettingsPanel />
       <PlayerPanel />
