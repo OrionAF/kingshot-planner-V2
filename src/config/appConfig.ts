@@ -87,8 +87,8 @@ export const AppConfig = {
       category: 'hq',
       tags: ['biome:plains'],
     },
-    pitfall: {
-      name: 'Pitfall Trap',
+    bear_trap: {
+      name: 'Bear Trap',
       w: 3,
       h: 3,
       coverage: 0,
@@ -199,47 +199,56 @@ export const AppConfig = {
   },
   // Curated distinct alliance color palette (used for auto-assignment / fallback)
   ALLIANCE_COLOR_PALETTE: [
-    '#e6194b', // vivid red
-    '#3cb44b', // bright green
-    '#0082c8', // bright blue
-    '#f58231', // vivid orange
-    '#911eb4', // vivid purple
-    '#46f0f0', // cyan
-    '#f032e6', // magenta
-    '#d2f53c', // bright lime
-    '#fabebe', // light pink
-    '#aa6e28', // brown
-    '#800000', // maroon
-    '#000080', // navy
-    '#ff7f50', // coral
-    '#ff4500', // orange-red
-    '#ff1493', // deep pink
-    '#ff69b4', // hot pink
-    '#ba55d3', // medium orchid
-    '#4b0082', // indigo
-    '#6a5acd', // slate blue
-    '#4169e1', // royal blue
-    '#1e90ff', // dodger blue
-    '#00bfff', // deep sky blue
-    '#00ced1', // dark turquoise
-    '#20b2aa', // light sea green
-    '#40e0d0', // turquoise
-    '#00ff7f', // spring green
-    '#7fff00', // chartreuse
-    '#adff2f', // green yellow
-    '#ffd700', // gold
-    '#ff8c00', // dark orange
-    '#ff6347', // tomato
-    '#dc143c', // crimson
-    '#b22222', // firebrick
-    '#8b0000', // dark red
-    '#9932cc', // dark orchid
-    '#8a2be2', // blue violet
-    '#9370db', // medium purple
-    '#ff00ff', // fuchsia
-    '#ffb6c1', // light pink
-    '#ffdab9', // peach puff
-    '#f0e68c', // khaki
+    '#d6685c',
+    '#f25d0d',
+    '#d6be5c',
+    '#91d926',
+    '#1fad8a',
+    '#19a8e6',
+    '#a675f0',
+    '#9129a3',
+    '#e08e85',
+    '#d6875c',
+    '#c2a60a',
+    '#87d65c',
+    '#2972a3',
+    '#5a29a3',
+    '#c45cd6',
+    '#f20d46',
+    '#c2540a',
+    '#c4d65c',
+    '#3bf20d',
+    '#2688d9',
+    '#d385e0',
+    '#e0b285',
+    '#97b814',
+    '#14b856',
+    '#295aa3',
+    '#f066ff',
+    '#a37829',
+    '#29a360',
+    '#85a5e0',
+    '#c20ac2',
+    '#0df280',
+    '#0a38c2',
+    '#f20dc4',
+    '#26d991',
+    '#0d46f2',
+    '#b81497',
+    '#52e0b6',
+    '#8589e0',
+    '#ff66d9',
+    '#1919e6',
+    '#f20da2',
+    '#8566ff',
+    '#a32978',
+    '#d65cab',
+    '#e085b7',
+    '#cc0070',
+    '#ff0073',
+    '#a32954',
+    '#d65c87',
+    '#c20a4a',
   ],
   allianceColorConstraints: {
     minColorDistance: 0.28, // Euclidean RGB distance (0-1) required vs existing & biomes

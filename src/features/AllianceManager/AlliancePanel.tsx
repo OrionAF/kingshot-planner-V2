@@ -26,19 +26,21 @@ export function AlliancePanel() {
   };
 
   const isOpen = openPanel === 'alliance';
-  const panelClassName = `${styles.sidebarPanel} ${isOpen ? styles.open : ''}`;
+  const panelClassName = `${styles.AllianceSidebarPanel} ${isOpen ? styles.open : ''}`;
 
   return (
     <Panel className={panelClassName}>
       <div className={styles.allianceListContainer}>
         <h4 className={styles.sectionTitle}>Alliances</h4>
-        {alliances.map((alliance) => (
-          <AllianceListItem
-            key={alliance.id}
-            alliance={alliance}
-            showTagRight
-          />
-        ))}
+        <div className={styles.allianceList}>
+          {alliances.map((alliance) => (
+            <AllianceListItem
+              key={alliance.id}
+              alliance={alliance}
+              showTagRight={false}
+            />
+          ))}
+        </div>
       </div>
 
       <div className={styles.createAllianceContainer}>

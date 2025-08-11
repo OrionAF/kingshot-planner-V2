@@ -13,6 +13,7 @@ import {
 import baseMapData from '../assets/baseMap.json';
 import { AppConfig, type BuildingDefinition } from '../config/appConfig';
 import { globalEventBus } from '../types/infrastructure.types';
+import type { PlacementResult } from '../types/infrastructure.types';
 import { generateId, seedIdCounter } from '../utils/idGenerator';
 
 import { PERSIST_VERSION, migratePersisted } from './persistence';
@@ -566,134 +567,169 @@ export const useMapStore = create<MapState & MapActions>()(
         globalEventBus.emit('alliances:changed', undefined);
       },
 
-      checkPlacementValidity: (x, y, type, allianceId = null) => {
-        const {
-          buildingMap,
-          players,
-          userBuildings,
-          claimedTerritory,
-          globallyClaimedTiles,
-        } = get();
-        const N = AppConfig.N;
-        let w = 0,
-          h = 0,
-          rule: BuildingDefinition['rule'] = 'any';
-        let def: BuildingDefinition | null = null;
-        if (type === 'player') {
-          w = AppConfig.player.width;
-          h = AppConfig.player.height;
-        } else {
-          def = AppConfig.BUILDING_CATALOG[type];
-          w = def.w;
-          h = def.h;
-          rule = def.rule;
-        }
-        const biome = getBiomeForTile(x, y);
-        if (
-          (rule === 'fertile' && biome !== 'fertile') ||
-          (rule === 'plains' && biome !== 'plains') ||
-          (rule === 'badlands' && biome !== 'badlands')
-        ) {
-          return {
-            valid: false,
-            reasonCode: 'BIOME_MISMATCH',
-            message: `Requires ${rule} biome.`,
-          };
-        }
-        const allianceTiles =
-          claimedTerritory.get(allianceId ?? -1) ?? new Set();
-        // Foreign territory check
-        if (allianceId != null && type !== 'player') {
-          for (let i = 0; i < w; i++) {
-            for (let j = 0; j < h; j++) {
-              const owner = globallyClaimedTiles.get(`${x + i},${y + j}`);
-              if (owner != null && owner !== allianceId) {
-                return {
+      checkPlacementValidity: (() => {
+        // Simple last-call memo to avoid recomputing when mouse stops briefly
+        let lastKey: string | null = null;
+        let lastResult: PlacementResult | null = null;
+        return (x, y, type, allianceId = null) => {
+          const key = `${x}|${y}|${type}|${allianceId ?? -1}`;
+          if (key === lastKey && lastResult) return lastResult;
+
+          const {
+            buildingMap,
+            players,
+            userBuildings,
+            claimedTerritory,
+            globallyClaimedTiles,
+          } = get();
+          const N = AppConfig.N;
+          let w = 0,
+            h = 0,
+            rule: BuildingDefinition['rule'] = 'any';
+          let def: BuildingDefinition | null = null;
+          if (type === 'player') {
+            w = AppConfig.player.width;
+            h = AppConfig.player.height;
+          } else {
+            def = AppConfig.BUILDING_CATALOG[type];
+            w = def.w;
+            h = def.h;
+            rule = def.rule;
+          }
+
+          // Fast rectangle bounds check (instead of per-tile)
+          if (x < 0 || y < 0 || x + w > N || y + h > N) {
+            lastKey = key;
+            lastResult = {
+              valid: false,
+              reasonCode: 'OUT_OF_BOUNDS',
+              message: 'Outside map bounds.',
+            };
+            return lastResult;
+          }
+
+          const biome = getBiomeForTile(x, y);
+          if (
+            (rule === 'fertile' && biome !== 'fertile') ||
+            (rule === 'plains' && biome !== 'plains') ||
+            (rule === 'badlands' && biome !== 'badlands')
+          ) {
+            lastKey = key;
+            lastResult = {
+              valid: false,
+              reasonCode: 'BIOME_MISMATCH',
+              message: `Requires ${rule} biome.`,
+            };
+            return lastResult;
+          }
+
+          const allianceTiles =
+            claimedTerritory.get(allianceId ?? -1) ?? new Set<string>();
+
+          // Bounding-box collision with user buildings (O(B))
+          for (const b of userBuildings) {
+            if (x < b.x + b.w && x + w > b.x && y < b.y + b.h && y + h > b.y) {
+              lastKey = key;
+              lastResult = {
+                valid: false,
+                reasonCode: 'COLLIDES_USER',
+                message: 'Overlaps your existing building.',
+              };
+              return lastResult;
+            }
+          }
+
+          // Bounding-box collision with players (O(P))
+          for (const p of players) {
+            if (x < p.x + p.w && x + w > p.x && y < p.y + p.h && y + h > p.y) {
+              lastKey = key;
+              lastResult = {
+                valid: false,
+                reasonCode: 'COLLIDES_PLAYER',
+                message: 'Overlaps a player.',
+              };
+              return lastResult;
+            }
+          }
+
+          // Single tile pass for base-map collision + territory related checks
+          const needsClaimCheck = rule === 'claimed';
+          const checkForeign = allianceId != null && type !== 'player';
+          for (let dy = 0; dy < h; dy++) {
+            const rowY = y + dy;
+            for (let dx = 0; dx < w; dx++) {
+              const colX = x + dx;
+              const coordStr = `${colX},${rowY}`;
+              if (buildingMap.has(coordStr)) {
+                lastKey = key;
+                lastResult = {
                   valid: false,
-                  reasonCode: 'FOREIGN_TERRITORY',
-                  message: "Tile is within another alliance's territory.",
+                  reasonCode: 'COLLIDES_BASE',
+                  message: 'Overlaps base map structure.',
                 };
+                return lastResult;
+              }
+              if (checkForeign) {
+                const owner = globallyClaimedTiles.get(coordStr);
+                if (owner != null && owner !== allianceId) {
+                  lastKey = key;
+                  lastResult = {
+                    valid: false,
+                    reasonCode: 'FOREIGN_TERRITORY',
+                    message: "Tile is within another alliance's territory.",
+                  };
+                  return lastResult;
+                }
+              }
+              if (needsClaimCheck && !allianceTiles.has(coordStr)) {
+                lastKey = key;
+                lastResult = {
+                  valid: false,
+                  reasonCode: 'TERRITORY_REQUIRED',
+                  message: 'Tile not within claimed territory.',
+                };
+                return lastResult;
               }
             }
           }
-        }
-        for (let i = 0; i < w; i++) {
-          for (let j = 0; j < h; j++) {
-            const checkX = x + i;
-            const checkY = y + j;
-            const coordStr = `${checkX},${checkY}`;
-            if (checkX < 0 || checkX >= N || checkY < 0 || checkY >= N)
-              return {
+
+          if (rule === 'territory' && def) {
+            const ok = isTerritoryRuleMet(x, y, def, allianceTiles);
+            if (!ok) {
+              lastKey = key;
+              lastResult = {
                 valid: false,
-                reasonCode: 'OUT_OF_BOUNDS',
-                message: 'Outside map bounds.',
+                reasonCode: 'TERRITORY_RULE_UNMET',
+                message:
+                  'Must border or be within coverage of alliance territory.',
               };
-            if (buildingMap.has(coordStr))
-              return {
-                valid: false,
-                reasonCode: 'COLLIDES_BASE',
-                message: 'Overlaps base map structure.',
-              };
-            for (const b of userBuildings) {
-              if (
-                checkX >= b.x &&
-                checkX < b.x + b.w &&
-                checkY >= b.y &&
-                checkY < b.y + b.h
-              )
-                return {
-                  valid: false,
-                  reasonCode: 'COLLIDES_USER',
-                  message: 'Overlaps your existing building.',
-                };
-            }
-            for (const p of players) {
-              if (
-                checkX >= p.x &&
-                checkX < p.x + p.w &&
-                checkY >= p.y &&
-                checkY < p.y + p.h
-              )
-                return {
-                  valid: false,
-                  reasonCode: 'COLLIDES_PLAYER',
-                  message: 'Overlaps a player.',
-                };
-            }
-            if (rule === 'claimed' && !allianceTiles.has(coordStr)) {
-              return {
-                valid: false,
-                reasonCode: 'TERRITORY_REQUIRED',
-                message: 'Tile not within claimed territory.',
-              };
+              return lastResult;
             }
           }
-        }
-        if (rule === 'territory' && def) {
-          const ok = isTerritoryRuleMet(x, y, def, allianceTiles);
-          if (!ok)
-            return {
-              valid: false,
-              reasonCode: 'TERRITORY_RULE_UNMET',
-              message:
-                'Must border or be within coverage of alliance territory.',
-            };
-        }
-        if (def && allianceId != null && typeof def.limit === 'number') {
-          const { buildingCounts } = get();
-          const currentCount =
-            buildingCounts.get(allianceId)?.[type as BuildingType] || 0;
-          const remaining = (def.limit ?? Infinity) - currentCount;
-          if (remaining <= 0)
-            return {
-              valid: false,
-              reasonCode: 'LIMIT_REACHED',
-              message: `Limit (${def.limit}) reached for ${def.name}.`,
-            };
-          return { valid: true, message: `${remaining} remaining` };
-        }
-        return { valid: true };
-      },
+
+          if (def && allianceId != null && typeof def.limit === 'number') {
+            const { buildingCounts } = get();
+            const currentCount =
+              buildingCounts.get(allianceId)?.[type as BuildingType] || 0;
+            const remaining = (def.limit ?? Infinity) - currentCount;
+            if (remaining <= 0) {
+              lastKey = key;
+              lastResult = {
+                valid: false,
+                reasonCode: 'LIMIT_REACHED',
+                message: `Limit (${def.limit}) reached for ${def.name}.`,
+              };
+              return lastResult;
+            }
+            lastKey = key;
+            lastResult = { valid: true, message: `${remaining} remaining` };
+            return lastResult;
+          }
+          lastKey = key;
+          lastResult = { valid: true };
+          return lastResult;
+        };
+      })(),
     }),
     {
       name: 'kingshot-plan-storage',

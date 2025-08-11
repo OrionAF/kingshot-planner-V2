@@ -43,28 +43,29 @@ export function BuildPanel() {
 
   return (
     <Panel className={panelClassName}>
-      {/* --- Alliance Selection Section --- */}
-      <div className={styles.section}>
-        <h4 className={styles.sectionTitle}>1. Select an Alliance</h4>
-        <div className={styles.allianceList}>
-          {alliances.length > 0 ? (
-            alliances.map((alliance) => (
-              <AllianceListItem
-                key={alliance.id}
-                alliance={alliance}
-                selected={activeAllianceId === alliance.id}
-                onSelect={(id) => setActiveAllianceId(id)}
-                showTagRight
-              />
-            ))
-          ) : (
-            <div className={styles.placeholder}>Create an alliance first.</div>
-          )}
+      <div className={styles.scrollRegion}>
+        <div className={styles.section}>
+          <h4 className={styles.sectionTitle}>1. Select an Alliance</h4>
+          <div className={styles.allianceList}>
+            {alliances.length > 0 ? (
+              alliances.map((alliance) => (
+                <AllianceListItem
+                  key={alliance.id}
+                  alliance={alliance}
+                  selected={activeAllianceId === alliance.id}
+                  onSelect={(id) => setActiveAllianceId(id)}
+                  showTagRight={false}
+                />
+              ))
+            ) : (
+              <div className={styles.placeholder}>
+                Create an alliance first.
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* --- Building Selection Section --- */}
-      <div className={styles.section}>
+      <div className={styles.fixedBottom}>
         <h4
           className={styles.sectionTitle}
           style={{ opacity: activeAllianceId ? 1 : 0.5 }}
@@ -77,19 +78,12 @@ export function BuildPanel() {
             const currentCount =
               buildingCounts[`${activeAllianceId}-${type}`] || 0;
             const limit = def.limit ?? Infinity;
-
-            // This is the key logic fix. The button is disabled if no alliance is
-            // selected OR if the building limit has been reached.
             const isAtLimit = currentCount >= limit;
             const isDisabled = !activeAllianceId || isAtLimit;
-
             let title = '';
-            if (!activeAllianceId) {
-              title = 'Please select an alliance first.';
-            } else if (isAtLimit) {
+            if (!activeAllianceId) title = 'Please select an alliance first.';
+            else if (isAtLimit)
               title = `Limit of ${limit} reached for this alliance.`;
-            }
-
             return (
               <button
                 key={type}

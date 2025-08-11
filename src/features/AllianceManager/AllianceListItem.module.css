@@ -34,7 +34,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 4px;
   border-radius: 3px 0 0 3px;
 }
 .name {
@@ -46,10 +46,11 @@
 .tag {
   background: #555;
   border-radius: 2px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   padding: 2px 4px 1px 4px;
   letter-spacing: 0.5px;
-  min-width: 34px;
+  min-width: 35.5px;
   text-align: center;
+  line-height: 1.1;
 }

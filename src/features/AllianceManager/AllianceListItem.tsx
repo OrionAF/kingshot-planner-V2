@@ -25,9 +25,9 @@ export function AllianceListItem({
         className={styles.colorBar}
         style={{ background: alliance.color }}
       />
-      <span className={styles.name}>
-        {showTagRight ? alliance.name : `[${alliance.tag}] ${alliance.name}`}
-      </span>
+      {/* Tag on left when showTagRight is false */}
+      {!showTagRight && <span className={styles.tag}>{alliance.tag}</span>}
+      <span className={styles.name}>{alliance.name}</span>
       {showTagRight && <span className={styles.tag}>{alliance.tag}</span>}
     </button>
   );

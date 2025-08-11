@@ -40,6 +40,33 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
   let lastPanPos = { x: 0, y: 0 };
   let clickStartPos = { x: 0, y: 0 };
   let lastPinchDist = 0;
+  // rAF coalescing for placement validation
+  let pendingValidation = false;
+  let queuedPlacement: {
+    x: number;
+    y: number;
+    type: string;
+    allianceId: number | null | undefined;
+  } | null = null;
+
+  function requestPlacementValidation() {
+    if (pendingValidation || !queuedPlacement) return;
+    pendingValidation = true;
+    requestAnimationFrame(() => {
+      const payload = queuedPlacement; // snapshot
+      pendingValidation = false;
+      if (!payload) return;
+      const { setPlacementValidity } = useUiStore.getState();
+      const { checkPlacementValidity } = useMapStore.getState();
+      const res = checkPlacementValidity(
+        payload.x,
+        payload.y,
+        payload.type as any,
+        payload.allianceId ?? null,
+      );
+      setPlacementValidity(res);
+    });
+  }
 
   const handleMouseDown = (e: MouseEvent) => {
     if (e.button !== 0) return;
@@ -54,12 +81,8 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
 
   const handleMouseMove = (e: MouseEvent) => {
     const camera = useCameraStore.getState();
-    const {
-      isPlacingPlayer,
-      buildMode,
-      setMouseWorldPosition,
-      setPlacementValidity,
-    } = useUiStore.getState();
+    const { isPlacingPlayer, buildMode, setMouseWorldPosition } =
+      useUiStore.getState();
 
     if (isPlacingPlayer || buildMode.selectedBuildingType) {
       canvas.style.cursor = 'crosshair';
@@ -75,21 +98,42 @@ export function createInputHandlers(canvas: HTMLCanvasElement) {
     setMouseWorldPosition({ x: roundedX, y: roundedY });
 
     if (isPlacingPlayer || buildMode.selectedBuildingType) {
-      const { checkPlacementValidity } = useMapStore.getState();
       const type = isPlacingPlayer ? 'player' : buildMode.selectedBuildingType!;
-      const placementResult = checkPlacementValidity(
-        roundedX,
-        roundedY,
+      queuedPlacement = {
+        x: roundedX,
+        y: roundedY,
         type,
-        buildMode.activeAllianceId,
-      );
-      setPlacementValidity(placementResult);
+        allianceId: buildMode.activeAllianceId,
+      };
+      requestPlacementValidation();
     }
 
     if (!isPointerDown) return;
-    panBy(e.clientX - lastPanPos.x, e.clientY - lastPanPos.y);
+    // rAF-coalesced panning to reduce state churn
+    const dx = e.clientX - lastPanPos.x;
+    const dy = e.clientY - lastPanPos.y;
     lastPanPos = { x: e.clientX, y: e.clientY };
+    queuePan(dx, dy);
   };
+
+  // ---- rAF Panning Coalescer ----
+  let panQueued = false;
+  let accumDX = 0;
+  let accumDY = 0;
+  function queuePan(dx: number, dy: number) {
+    accumDX += dx;
+    accumDY += dy;
+    if (panQueued) return;
+    panQueued = true;
+    requestAnimationFrame(() => {
+      panQueued = false;
+      if (accumDX !== 0 || accumDY !== 0) {
+        panBy(accumDX, accumDY);
+        accumDX = 0;
+        accumDY = 0;
+      }
+    });
+  }
 
   const handleMouseUp = (e: MouseEvent) => {
     if (e.button !== 0) return;

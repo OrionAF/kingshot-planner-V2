@@ -6,6 +6,7 @@ import { useCameraStore } from '../state/useCameraStore';
 import { useMapStore } from '../state/useMapStore';
 import { useSelectionStore } from '../state/useSelectionStore';
 import { useUiStore } from '../state/useUiStore';
+import { usePerfStore } from '../state/usePerfStore';
 import type { Alliance, BaseBuilding } from '../types/map.types';
 import { screenToWorld, worldToScreen } from './coordinate-utils';
 import {
@@ -151,6 +152,14 @@ export class WebGLRenderer {
 
   public renderFrame(time = 0) {
     const gl = this.gl;
+    const perfState = usePerfStore.getState();
+    const perfEnabled = perfState.enabled;
+    let frameStart = 0;
+    if (perfEnabled) frameStart = performance.now();
+    let msTerritory = 0;
+    let msObjects = 0;
+    let msSprites = 0;
+    let msGhost = 0;
     const camera = useCameraStore.getState();
     const { images } = useAssetStore.getState();
     const {
@@ -188,12 +197,23 @@ export class WebGLRenderer {
     gl.uniform1f(this.gridThicknessLocation, AppConfig.webgl.gridThickness);
     gl.uniform1f(this.gridDarknessLocation, AppConfig.webgl.gridDarkness);
     this.drawMapPlane();
-    claimedTerritory.forEach((tiles, allianceId) => {
-      const alliance = alliances.find((a) => a.id === allianceId);
-      if (alliance && tiles.size > 0) {
-        this.drawTerritory(alliance, tiles, globallyClaimedTiles);
-      }
-    });
+    if (perfEnabled) {
+      const t0 = performance.now();
+      claimedTerritory.forEach((tiles, allianceId) => {
+        const alliance = alliances.find((a) => a.id === allianceId);
+        if (alliance && tiles.size > 0) {
+          this.drawTerritory(alliance, tiles, globallyClaimedTiles);
+        }
+      });
+      msTerritory = performance.now() - t0;
+    } else {
+      claimedTerritory.forEach((tiles, allianceId) => {
+        const alliance = alliances.find((a) => a.id === allianceId);
+        if (alliance && tiles.size > 0) {
+          this.drawTerritory(alliance, tiles, globallyClaimedTiles);
+        }
+      });
+    }
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
     // Viewport culling: compute visible world bounds using ALL 4 screen corners
     const [tlx, tly] = screenToWorld(0, 0, camera);
@@ -213,14 +233,28 @@ export class WebGLRenderer {
         o.y + o.h - 1 < minY
       );
 
-    for (const building of baseBuildings) {
-      if (inView(building)) this.drawObject(building);
-    }
-    for (const building of userBuildings) {
-      if (inView(building)) this.drawObject(building);
-    }
-    for (const player of players) {
-      if (inView(player)) this.drawObject(player, 1.0);
+    if (perfEnabled) {
+      const t0 = performance.now();
+      for (const building of baseBuildings) {
+        if (inView(building)) this.drawObject(building);
+      }
+      for (const building of userBuildings) {
+        if (inView(building)) this.drawObject(building);
+      }
+      for (const player of players) {
+        if (inView(player)) this.drawObject(player, 1.0);
+      }
+      msObjects = performance.now() - t0;
+    } else {
+      for (const building of baseBuildings) {
+        if (inView(building)) this.drawObject(building);
+      }
+      for (const building of userBuildings) {
+        if (inView(building)) this.drawObject(building);
+      }
+      for (const player of players) {
+        if (inView(player)) this.drawObject(player, 1.0);
+      }
     }
     if (selection) {
       switch (selection.type) {
@@ -235,29 +269,54 @@ export class WebGLRenderer {
       }
     }
     if (images.size > 0) {
-      const spriteProjectionMatrix = this.calculateSpriteProjectionMatrix();
-      gl.uniformMatrix3fv(
-        this.projectionUniformLocation,
-        false,
-        spriteProjectionMatrix,
-      );
-      for (const building of baseBuildings) {
-        if (!inView(building)) continue;
-        const image = building.imgKey ? images.get(building.imgKey) : null;
-        if (image && building.anchorTile) {
-          this.drawImageAsSprite(camera, image, building);
+      if (perfEnabled) {
+        const t0 = performance.now();
+        const spriteProjectionMatrix = this.calculateSpriteProjectionMatrix();
+        gl.uniformMatrix3fv(
+          this.projectionUniformLocation,
+          false,
+          spriteProjectionMatrix,
+        );
+        for (const building of baseBuildings) {
+          if (!inView(building)) continue;
+          const image = building.imgKey ? images.get(building.imgKey) : null;
+          if (image && building.anchorTile) {
+            this.drawImageAsSprite(camera, image, building);
+          }
         }
+        gl.uniformMatrix3fv(
+          this.projectionUniformLocation,
+          false,
+          worldProjectionMatrix,
+        );
+        msSprites = performance.now() - t0;
+      } else {
+        const spriteProjectionMatrix = this.calculateSpriteProjectionMatrix();
+        gl.uniformMatrix3fv(
+          this.projectionUniformLocation,
+          false,
+          spriteProjectionMatrix,
+        );
+        for (const building of baseBuildings) {
+          if (!inView(building)) continue;
+          const image = building.imgKey ? images.get(building.imgKey) : null;
+          if (image && building.anchorTile) {
+            this.drawImageAsSprite(camera, image, building);
+          }
+        }
+        gl.uniformMatrix3fv(
+          this.projectionUniformLocation,
+          false,
+          worldProjectionMatrix,
+        );
       }
-      gl.uniformMatrix3fv(
-        this.projectionUniformLocation,
-        false,
-        worldProjectionMatrix,
-      );
     }
     const isDesktop = window.matchMedia('(min-width: 769px)').matches;
     const isPlacingSomething =
       isPlacingPlayer || !!buildMode.selectedBuildingType;
     if (isPlacingSomething) {
+      let ghostStart = 0;
+      if (perfEnabled) ghostStart = performance.now();
       const flickerPeriod = AppConfig.interactions.GHOST_FLICKER_PERIOD_MS;
       const tri = 1 - Math.abs(((time / flickerPeriod) % 2) - 1);
       const eased = 0.5 - 0.5 * Math.cos(tri * Math.PI);
@@ -374,6 +433,19 @@ export class WebGLRenderer {
           gl.drawArrays(gl.LINES, 0, positions.length / 2);
         }
       }
+      if (perfEnabled) msGhost = performance.now() - ghostStart;
+    }
+    if (perfEnabled) {
+      const total = performance.now() - frameStart;
+      usePerfStore.getState().record({
+        lastFrameMs: total,
+        phases: {
+          territory: msTerritory,
+          objects: msObjects,
+          sprites: msSprites,
+          ghost: msGhost,
+        },
+      });
     }
   }
 
@@ -570,7 +642,7 @@ export class WebGLRenderer {
     gl.uniform1f(this.isDrawingTerritoryLocation, 0.0);
     gl.uniform1f(this.isDrawingObjectLocation, 1.0);
     const borderSegments: number[] = [];
-    const inset = 0.01; // Slight inset to stay inside territory but keep corners touching
+    const inset = 0.015; // Slight inset to stay inside territory but keep corners touching
     tiles.forEach((coordStr) => {
       const [x, y] = coordStr.split(',').map(Number);
       const upKey = `${x},${y - 1}`;
