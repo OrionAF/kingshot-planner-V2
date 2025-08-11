@@ -14,6 +14,8 @@ import { EditPlayerModal } from './features/PlayerManager/EditPlayerModal';
 import { BuildPanel } from './features/Build/BuildPanel';
 import { useAssetStore } from './state/useAssetStore';
 import { usePerfStore } from './state/usePerfStore';
+import { useMetaStore } from './state/useMetaStore';
+import { initUnifiedPersistence } from './state/unifiedPersist';
 
 function PerfOverlay() {
   const { enabled, lastFrameMs, fps, avgFps, timings } = usePerfStore();
@@ -68,15 +70,20 @@ function PerfOverlay() {
 function App() {
   // Trigger asset loading on startup
   const { isLoading, error } = useAssetStore();
+  const { showPatchNotes, dismissPatchNotes } = useMetaStore();
   useEffect(() => {
     useAssetStore.getState().loadAssets();
+    const disposePersist = initUnifiedPersistence();
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'F8') {
         usePerfStore.getState().toggle();
       }
     };
     window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    return () => {
+      window.removeEventListener('keydown', handler);
+      disposePersist?.();
+    };
   }, []);
 
   return (
@@ -96,6 +103,27 @@ function App() {
       <BottomToolbar />
       <EditPlayerModal />
       <PerfOverlay />
+      {showPatchNotes && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 60,
+            right: 20,
+            background: '#222',
+            color: '#fff',
+            padding: '12px 16px',
+            borderRadius: 8,
+            zIndex: 1100,
+            maxWidth: 300,
+          }}
+        >
+          <strong>Patch Notes</strong>
+          <p style={{ fontSize: 12, lineHeight: 1.4 }}>
+            New version loaded. (Placeholder patch notes). Click to dismiss.
+          </p>
+          <button onClick={dismissPatchNotes}>Dismiss</button>
+        </div>
+      )}
     </main>
   );
 }

@@ -1,7 +1,7 @@
 // Phase 0 foundational shared types & enums
 
 export interface Bookmark {
-  id: string; // stable uuid or generated id
+  id: string; // stable uuid or generated id (stringified)
   x: number;
   y: number;
   label: string;

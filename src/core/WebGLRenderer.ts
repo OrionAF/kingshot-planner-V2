@@ -7,7 +7,9 @@ import { useMapStore } from '../state/useMapStore';
 import { useSelectionStore } from '../state/useSelectionStore';
 import { useUiStore } from '../state/useUiStore';
 import { usePerfStore } from '../state/usePerfStore';
+import { useOverwatchStore } from '../state/useOverwatchStore';
 import type { Alliance, BaseBuilding } from '../types/map.types';
+import { layerManager } from './layers';
 import { screenToWorld, worldToScreen } from './coordinate-utils';
 import {
   mapFragmentShaderSource,
@@ -170,6 +172,7 @@ export class WebGLRenderer {
       claimedTerritory,
       globallyClaimedTiles,
     } = useMapStore.getState();
+    const { settings: overwatch } = useOverwatchStore.getState();
     const {
       isPlacingPlayer,
       playerToPlace,
@@ -197,6 +200,8 @@ export class WebGLRenderer {
     gl.uniform1f(this.gridThicknessLocation, AppConfig.webgl.gridThickness);
     gl.uniform1f(this.gridDarknessLocation, AppConfig.webgl.gridDarkness);
     this.drawMapPlane();
+    // Invoke external registered layers (e.g., overlays/dev) between base map and built-in passes
+    layerManager.draw(time);
     if (perfEnabled) {
       const t0 = performance.now();
       claimedTerritory.forEach((tiles, allianceId) => {
@@ -239,6 +244,10 @@ export class WebGLRenderer {
         if (inView(building)) this.drawObject(building);
       }
       for (const building of userBuildings) {
+        // Overwatch category filtering (user placed buildings)
+        const def = AppConfig.BUILDING_CATALOG[building.type];
+        const cat = def?.category;
+        if (cat && overwatch[cat] === false) continue;
         if (inView(building)) this.drawObject(building);
       }
       for (const player of players) {
@@ -250,6 +259,9 @@ export class WebGLRenderer {
         if (inView(building)) this.drawObject(building);
       }
       for (const building of userBuildings) {
+        const def = AppConfig.BUILDING_CATALOG[building.type];
+        const cat = def?.category;
+        if (cat && overwatch[cat] === false) continue;
         if (inView(building)) this.drawObject(building);
       }
       for (const player of players) {

@@ -263,3 +263,40 @@ export const AppConfig = {
     maxAttempts: 14, // Attempts to adjust before falling back to unused palette entry
   },
 };
+
+/**
+ * Segmented configuration groups (Phase 0 theming/config refactor baseline).
+ * These wrap existing AppConfig properties without breaking legacy references.
+ * Future work can migrate call sites from AppConfig.* to Config.* granular paths.
+ */
+export const Config = {
+  ui: {
+    colors: {
+      textPrimary: AppConfig.textColor,
+      textAlt: AppConfig.textColorAlt,
+      selection: AppConfig.selectionColor,
+      ping: AppConfig.pingColor,
+    },
+  },
+  interaction: {
+    baseScale: AppConfig.baseScale,
+    camera: AppConfig.camera,
+    ghost: AppConfig.interactions, // ghost placement animation settings
+  },
+  rendering: {
+    tile: { w: AppConfig.tileW, h: AppConfig.tileH },
+    webgl: AppConfig.webgl,
+    territory: AppConfig.territory,
+    biomes: {
+      colors: AppConfig.biomeColors,
+      regions: AppConfig.biomeRegions,
+    },
+  },
+  data: {
+    buildingCatalog: AppConfig.BUILDING_CATALOG,
+    alliancePalette: AppConfig.ALLIANCE_COLOR_PALETTE,
+  },
+  perf: {
+    enableDevMode: AppConfig.enableDevMode,
+  },
+};

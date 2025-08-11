@@ -51,3 +51,5 @@ Thumbs.db
 # Keep these txt backups out of git since they are for our specific workflow
 *.ts.txt
 backlog.md
+High-Level Rewrite Roadmap.md
+PHASED_ROADMAP_STATUS.md
